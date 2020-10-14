@@ -8,8 +8,8 @@ python_docker:
 
 
 python_venv:
-	python -m venv quickstart_venv && \
- 		./quickstart_venv/bin/pip install -r python/requirements.txt && \
- 		set -a && source .env && set +a && ./quickstart_venv/bin/python -m python.src.server
+	python3 -m venv quickstart_venv && \
+ 		./quickstart_venv/bin/pip3 install -r python/requirements.txt && \
+ 		set -a && source .env && set +a && ./quickstart_venv/bin/python3 -m python.src.server
 
 
