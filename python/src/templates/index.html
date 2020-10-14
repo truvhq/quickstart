@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta name="theme-color" content="#000000" />
+
+    <title>employment verification applicant portal</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <script src="https://cdn.citadelid.com/bridge.js"></script>
+    <style>
+      header {
+        position: fixed;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        background: white;
+        padding: 1rem;
+      }
+
+      header img {
+        height: 3rem;
+      }
+      body {
+        padding: 40px;
+        margin: 0;
+        margin-top: 4rem;
+        background: #f1f4f9;
+      }
+      button {
+        border: 0;
+        background: #15aa63;
+        border-radius: 6px;
+        color: #ffffff;
+        cursor: pointer;
+        font-family: Open Sans;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 32px;
+        padding: 12px 60px;
+        outline: 0;
+        transition: all 0.15s ease-out;
+        display: block;
+      }
+
+      button:hover {
+        background: #179463;
+      }
+
+      .spinnerContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .hidden {
+        visibility: hidden;
+      }
+
+      .row {
+        justify-content: space-between;
+      }
+
+      .titleContainer {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 2rem;
+      }
+
+      .titleContainer .img {
+        border-radius: 50%;
+        background: #365bf0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        color: white;
+        margin-right: 1rem;
+      }
+
+      .titleContainer svg {
+        width: 50%;
+        heigt: 50%;
+      }
+
+      form {
+        background: white;
+        padding: 2rem 5rem;
+      }
+
+      .formSection {
+        margin-bottom: 2rem;
+      }
+
+      #homeAdrressInput {
+        margin-bottom: 1rem;
+      }
+
+      .historyText {
+        display: block;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <script>
+      function getApiRequests(apiEnpoint) {
+        const headers = {
+          'Content-Type': 'application/json;charset=UTF-8',
+        };
+
+        const getAccessToken = async (publicToken) => {
+          const response = await (await fetch(apiEnpoint + 'createAccessToken', {
+            method: 'post',
+            body: JSON.stringify({ public_token: publicToken }),
+            headers,
+          })).json()
+
+          return response['access_token'];
+        };
+
+        /**
+         * @return {Promise<EmploymentItem[]>}
+         */
+        const getVerificationInfoByToken = async (access_token) => {
+          const response = await fetch(apiEnpoint + `getVerifications/${access_token}`, {
+            method: 'get',
+            headers,
+          }).then((r) => r.json());
+          return response.employments;
+        };
+
+        return {
+          getAccessToken,
+          getVerificationInfoByToken,
+        };
+      }
+
+      (function () {
+        const apiRequests = getApiRequests('http://127.0.0.1:5000/');
+
+        const bridge = CitadelBridge.init({
+          clientName: 'Citadel Quickstart',
+          companyMappingId: null,
+          key: '{{ PUBLIC_KEY }}',
+          product: 'employment OR income',
+          trackingInfo: 'any data for tracking current user',
+          onLoad: function () {
+            console.log('loaded');
+          },
+          onEvent: function (eventType) {
+            console.log('event: ', eventType);
+
+            if (eventType === 'flow_fill_manually') {
+              renderEmploymentHistory([{ company: { address: {} } }]);
+            }
+          },
+          onSuccess: async function (token) {
+            console.log('token: ', token);
+            const content = document.querySelector('.spinnerContainer');
+
+            content.classList.remove('hidden');
+            let accessToken;
+            let verificationInfo;
+            try {
+              accessToken = await apiRequests.getAccessToken(token);
+              verificationInfo = await apiRequests.getVerificationInfoByToken(accessToken);
+            } catch(e) {
+              console.error(e)
+              content.classList.add('hidden');
+              return;
+            }
+            content.classList.add('hidden');
+
+            if (!verificationInfo.length) {
+              return;
+            }
+
+            setUserInfo(verificationInfo[0]);
+
+            renderEmploymentHistory(verificationInfo);
+          },
+          onError: function () {
+            console.log('error');
+          },
+          onClose: function () {
+            console.log('closed');
+          },
+        });
+        window.bridge = bridge;
+      })();
+    </script>
+
+    <div class="spinnerContainer hidden">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+
+    <header>
+      <div class="container">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1280px-Amazon_logo.svg.png"
+          alt=""
+        />
+      </div>
+    </header>
+
+    <div id="content" class="container">
+      <div class="titleContainer">
+        <div class="img">
+          <svg viewBox="0 0 16 16" class="bi bi-person-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path
+              fill-rule="evenodd"
+              d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm4.854-7.85a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h2>Enter Your Information</h2>
+          <span>All fields are required. Please checck for accuracy and spelling to avoid delays</span>
+        </div>
+      </div>
+      <form>
+        <div class="formSection">
+          <h3>Personal Information</h3>
+
+          <div class="form-group">
+            <label for="firstNameInput">First name</label>
+            <input required type="text" class="form-control" id="firstNameInput" placeholder="First Name" />
+          </div>
+
+          <div class="form-group">
+            <label for="middleNameInput">Middle Name</label>
+            <input required type="text" class="form-control" id="middleNameInput" placeholder="Middle Name" />
+          </div>
+
+          <div class="form-group">
+            <label for="lastNameInput">Last name</label>
+            <input required type="text" class="form-control" id="lastNameInput" placeholder="Last Name" />
+          </div>
+
+          <div class="form-group">
+            <label for="homeAdrressInput">Current home address</label>
+            <input required type="text" class="form-control" id="homeAdrressInput" placeholder="Street Address" />
+
+            <div class="row row-cols-1 row-cols-md-4">
+              <div class="col">
+                <input required type="text" class="form-control" id="cityInput" placeholder="City" />
+              </div>
+
+              <div class="col">
+                <input required type="text" class="form-control" id="stateInput" placeholder="State" />
+              </div>
+
+              <div class="col">
+                <input required type="text" class="form-control" id="zipInput" placeholder="Zipcode" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Date of Birth</label>
+
+            <div class="row row-cols-1 row-cols-md-4">
+              <div class="col">
+                <input required type="text" class="form-control" id="birthMonth" placeholder="Month" />
+              </div>
+
+              <div class="col">
+                <input required type="text" class="form-control" id="birthDay" placeholder="Day" />
+              </div>
+
+              <div class="col">
+                <input required type="text" class="form-control" id="birthYear" placeholder="Year" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ssnInput">Social Security Number (SSN)</label>
+            <input required type="text" class="form-control" id="ssnInput" placeholder="Digits, No Dashes" />
+          </div>
+        </div>
+
+        <div class="formSection historyContainer">
+          <h3>Employment History</h3>
+          <span class="historyText">Please provide up to 2 recent employers within the last 7 years</span>
+
+          <div id="history"></div>
+          <button type="button" id="button" onclick="bridge.open()">
+            Verify employment
+          </button>
+        </div>
+
+        <div class="formSection">
+          <h3>Applicant Consent & E-Signature:</h3>
+
+          <div class="custom-control custom-checkbox">
+            <input required type="checkbox" class="custom-control-input" id="agreement" />
+            <label class="custom-control-label" for="agreement"
+              >I am providing my electronic signature to certify all information entered is complete accurate.
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">I agree, submit</button>
+      </form>
+    </div>
+
+    <script>
+      /**
+       * @typedef {Object} Address
+       * @property {string | null} zip
+       * @property {string | null} city
+       * @property {string | null} state
+       * @property {string | null} street
+       * @property {string | null} country
+       */
+
+      /**
+       * @typedef {Object} Company
+       * @property {Address | null} address
+       * @property {string | null} name
+       * @property {string | null} phone
+       */
+
+      /**
+       * @typedef {Object} Profile
+       * @property {string | null} first_name
+       * @property {string | null} last_name
+       * @property {string | null} middle_initials
+       * @property {string | null} email
+       * @property {string | null} ssn
+       * @property {string | null} date_of_birth
+       */
+
+      /**
+       * @typedef {Object} EmploymentItem
+       * @property {string} id
+       * @property {string} job_title
+       * @property {string} job_type
+       * @property {string} start_date
+       * @property {string} end_date
+       * @property {Company} company
+       * @property {Profile} profile
+       */
+
+      /**
+       * @param {string} id
+       * @param {string} value
+       */
+      function setFormItemValue(id, value) {
+        const element = document.querySelector(`#${id}`);
+        if (element && value) {
+          element.value = value;
+          element.setAttribute('readOnly', true);
+        }
+      }
+
+      /**
+       *
+       * @param {EmploymentItem} employmentItem
+       */
+      function setUserInfo(employmentItem) {
+        setFormItemValue('firstNameInput', employmentItem.profile.first_name);
+        setFormItemValue('middleNameInput', employmentItem.profile.middle_initials);
+        setFormItemValue('lastNameInput', employmentItem.profile.last_name);
+
+        setFormItemValue('ssnInput', employmentItem.profile.ssn);
+
+        const [year, month, day] = employmentItem.profile.date_of_birth.split('-');
+
+        setFormItemValue('birthDay', day);
+        setFormItemValue('birthMonth', month);
+        setFormItemValue('birthYear', year);
+      }
+
+      /**
+       * @param {string} id
+       * @param {string | undefined} title
+       * @param {string | undefined} value
+       */
+      function createInput(id, value, title) {
+        const container = document.createElement('div');
+        const label = title && document.createElement('label');
+        const input = document.createElement('input');
+
+        container.classList.add('form-group');
+        input.id = id;
+        input.classList.add('form-control');
+
+        if (value) {
+          input.value = value.replace(/_/g, ' ');
+          input.setAttribute('readOnly', true);
+        }
+        if (label) {
+          label.setAttribute('for', id);
+          label.innerText = title;
+        }
+
+        label && container.appendChild(label);
+        container.appendChild(input);
+
+        return container;
+      }
+
+      /**
+       *
+       * @param {EmploymentItem} employment
+       */
+      function createEmploymentCard(employment) {
+        const container = document.createElement('div');
+
+        const company = employment.company;
+
+        const name = createInput(`${company.name}-name`, company.name, 'Employer Name');
+
+        const phone = createInput(`${company.name}-phone`, company.phone);
+
+        const city = createInput(`${company.name}-city`, company.address.city);
+
+        const state = createInput(`${company.name}-state`, company.address.state);
+
+        const phoneAndLocation = document.createElement('div');
+        phoneAndLocation.innerHTML = '<label>Employer Phone and Location</label>';
+
+        phoneAndLocation.appendChild(phone);
+        phoneAndLocation.appendChild(city);
+        phoneAndLocation.appendChild(state);
+
+        const positionType = createInput(`${company.name}-positionType`, employment.job_type, 'Position Type');
+        const jobTitle = createInput(`${company.name}-jobTitle`, employment.job_title, 'Job Title');
+
+        const [startY, startM] = (employment.start_date || '').split('-');
+        const [endY, endM] = (employment.end_date || '').split('-');
+
+        const startMonth = createInput(`${company.name}-startMonth`, startM);
+        const startYear = createInput(`${company.name}-startYear`, startY);
+
+        const endMonth = createInput(`${company.name}-endMonth`, endM);
+        const endYear = createInput(`${company.name}-endYear`, endY);
+
+        const jobContainer = document.createElement('div');
+        const jobPeriodsContainer = document.createElement('div');
+        const startPeriodContainer = document.createElement('div');
+        const endPeriodContainer = document.createElement('div');
+
+        startPeriodContainer.innerHTML = '<label>Employment Start Date</label>';
+        startPeriodContainer.appendChild(startMonth);
+        startPeriodContainer.appendChild(startYear);
+
+        endPeriodContainer.innerHTML = '<label>Employment End Date</label>';
+        endPeriodContainer.appendChild(endMonth);
+        endPeriodContainer.appendChild(endYear);
+
+        positionType.classList.add('col');
+        jobTitle.classList.add('col');
+        startPeriodContainer.classList.add('col');
+        endPeriodContainer.classList.add('col');
+
+        jobContainer.classList.add('row', 'row-cols-1', 'row-cols-md-2');
+        jobPeriodsContainer.classList.add('row', 'row-cols-1', 'row-cols-md-2');
+        jobPeriodsContainer.appendChild(startPeriodContainer);
+        jobPeriodsContainer.appendChild(endPeriodContainer);
+        jobContainer.appendChild(positionType);
+        jobContainer.appendChild(jobTitle);
+
+        container.appendChild(name);
+        container.appendChild(phoneAndLocation);
+        container.appendChild(jobContainer);
+        container.appendChild(jobPeriodsContainer);
+
+        return container;
+      }
+
+      /**
+       *
+       * @param {EmploymentItem[]} employments
+       */
+      function renderEmploymentHistory(employments) {
+        const result = employments.map(createEmploymentCard).reduce((acc, cur) => {
+          acc.appendChild(cur);
+          return acc;
+        }, document.createDocumentFragment());
+
+        const historyContainer = document.querySelector('#history');
+        const button = document.querySelector('#button');
+
+        historyContainer.appendChild(result);
+        button.innerText = 'Add employer';
+      }
+    </script>
+  </body>
+</html>
