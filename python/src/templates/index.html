@@ -118,6 +118,17 @@
       h3 {
         margin-bottom: 1rem;
       }
+
+      .container {
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e2e2e2;
+            margin-bottom: 30px;
+      }
+        .container:last-child {
+            padding-bottom: 0px;
+            border-bottom: 0px solid #e2e2e2;
+            margin-bottom: 0px;
+        }
     </style>
   </head>
   <body>
@@ -160,24 +171,26 @@
       (function () {
         const apiRequests = getApiRequests('http://127.0.0.1:5000/');
 
+        let successClosing
+
         const bridge = CitadelBridge.init({
           clientName: 'Citadel Quickstart',
           companyMappingId: null,
-          key: '{{ PUBLIC_KEY }}',
-          product: 'employment OR income',
+          key: '{{ public_key }}',
+          product: 'employment',
           trackingInfo: 'any data for tracking current user',
           onLoad: function () {
             console.log('loaded');
+            successClosing = null
           },
           onEvent: function (eventType) {
             console.log('event: ', eventType);
-
-            if (eventType === 'flow_fill_manually') {
-              renderEmploymentHistory([{ company: { address: {} } }]);
-            }
           },
           onSuccess: async function (token) {
             console.log('token: ', token);
+
+            successClosing = true
+
             const content = document.querySelector('.spinnerContainer');
 
             content.classList.remove('hidden');
@@ -206,6 +219,9 @@
           },
           onClose: function () {
             console.log('closed');
+            if (successClosing !== true) {
+              renderEmploymentHistory([{ company: { address: {} } }]);
+            }
           },
         });
         window.bridge = bridge;
@@ -432,6 +448,7 @@
        */
       function createEmploymentCard(employment) {
         const container = document.createElement('div');
+        container.classList.add("container")
 
         const company = employment.company;
 

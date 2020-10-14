@@ -10,6 +10,7 @@ from .naive_api_client import NaiveApiClient
 app = Flask(__name__)
 CORS(app)
 
+public_key = os.environ.get('API_PUBLIC_KEY')
 secret = os.environ.get('API_SECRET')
 client_id = os.environ.get('API_CLIENT_ID')
 
@@ -19,13 +20,18 @@ api_client = NaiveApiClient(
     client_id=client_id,
 )
 
-if not secret or not client_id:
+if not secret or not client_id or not public_key:
     raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID'")
 
 print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
       api_client.API_URL, "\n",
       json.dumps(api_client.API_HEADERS, indent=4), "\n",
       "=" * 94, "\n", )
+
+
+@app.context_processor
+def inject_public_key():
+    return dict(public_key=public_key,)
 
 
 @app.route('/')
@@ -53,4 +59,5 @@ def get_verification_info_by_token(access_token: str):
 
 
 if __name__ == '__main__':
+    app.debug = True
     app.run()
