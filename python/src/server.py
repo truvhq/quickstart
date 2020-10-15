@@ -21,7 +21,7 @@ api_client = NaiveApiClient(
 )
 
 if not secret or not client_id or not public_key:
-    raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID'")
+    raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID' and 'API_PUBLIC_KEY'")
 
 print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
       api_client.API_URL, "\n",
