@@ -25,6 +25,7 @@ if not secret or not client_id or not public_key:
 
 print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
       api_client.API_URL, "\n",
+      "API_PUBLIC_KEY", public_key, "\n",
       json.dumps(api_client.API_HEADERS, indent=4), "\n",
       "=" * 94, "\n", )
 

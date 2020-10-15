@@ -10,6 +10,7 @@ After you have to write your `SECRET_KEY` and `CLIENT_ID` to the `.env` file.
 Content of `.env` have to look like 
 ```
 API_URL=https://prod.citadelid.com/v1/
+API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 ```
@@ -54,6 +55,7 @@ After you have to write your `SECRET_KEY` and `CLIENT_ID` to the `.env` file.
 Content of `.env` have to look like 
 ```
 API_URL=https://prod.citadelid.com/v1/
+API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 ```
