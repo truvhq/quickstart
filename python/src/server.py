@@ -32,7 +32,7 @@ print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
 
 @app.context_processor
 def inject_public_key():
-    return dict(public_key=public_key,)
+    return dict(public_key=public_key, )
 
 
 @app.route('/')
