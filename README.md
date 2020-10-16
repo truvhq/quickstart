@@ -15,9 +15,9 @@ You have two options - running with `docker` and `docker-compose` or starting wi
 -  cd quickstart
 -  make env
 
-After you have to write your `SECRET_KEY` and `CLIENT_ID` to the `.env` file.
+After you have to write your `SECRET_KEY`, `CLIENT_ID` and `PUBLIC_KEY` to the `.env` file.
 
-Content of `.env` have to look like 
+Content of `.env` has to look like this:
 ```
 API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
@@ -51,17 +51,16 @@ web_1  |  * Debugger PIN: 593-914-178
 To access the app, open http://127.0.0.1:5000/ in your browser.
 
 
-## Quickstart with only python and virtual env
+## Quickstart with python and virtual env
 *Requirements*: `python --version` must print into console `Python 3.8.X`
-if you have an alias for python of 3.8 you must 
 
 - git clone https://github.com/citadelid/quickstart
 - cd quickstart
 - make env
 
-After you have to write your `SECRET_KEY` and `CLIENT_ID` to the `.env` file.
+After you have to write your `SECRET_KEY`, `CLIENT_ID` and `PUBLIC_KEY` to the `.env` file.
 
-Content of `.env` have to look like 
+Content of `.env` have to look like this:
 ```
 API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
@@ -96,11 +95,13 @@ To access the app, open http://127.0.0.1:5000/ in your browser.
 ## Overview
 Quickstart app emulates the experience of an applicant going through a background check and visiting the applicant portal.
 
-Before using Citadel for verification, applicants filled out the form. To streamline the process and make employment verification easy and instant, we "hide" the form behind the button. 
+Before using Citadel for verification, applicants filled out the form. 
 
-If the verification is successful via Citadel, then we will show to the applicant the data that we found in their payroll account. 
+To streamline the process and make employment verification easy and instant, we "hide" the form behind the button. 
 
-If the verification is not successful or the applicant decided to exit Citadel's widget, the applicant will see the form, fill it out and the verification can be done via an existing verification process.
+If the verification is successful via Citadel, then we show to the applicant the data that we found in their payroll account. 
+
+If the verification isn't successful or the applicant decided to exit Citadel's widget, the applicant will see the form, fill it out and the verification can be done via an existing verification process.
 
 ## Successful verification
 
@@ -115,7 +116,7 @@ password: goodpassword
 
 Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
 
-The API call will be done and the data will be loaded into the fields of the form.
+The API call will be executed and the data will be loaded into the fields of the form.
 
 ## No verification
 
