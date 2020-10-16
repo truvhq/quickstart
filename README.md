@@ -91,7 +91,7 @@ API_CLIENT_ID=<YOUR CLIENT_ID HERE>
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-# Run your verifications
+# Run you first verification
 ## Overview
 Quickstart app emulates the experience of an applicant going through a background check and visiting the applicant portal.
 
