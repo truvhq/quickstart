@@ -1,5 +1,15 @@
-# Quickstart with docker/docker-compose
-*prerequirements*: `docker` and `docker-compose` available
+# Introduction
+Let's get you started with Citadel by walking through this Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
+
+You'll have two different API keys (`client_id` and `access_key`), and we'll start in the Sandbox environment. 
+
+
+# Set up the Quickstart
+Once you have your API keys, it's time to run the Citadel Quickstart app locally.
+You have two options - running with `docker` and `docker-compose` or starting with python and virtual env
+
+## Quickstart with docker/docker-compose
+*Requirements*: `docker` and `docker-compose` are available.
 
 -  git clone https://github.com/citadelid/quickstart
 -  cd quickstart
@@ -41,8 +51,8 @@ web_1  |  * Debugger PIN: 593-914-178
 open http://127.0.0.1:5000/ in browser
 
 
-# Quickstart with only python and virtual env
-*prerequirements*: `python --version` must print into console something like`Python 3.8.X`
+## Quickstart with only python and virtual env
+*Requirements*: `python --version` must print into console something like`Python 3.8.X`
 if you have an alias for python of 3.8 you must 
 
 
@@ -79,5 +89,47 @@ API_CLIENT_ID=<YOUR CLIENT_ID HERE>
    Use a production WSGI server instead.
  * Debug mode: off
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+```
+
+# Run your verifications
+## Overview
+Quickstart app emulates the experience of an applicant going through a background check and visiting the applicant portal.
+
+Before using Citadel for verification, applicants filled out the form. To streamline the process and make employment verification easy and instant, we "hide" the form behind the button. 
+
+If the verification is successful via Citadel, then we will show to the applicant the data that we found in their payroll account. 
+
+If the verification is not successful or the applicant decided to exit Citadel's widget, the applicant will see the form, fill it out and the verification can be done via an existing verification process.
+
+## Successful verification
+
+After opening the Quickstart app running locally, click the `Verify employment` button, search for a company, eg `Facebook` and select any provider. 
+
+Use the Sandbox credentials to simulate a successful login.
 
 ```
+username: goodlogin
+password: goodpassword
+```
+
+Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
+
+The API call will be done and the data will be loaded into the fields of the form.
+
+## No verification
+
+Now click `Add employer` button, search for a company, eg `Facebook` and select any provider. 
+
+Click exit icon at the top right of the widget and you'll see the empty form.
+
+# What happened under the hood
+## Token exchange flow
+
+
+
+## API call
+
+
+
+
+
