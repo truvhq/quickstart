@@ -182,7 +182,6 @@ First we initiate the widget using your `public_key`.
         });
         window.bridge = bridge;
       })();
-    </script>
 ```
 
 Once widget is initiated, we receive `public_token` that can be exchange for `access_token` that will be used to access data via API and that will be unique for this verification.
@@ -208,7 +207,7 @@ Once widget is initiated, we receive `public_token` that can be exchange for `ac
 ```
 
 ## API calls
-After receiving the `access_token` we can now make API calls and pass this data to the frontend to show in the app.
+After receiving the `access_token` we can now make API calls and pass the data to the frontend to show in the app.
 
 ```
     def get_verification_info_by_token(self, access_token: str) -> Any:
@@ -223,8 +222,8 @@ After receiving the `access_token` we can now make API calls and pass this data 
             headers=self.API_HEADERS,
         ).json()
 ```
-When verification was successful, we show the form and populate it with data that we received from the backend
 
+When verification was successful, we show the form and populate it with data that we received from the backend:
 ```
           onSuccess: async function (token) {
             console.log('token: ', token);
@@ -256,7 +255,7 @@ When verification was successful, we show the form and populate it with data tha
           },
 ```
 
-And if the widget was closed, we show the form that the applicant call fill out.
+And if the widget was closed, we show the form that the applicant can fill out:
 
 ```
           onClose: function () {
