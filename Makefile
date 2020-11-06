@@ -4,7 +4,7 @@ env:
 	test -f .env || cp .env.example .env
 
 python_docker:
-	docker-compose --file python/docker-compose.yml up --build
+	docker-compose --file docker-compose.yml up --build
 
 
 python_venv:
