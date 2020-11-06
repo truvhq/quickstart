@@ -2,7 +2,7 @@ from typing import TypedDict, List, Any
 
 import requests
 
-# https://docs.citadelid.com/#api-calls
+# https://docs.citadelid.com
 # Header which using in private api calls
 ApiHeaders = TypedDict('ApiHeaders', {
     'X-Access-Secret': str,
@@ -55,9 +55,9 @@ class NaiveApiClient:
         ).json()
         return tokens['access_tokens'][0]
 
-    def get_verification_info_by_token(self, access_token: str) -> Any:
+    def get_employment_info_by_token(self, access_token: str) -> Any:
         """
-        https://docs.citadelid.com/#get-results-of-income-verification
+        https://docs.citadelid.com/#employment-verification
         :param access_token:
         :return:
         """
@@ -69,6 +69,24 @@ class NaiveApiClient:
 
         return requests.post(
             self.API_URL + 'verifications/employments/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+
+    def get_income_info_by_token(self, access_token: str) -> Any:
+        """
+        https://docs.citadelid.com/#income-verification
+        :param access_token:
+        :return:
+        """
+
+        class VerificationRequest(TypedDict):
+            access_token: str
+
+        request_data: VerificationRequest = {'access_token': access_token}
+
+        return requests.post(
+            self.API_URL + 'verifications/incomes/',
             json=request_data,
             headers=self.API_HEADERS,
         ).json()

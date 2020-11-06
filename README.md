@@ -23,6 +23,7 @@ API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
+API_PRODUCT_TYPE=employment OR income
 ```
 
 - make python_docker
@@ -66,6 +67,7 @@ API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
+API_PRODUCT_TYPE=employment OR income
 ```
 
 - make python_venv
@@ -93,11 +95,11 @@ To access the app, open http://127.0.0.1:5000/ in your browser.
 
 # Run you first verification
 ## Overview
-Quickstart app emulates the experience of an applicant going through a background check and visiting the applicant portal.
+Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
 
 Before using Citadel for verification, applicants filled out the form. 
 
-To streamline the process and make employment verification easy and instant, we "hide" the form behind the button. 
+To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button. 
 
 If the verification is successful via Citadel, then we show to the applicant the data that we found in their payroll account. 
 
@@ -105,7 +107,7 @@ If the verification isn't successful or the applicant decided to exit Citadel's 
 
 ## Successful verification
 
-After opening the Quickstart app running locally, click the `Verify employment` button, search for a company, eg `Facebook` and select any provider. 
+After opening the Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, eg `Facebook` and select any provider. 
 
 Use the Sandbox credentials to simulate a successful login.
 
@@ -134,7 +136,7 @@ First we initiate the widget using your `public_key`.
           clientName: 'Citadel Quickstart',
           companyMappingId: null,
           key: '{{ public_key }}',
-          product: 'employment',
+          product: '{{ product_type}}',
           trackingInfo: 'any data for tracking current user',
           onLoad: function () {
             console.log('loaded');
@@ -151,11 +153,9 @@ First we initiate the widget using your `public_key`.
             const content = document.querySelector('.spinnerContainer');
 
             content.classList.remove('hidden');
-            let accessToken;
             let verificationInfo;
             try {
-              accessToken = await apiRequests.getAccessToken(token);
-              verificationInfo = await apiRequests.getVerificationInfoByToken(accessToken);
+              verificationInfo = await apiRequests.getVerificationInfoByToken(token);
             } catch(e) {
               console.error(e)
               content.classList.add('hidden');
@@ -187,28 +187,8 @@ First we initiate the widget using your `public_key`.
 
 Once widget is initiated, we receive `public_token` that can be exchange for `access_token` that will be used to access data via API and that will be unique for this verification.
 
-```
-   def get_access_token(self, public_token: str) -> str:
-        class AccessTokenRequest(TypedDict):
-            public_tokens: List[str]
-
-        class AccessTokenResponse(TypedDict):
-            access_tokens: List[str]
-
-        request_data: AccessTokenRequest = {
-            'public_tokens': [public_token],
-        }
-
-        tokens: AccessTokenResponse = requests.post(
-            self.API_URL + 'access-tokens/',
-            json=request_data,
-            headers=self.API_HEADERS,
-        ).json()
-        return tokens['access_tokens'][0]
-```
-
 ## API calls
-After receiving the `access_token` we can now make API calls and pass the data to the frontend to show in the app.
+After receiving the `access_token` we can make API calls and pass the data to the frontend to show in the app.
 
 ```
     def get_verification_info_by_token(self, access_token: str) -> Any:
@@ -234,11 +214,9 @@ When verification was successful, we show the form and populate it with data tha
             const content = document.querySelector('.spinnerContainer');
 
             content.classList.remove('hidden');
-            let accessToken;
             let verificationInfo;
             try {
-              accessToken = await apiRequests.getAccessToken(token);
-              verificationInfo = await apiRequests.getVerificationInfoByToken(accessToken);
+              verificationInfo = await apiRequests.getVerificationInfoByToken(token);
             } catch(e) {
               console.error(e)
               content.classList.add('hidden');

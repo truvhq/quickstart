@@ -141,21 +141,11 @@
           'Content-Type': 'application/json;charset=UTF-8',
         };
 
-        const getAccessToken = async (publicToken) => {
-          const response = await (await fetch(apiEnpoint + 'createAccessToken', {
-            method: 'post',
-            body: JSON.stringify({ public_token: publicToken }),
-            headers,
-          })).json()
-
-          return response['access_token'];
-        };
-
         /**
          * @return {Promise<EmploymentItem[]>}
          */
-        const getVerificationInfoByToken = async (access_token) => {
-          const response = await fetch(apiEnpoint + `getVerifications/${access_token}`, {
+        const getVerificationInfoByToken = async (public_token) => {
+          const response = await fetch(apiEnpoint + `getVerifications/${public_token}`, {
             method: 'get',
             headers,
           }).then((r) => r.json());
@@ -163,7 +153,6 @@
         };
 
         return {
-          getAccessToken,
           getVerificationInfoByToken,
         };
       }
@@ -177,7 +166,7 @@
           clientName: 'Citadel Quickstart',
           companyMappingId: null,
           key: '{{ public_key }}',
-          product: 'employment',
+          product: '{{ product_type }}',
           trackingInfo: 'any data for tracking current user',
           onLoad: function () {
             console.log('loaded');
@@ -194,11 +183,9 @@
             const content = document.querySelector('.spinnerContainer');
 
             content.classList.remove('hidden');
-            let accessToken;
             let verificationInfo;
             try {
-              accessToken = await apiRequests.getAccessToken(token);
-              verificationInfo = await apiRequests.getVerificationInfoByToken(accessToken);
+              verificationInfo = await apiRequests.getVerificationInfoByToken(token);
             } catch(e) {
               console.error(e)
               content.classList.add('hidden');
@@ -237,8 +224,9 @@
     <header>
       <div class="container">
         <img
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1280px-Amazon_logo.svg.png"
-          alt=""
+          src="https://citadelid-resources.s3-us-west-2.amazonaws.com/Citadel.svg"
+          alt="Citadel"
+          style="width:100px;height:50px;"
         />
       </div>
     </header>
@@ -255,7 +243,7 @@
         </div>
         <div>
           <h2>Enter Your Information</h2>
-          <span>All fields are required. Please checck for accuracy and spelling to avoid delays</span>
+          <span>All fields are required. Please check for accuracy and spelling to avoid delays</span>
         </div>
       </div>
       <form>
@@ -321,12 +309,12 @@
         </div>
 
         <div class="formSection historyContainer">
-          <h3>Employment History</h3>
-          <span class="historyText">Please provide up to 2 recent employers within the last 7 years</span>
+          <h3>Verify Your Income Information</h3>
+          <span class="historyText">Please provide 2 recent paystubs and annual income</span>
 
           <div id="history"></div>
-          <button type="button" id="button" onclick="bridge.open()">
-            Verify employment
+          <button type="button" id="verify-button" onclick="bridge.open()">
+            Verify income
           </button>
         </div>
 
@@ -454,60 +442,31 @@
 
         const name = createInput(`${company.name}-name`, company.name, 'Employer Name');
 
-        const phone = createInput(`${company.name}-phone`, company.phone);
+        const annualIncome = createInput(`${company.name}-annualIncome`, employment.annual_salary || '', 'Annual Income');
+        const hourlyIncome = createInput(`${company.name}-hourlyIncome`, employment.hourly_salary || '', 'Hourly Income');
 
-        const city = createInput(`${company.name}-city`, company.address.city);
+        const paystubContainer = document.createElement('div');
+        paystubContainer.innerHTML = '<label>Most recent paystubs:</label>';
 
-        const state = createInput(`${company.name}-state`, company.address.state);
-
-        const phoneAndLocation = document.createElement('div');
-        phoneAndLocation.innerHTML = '<label>Employer Phone and Location</label>';
-
-        phoneAndLocation.appendChild(phone);
-        phoneAndLocation.appendChild(city);
-        phoneAndLocation.appendChild(state);
-
-        const positionType = createInput(`${company.name}-positionType`, employment.job_type, 'Position Type');
-        const jobTitle = createInput(`${company.name}-jobTitle`, employment.job_title, 'Job Title');
-
-        const [startY, startM] = (employment.start_date || '').split('-');
-        const [endY, endM] = (employment.end_date || '').split('-');
-
-        const startMonth = createInput(`${company.name}-startMonth`, startM);
-        const startYear = createInput(`${company.name}-startYear`, startY);
-
-        const endMonth = createInput(`${company.name}-endMonth`, endM);
-        const endYear = createInput(`${company.name}-endYear`, endY);
-
-        const jobContainer = document.createElement('div');
-        const jobPeriodsContainer = document.createElement('div');
-        const startPeriodContainer = document.createElement('div');
-        const endPeriodContainer = document.createElement('div');
-
-        startPeriodContainer.innerHTML = '<label>Employment Start Date</label>';
-        startPeriodContainer.appendChild(startMonth);
-        startPeriodContainer.appendChild(startYear);
-
-        endPeriodContainer.innerHTML = '<label>Employment End Date</label>';
-        endPeriodContainer.appendChild(endMonth);
-        endPeriodContainer.appendChild(endYear);
-
-        positionType.classList.add('col');
-        jobTitle.classList.add('col');
-        startPeriodContainer.classList.add('col');
-        endPeriodContainer.classList.add('col');
-
-        jobContainer.classList.add('row', 'row-cols-1', 'row-cols-md-2');
-        jobPeriodsContainer.classList.add('row', 'row-cols-1', 'row-cols-md-2');
-        jobPeriodsContainer.appendChild(startPeriodContainer);
-        jobPeriodsContainer.appendChild(endPeriodContainer);
-        jobContainer.appendChild(positionType);
-        jobContainer.appendChild(jobTitle);
+        if (employment.statements) {
+          const paystubs = employment.statements.reduce((acc, cur) => {
+            if (cur.file) {
+              const paystub = document.createElement('div')
+              const el = document.createElement('a');
+              el.textContent = cur.pay_date
+              el.setAttribute('href', cur.file);
+              el.setAttribute('target', '_blank');
+              paystub.appendChild(el)
+              acc.appendChild(paystub);
+            }
+            return acc;
+          }, paystubContainer);
+        }
 
         container.appendChild(name);
-        container.appendChild(phoneAndLocation);
-        container.appendChild(jobContainer);
-        container.appendChild(jobPeriodsContainer);
+        container.appendChild(annualIncome);
+        container.appendChild(hourlyIncome);
+        container.appendChild(paystubContainer);
 
         return container;
       }
@@ -523,10 +482,9 @@
         }, document.createDocumentFragment());
 
         const historyContainer = document.querySelector('#history');
-        const button = document.querySelector('#button');
-
         historyContainer.appendChild(result);
-        button.innerText = 'Add employer';
+        const button = document.getElementById('verify-button')
+        button.style.display = 'none'
       }
     </script>
   </body>

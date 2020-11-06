@@ -13,6 +13,7 @@ CORS(app)
 public_key = os.environ.get('API_PUBLIC_KEY')
 secret = os.environ.get('API_SECRET')
 client_id = os.environ.get('API_CLIENT_ID')
+product_type = os.environ.get('API_PRODUCT_TYPE', 'employment')
 
 api_client = NaiveApiClient(
     api_url=os.environ.get('API_URL', 'https://prod.citadelid.com/v1/'),
@@ -35,10 +36,18 @@ def inject_public_key():
     return dict(public_key=public_key, )
 
 
+@app.context_processor
+def inject_product_type():
+    return dict(product_type=product_type, )
+
+
 @app.route('/')
 def index():
     """Just render example with bridge.js"""
-    return render_template('index.html')
+    if product_type == 'income':
+        return render_template('income.html')
+    else:
+        return render_template('employment.html')
 
 
 @app.route('/createAccessToken', methods=['POST'])
@@ -52,10 +61,20 @@ def create_access_token():
     }
 
 
-@app.route('/getVerifications/<access_token>', methods=['GET'])
-def get_verification_info_by_token(access_token: str):
+@app.route('/getVerifications/<public_token>', methods=['GET'])
+def get_verification_info_by_token(public_token: str):
     """ getVerificationInfoByToken """
-    verifications = api_client.get_verification_info_by_token(access_token)
+
+    # First exchange public_token to access_token
+    access_token = api_client.get_access_token(public_token)
+
+    # Use access_token to retrieve the data
+    if product_type == 'employment':
+        verifications = api_client.get_employment_info_by_token(access_token)
+    elif product_type == 'income':
+        verifications = api_client.get_income_info_by_token(access_token)
+    else:
+        raise Exception('Unsupported product type!')
     return verifications
 
 

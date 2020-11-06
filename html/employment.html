@@ -141,21 +141,11 @@
           'Content-Type': 'application/json;charset=UTF-8',
         };
 
-        const getAccessToken = async (publicToken) => {
-          const response = await (await fetch(apiEnpoint + 'createAccessToken', {
-            method: 'post',
-            body: JSON.stringify({ public_token: publicToken }),
-            headers,
-          })).json()
-
-          return response['access_token'];
-        };
-
         /**
          * @return {Promise<EmploymentItem[]>}
          */
-        const getVerificationInfoByToken = async (access_token) => {
-          const response = await fetch(apiEnpoint + `getVerifications/${access_token}`, {
+        const getVerificationInfoByToken = async (public_token) => {
+          const response = await fetch(apiEnpoint + `getVerifications/${public_token}`, {
             method: 'get',
             headers,
           }).then((r) => r.json());
@@ -163,7 +153,6 @@
         };
 
         return {
-          getAccessToken,
           getVerificationInfoByToken,
         };
       }
@@ -177,7 +166,7 @@
           clientName: 'Citadel Quickstart',
           companyMappingId: null,
           key: '{{ public_key }}',
-          product: 'employment',
+          product: '{{ product_type }}',
           trackingInfo: 'any data for tracking current user',
           onLoad: function () {
             console.log('loaded');
@@ -194,11 +183,9 @@
             const content = document.querySelector('.spinnerContainer');
 
             content.classList.remove('hidden');
-            let accessToken;
             let verificationInfo;
             try {
-              accessToken = await apiRequests.getAccessToken(token);
-              verificationInfo = await apiRequests.getVerificationInfoByToken(accessToken);
+              verificationInfo = await apiRequests.getVerificationInfoByToken(token);
             } catch(e) {
               console.error(e)
               content.classList.add('hidden');
@@ -237,8 +224,9 @@
     <header>
       <div class="container">
         <img
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1280px-Amazon_logo.svg.png"
-          alt=""
+          src="https://citadelid-resources.s3-us-west-2.amazonaws.com/Citadel.svg"
+          alt="Citadel"
+          style="width:100px;height:50px;"
         />
       </div>
     </header>
@@ -255,7 +243,7 @@
         </div>
         <div>
           <h2>Enter Your Information</h2>
-          <span>All fields are required. Please checck for accuracy and spelling to avoid delays</span>
+          <span>All fields are required. Please check for accuracy and spelling to avoid delays</span>
         </div>
       </div>
       <form>
