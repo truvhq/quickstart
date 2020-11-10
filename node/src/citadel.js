@@ -19,7 +19,7 @@ const getHeaders = () => {
  * Calls out to Citadel exchanging the public token given by the API request
  * for an access token to make subsequent requests
  * @param {String} public_token The token provided by the API request to exchange
- * @return The access token provided by citadel
+ * @return The access token provided by citadel - https://docs.citadelid.com/#exchange-token-flow
  **/
 const getAccessToken = async (public_token) => {
   const requestBody = JSON.stringify({
@@ -32,7 +32,7 @@ const getAccessToken = async (public_token) => {
 /**
  * Retrieves employment verifications from Citadel
  * @param {String} access_token The access token provided by Citadel
- * @return The response from Citadel
+ * @return The response from Citadel - https://docs.citadelid.com/#schemaemploymentcheck
  */
 const getEmploymentInfoByToken = async (access_token) => {
   const requestBody = JSON.stringify({
@@ -44,7 +44,7 @@ const getEmploymentInfoByToken = async (access_token) => {
 /**
  * Retrieves income verifications from Citadel
  * @param {String} access_token
- * @return The response from Citadel
+ * @return The response from Citadel - https://docs.citadelid.com/#schemaincomecheck
  */
 const getIncomeInfoByToken = async (access_token) => {
   const requestBody = JSON.stringify({
