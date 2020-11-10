@@ -176,33 +176,34 @@ const getAccessToken = async (public_token) => {
 ## <a id="step-7"></a>7. :cloud: sends API request to Citadel with `access_token` for employment/income verification
 ```
 const getEmploymentInfoByToken = async (access_token) => {
-  const headers = getHeaders()
-  const inputBody = JSON.stringify({
+  const requestBody = JSON.stringify({
     access_token,
   })
-
-  const response = await fetch(`${API_URL}/verifications/employments/`, {
-    method: "POST",
-    body: inputBody,
-    headers: headers,
-  })
-  const body = await response.json()
-  return body
+  return await sendRequest("verifications/employments/",requestBody)
 }
 
 const getIncomeInfoByToken = async (access_token) => {
-  const headers = getHeaders()
-  const inputBody = JSON.stringify({
+  const requestBody = JSON.stringify({
     access_token,
   })
+  return await sendRequest("verifications/incomes/",requestBody)
+}
 
-  const response = await fetch(`${API_URL}/verifications/incomes/`, {
-    method: "POST",
-    body: inputBody,
-    headers: headers,
-  })
-  const body = await response.json()
-  return body
+const sendRequest = async (endpoint, body) => {
+  const headers = getHeaders()
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: "POST",
+      body,
+      headers,
+    })
+    const responseBody = await response.json()
+    return responseBody
+  } catch (e) {
+    console.error(`Error with ${endpoint} request`)
+    console.error(e)
+    throw e
+  }
 }
 ```
 ## <a id="step-8"></a> 8. :cloud: sends employment/income verification information back to :computer:

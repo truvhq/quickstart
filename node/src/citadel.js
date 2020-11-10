@@ -22,24 +22,11 @@ const getHeaders = () => {
  * @return The access token provided by citadel
  **/
 const getAccessToken = async (public_token) => {
-  const headers = getHeaders()
-  const inputBody = JSON.stringify({
+  const requestBody = JSON.stringify({
     public_tokens: [public_token],
   })
-
-  try {
-    const response = await fetch(`${API_URL}access-tokens/`, {
-      method: "POST",
-      body: inputBody,
-      headers: headers,
-    })
-    const body = await response.json()
-    return body.access_tokens[0]
-  } catch (e) {
-    console.error("Error with /access-tokens/ request")
-    console.error(e)
-    throw e
-  }
+  const responseBody = await sendRequest("access-tokens/",requestBody)
+  return responseBody.access_tokens[0]
 }
 
 /**
@@ -48,24 +35,10 @@ const getAccessToken = async (public_token) => {
  * @return The response from Citadel
  */
 const getEmploymentInfoByToken = async (access_token) => {
-  const headers = getHeaders()
-  const inputBody = JSON.stringify({
+  const requestBody = JSON.stringify({
     access_token,
   })
-
-  try {
-    const response = await fetch(`${API_URL}verifications/employments/`, {
-      method: "POST",
-      body: inputBody,
-      headers: headers,
-    })
-    const body = await response.json()
-    return body
-  } catch (e) {
-    console.error("Error with /verifications/employments/ request")
-    console.error(e)
-    throw e
-  }
+  return await sendRequest("verifications/employments/",requestBody)
 }
 
 /**
@@ -74,21 +47,24 @@ const getEmploymentInfoByToken = async (access_token) => {
  * @return The response from Citadel
  */
 const getIncomeInfoByToken = async (access_token) => {
-  const headers = getHeaders()
-  const inputBody = JSON.stringify({
+  const requestBody = JSON.stringify({
     access_token,
   })
+  return await sendRequest("verifications/incomes/",requestBody)
+}
 
+const sendRequest = async (endpoint, body) => {
+  const headers = getHeaders()
   try {
-    const response = await fetch(`${API_URL}verifications/incomes/`, {
+    const response = await fetch(`${API_URL}${endpoint}`, {
       method: "POST",
-      body: inputBody,
-      headers: headers,
+      body,
+      headers,
     })
-    const body = await response.json()
-    return body
+    const responseBody = await response.json()
+    return responseBody
   } catch (e) {
-    console.error("Error with /verifications/incomes/ request")
+    console.error(`Error with ${endpoint} request`)
     console.error(e)
     throw e
   }
