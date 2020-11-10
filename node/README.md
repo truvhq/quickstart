@@ -207,16 +207,20 @@ const getIncomeInfoByToken = async (access_token) => {
 ```
 ## <a id="step-8"></a> 8. :cloud: sends employment/income verification information back to :computer:
 ```
-app.get("/getIncomeVerifications/:token", async (req, res) => {
-  const accessToken = await getAccessToken(req.params.token)
-  const incomeVerifications = await getIncomeInfoByToken(accessToken)
-  res.json(incomeVerifications)
-})
-
-app.get("/getEmploymentVerifications/:token", async (req, res) => {
-  const accessToken = await getAccessToken(req.params.token)
-  const incomeVerifications = await getEmploymentInfoByToken(accessToken)
-  res.json(incomeVerifications)
+app.get("/getVerifications/:token", async (req, res) => {
+  // retrieve income verification information
+  try {
+    const accessToken = await getAccessToken(req.params.token)
+    let verifications
+    if(API_PRODUCT_TYPE === "employment") {
+      verifications = await getEmploymentInfoByToken(accessToken)
+    } else {
+      verifications = await getIncomeInfoByToken(accessToken)
+    }
+    res.json(verifications)
+  } catch (e) {
+    res.status(500).json({ success: false })
+  }
 })
 ```
 ## <a id="step-9"></a>9. :computer: renders the verification info sent back by :cloud: for :smiley: to view
