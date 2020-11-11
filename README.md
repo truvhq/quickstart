@@ -67,7 +67,7 @@ API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
-API_PRODUCT_TYPE=employment OR income
+API_PRODUCT_TYPE=employment, income or admin
 ```
 
 - make python_venv
@@ -125,6 +125,11 @@ The API call will be executed and the data will be loaded into the fields of the
 Now click `Add employer` button, search for a company, eg `Facebook` and select any provider. 
 
 Click exit icon at the top right of the widget and you'll see the empty form.
+
+## Successful administration
+
+If using the `admin` product type, after opening the Quickstart app running locally click the `Connect` button and select any provider. Enter `Skx8LTnyrLiw4SYk8xfkRwOt5OGQbNulypqdsqd`
+for the API Key and click `submit`. The API call will be executed and the data will be loaded into the drop downs.
 
 # What happened under the hood
 ## Token exchange flow
