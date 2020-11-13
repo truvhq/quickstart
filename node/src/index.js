@@ -13,7 +13,6 @@ const {
   API_CLIENT_ID,
   API_SECRET,
   API_URL,
-  API_PUBLIC_KEY,
   API_PRODUCT_TYPE,
 } = process.env
 
@@ -65,7 +64,6 @@ app.listen(5000, () => {
     API_CLIENT_ID,
     API_SECRET,
     API_URL,
-    API_PUBLIC_KEY,
     API_PRODUCT_TYPE,
   }
   console.log(environment)

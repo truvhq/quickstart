@@ -175,7 +175,7 @@
         const bridge = CitadelBridge.init({
           clientName: 'Citadel Quickstart',
           companyMappingId: bridgeToken.settings.company_mapping_id,
-          key: bridgeToken.bridge_token,
+          bridgeToken: bridgeToken.bridge_token,
           product: '{{ product_type }}',
           trackingInfo: 'any data for tracking current user',
           onLoad: function () {
