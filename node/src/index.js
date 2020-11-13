@@ -4,6 +4,7 @@ import bodyParser from "body-parser"
 import htmlFile from "./serve.js"
 import {
   getAccessToken,
+  getBridgeToken,
   getEmploymentInfoByToken,
   getIncomeInfoByToken,
 } from "./citadel.js"
@@ -27,6 +28,18 @@ app.use(cors())
 // return HTML
 app.get("/", htmlFile)
 
+app.get("/getBridgeToken", async (req, res) => {
+  // retrieve income verification information
+  try {
+    const bridgeToken = await getBridgeToken()
+    res.json(bridgeToken)
+  } catch (e) {
+    console.error("error with getBridgeToken")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
 app.get("/getVerifications/:token", async (req, res) => {
   // retrieve income verification information
   try {
@@ -39,6 +52,8 @@ app.get("/getVerifications/:token", async (req, res) => {
     }
     res.json(verifications)
   } catch (e) {
+    console.error("error with getVerifications")
+    console.error(e)
     res.status(500).json({ success: false })
   }
 })
