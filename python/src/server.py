@@ -11,7 +11,6 @@ from .naive_api_client import NaiveApiClient
 app = Flask(__name__)
 CORS(app)
 
-public_key = os.environ.get('API_PUBLIC_KEY')
 secret = os.environ.get('API_SECRET')
 client_id = os.environ.get('API_CLIENT_ID')
 product_type = os.environ.get('API_PRODUCT_TYPE', 'employment')
@@ -22,19 +21,13 @@ api_client = NaiveApiClient(
     client_id=client_id,
 )
 
-if not secret or not client_id or not public_key:
-    raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID' and 'API_PUBLIC_KEY'")
+if not secret or not client_id:
+    raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID'")
 
 print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
       api_client.API_URL, "\n",
-      "API_PUBLIC_KEY", public_key, "\n",
       json.dumps(api_client.API_HEADERS, indent=4), "\n",
       "=" * 94, "\n", )
-
-
-@app.context_processor
-def inject_public_key():
-    return dict(public_key=public_key, )
 
 
 @app.context_processor

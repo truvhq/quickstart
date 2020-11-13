@@ -1,7 +1,7 @@
 # Introduction
 Let's get you started with Citadel by walking through this NodeJS Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
 
-You'll have two different API keys (`client_id`, `access_key`) and a `public_key` for initiating the widget, and we'll start in the Sandbox environment. 
+We'll start in the Sandbox environment with two different API keys (`client_id`, `access_key`).
 
 
 # Set up the NodeJS Quickstart
@@ -14,7 +14,6 @@ Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app 
 4. create a `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 ```
 API_URL=https://prod.citadelid.com/v1/
-API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment OR income>
@@ -28,7 +27,6 @@ After running this command, you should see:
   API_CLIENT_ID: <YOUR CLIENT ID HERE>,
   API_SECRET: <YOUR SECRET KEY HERE>,
   API_URL: 'https://prod.citadelid.com/v1',
-  API_PUBLIC_KEY: <YOUR PUBLIC KEY HERE>,
   API_PRODUCT_TYPE: <YOUR PRODUCT TYPE HERE>
 }
 ==============================================================================================
