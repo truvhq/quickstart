@@ -31,6 +31,18 @@ class NaiveApiClient:
             'Content-Type': 'application/json;charset=UTF-8',
         }
 
+    def get_bridge_token(self) -> Any:
+        """
+        https://docs.citadelid.com/?python#exchange-token-flow
+        :param public_token:
+        :return:
+        """
+        tokens: Any = requests.post(
+            self.API_URL + 'bridge-tokens/',
+            headers=self.API_HEADERS,
+        ).json()
+        return tokens
+
     def get_access_token(self, public_token: str) -> str:
         """
         https://docs.citadelid.com/?python#exchange-token-flow

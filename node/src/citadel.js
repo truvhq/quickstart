@@ -15,6 +15,11 @@ const getHeaders = () => {
   }
 }
 
+const getBridgeToken = async () => {
+  const responseBody = await sendRequest("bridge-tokens/")
+  return responseBody
+}
+
 /**
  * Calls out to Citadel exchanging the public token given by the API request
  * for an access token to make subsequent requests
@@ -70,4 +75,4 @@ const sendRequest = async (endpoint, body) => {
   }
 }
 
-export { getEmploymentInfoByToken, getAccessToken, getIncomeInfoByToken }
+export { getEmploymentInfoByToken, getAccessToken, getBridgeToken, getIncomeInfoByToken }

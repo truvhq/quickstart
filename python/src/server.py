@@ -49,6 +49,9 @@ def index():
     else:
         return render_template('employment.html')
 
+@app.route('/getBridgeToken', methods=['GET'])
+def create_bridge_token():
+    return api_client.get_bridge_token()
 
 @app.route('/createAccessToken', methods=['POST'])
 def create_access_token():

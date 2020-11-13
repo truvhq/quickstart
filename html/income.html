@@ -141,6 +141,14 @@
           'Content-Type': 'application/json;charset=UTF-8',
         };
 
+        const getBridgeToken = async () => {
+          const response = await fetch(apiEnpoint + `getBridgeToken`, {
+            method: 'get',
+            headers,
+          }).then((r) => r.json());
+          return response;
+        }
+
         /**
          * @return {Promise<EmploymentItem[]>}
          */
@@ -154,18 +162,20 @@
 
         return {
           getVerificationInfoByToken,
+          getBridgeToken
         };
       }
 
-      (function () {
+      (async function () {
         const apiRequests = getApiRequests('http://127.0.0.1:5000/');
 
         let successClosing
 
+        const bridgeToken = await apiRequests.getBridgeToken()
         const bridge = CitadelBridge.init({
           clientName: 'Citadel Quickstart',
-          companyMappingId: null,
-          key: '{{ public_key }}',
+          companyMappingId: bridgeToken.settings.company_mapping_id,
+          key: bridgeToken.bridge_token,
           product: '{{ product_type }}',
           trackingInfo: 'any data for tracking current user',
           onLoad: function () {
