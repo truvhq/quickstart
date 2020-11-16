@@ -132,13 +132,14 @@ for the API Key and click `submit`. The API call will be executed and the data w
 # What happened under the hood
 ## Token exchange flow
 
-First we initiate the widget using your `public_key`. 
+First we make a call to our API to request a bridge token from Citadel and use this bridge token to initiate the Citadel Bridge.
 
 ```
+        const bridgeToken = await apiRequests.getBridgeToken()
         const bridge = CitadelBridge.init({
           clientName: 'Citadel Quickstart',
-          companyMappingId: null,
-          key: '{{ public_key }}',
+          companyMappingId: bridgeToken.settings.company_mapping_id,
+          bridgeToken: bridgeToken.bridge_token,
           product: '{{ product_type}}',
           trackingInfo: 'any data for tracking current user',
           onLoad: function () {

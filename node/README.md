@@ -76,31 +76,92 @@ Click exit icon at the top right of the widget and you'll see the empty form.
 
 Here is the flow that a successful verification process takes in our example:
 
-1. [:computer: runs `CitadelBridge.init` with `public_key`](#step-1)
-2. [:smiley: clicks `Verify Income/`Verify Employment` button](#step-2)
-3. [:computer: displays Citadel widget, fires `onLoad` function executed](#step-3)
-4. [:smiley: selects employer, choses provider, logs in, clicks `Done`](#step-4)
-5. [:computer: first onSuccess function, sends request to :cloud: with temporary `token`, closes widget, first `onClose`](#step-5)
-6. [:cloud: sends API request to Citadel exchanging temporary `token` for `access_token`](#step-6)
-7. [:cloud: sends API request to Citadel with `access_token` for employment/income verification](#step-7)
-8. [:cloud: sends employment/income verification information back to :computer:](#step-8)
-9. [:computer: renders the verification info sent back by :cloud: for :smiley: to view](#step-9)
+1. [:computer: sends request to :cloud: for `bridge_token`](#step-1)
+2. [:cloud: sends API request to Citadel for `bridge_token`, sends response to :computer:](#step-2)
+3. [:computer: runs `CitadelBridge.init` with `bridge_token`](#step-3)
+4. [:smiley: clicks `Verify Income/`Verify Employment` button](#step-4)
+5. [:computer: displays Citadel widget, fires `onLoad` function executed](#step-5)
+6. [:smiley: selects employer, choses provider, logs in, clicks `Done`](#step-6)
+7. [:computer: first onSuccess function, sends request to :cloud: with temporary `token`, closes widget, first `onClose`](#step-7)
+8. [:cloud: sends API request to Citadel exchanging temporary `token` for `access_token`](#step-8)
+9. [:cloud: sends API request to Citadel with `access_token` for employment/income verification](#step-9)
+10. [:cloud: sends employment/income verification information back to :computer:](#step-10)
+11. [:computer: renders the verification info sent back by :cloud: for :smiley: to view](#step-11)
 
-## <a id="step-1"></a>1. :computer: runs `CitadelBridge.init` with `public_key`
+## <a id="step-1"></a>1. :computer: sends request to :cloud: for `bridge_token`
+```
+  const getBridgeToken = async () => {
+    const response = await fetch(apiEnpoint + `getBridgeToken`, {
+      method: 'get',
+      headers,
+    }).then((r) => r.json());
+    return response;
+  }
+```
+## <a id="step-2"></a>2. :cloud: sends API request to Citadel for `bridge_token`, sends response to :computer:
+```
+  const getHeaders = () => {
+    return {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-Access-Client-Id": API_CLIENT_ID,
+      "X-Access-Secret": API_SECRET,
+    }
+  }
+
+  ...
+
+  const getBridgeToken = async () => {
+    const responseBody = await sendRequest("bridge-tokens/")
+    return responseBody
+  }
+
+  ...
+
+  const sendRequest = async (endpoint, body) => {
+    const headers = getHeaders()
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: "POST",
+        body,
+        headers,
+      })
+      const responseBody = await response.json()
+      return responseBody
+    } catch (e) {
+      console.error(`Error with ${endpoint} request`)
+      console.error(e)
+      throw e
+    }
+  }
+```
+```
+  app.get("/getBridgeToken", async (req, res) => {
+    // retrieve bridge token
+    try {
+      const bridgeToken = await getBridgeToken()
+      res.json(bridgeToken)
+    } catch (e) {
+      console.error("error with getBridgeToken")
+      console.error(e)
+      res.status(500).json({ success: false })
+    }
+  })
+```
+## <a id="step-3"></a>3. :computer: runs `CitadelBridge.init` with `bridge_token`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel Quickstart',
-    companyMappingId: null,
-    key: '{{public_key}}',
+    clientName: 'Citadel NodeJS Quickstart',
+    companyMappingId: bridgeToken.settings.company_mapping_id,
+    bridgeToken: bridgeToken.bridge_token,
     product: 'income',
     trackingInfo: 'any data for tracking current user',
     ...
   });
   window.bridge = bridge;
 ```
-
-## <a id="step-2"></a>2. :smiley: clicks `Verify Income/`Verify Employment` button
-## <a id="step-3"></a>3. :computer: displays Citadel widget, fires `onLoad` function executed
+## <a id="step-4"></a>4. :smiley: clicks `Verify Income/`Verify Employment` button
+## <a id="step-5"></a>5. :computer: displays Citadel widget, fires `onLoad` function executed
 ```
   onLoad: function () {
     console.log('loaded');
@@ -108,8 +169,8 @@ Here is the flow that a successful verification process takes in our example:
   },
 ```
 
-## <a id="step-4"></a>4. :smiley: selects employer, choses provider, logs in, clicks `Done`
-## <a id="step-5"></a>5. :computer: first onSuccess function, sends request to :cloud: with temporary `token`, closes widget, first `onClose`
+## <a id="step-6"></a>6. :smiley: selects employer, choses provider, logs in, clicks `Done`
+## <a id="step-7"></a>7. :computer: first onSuccess function, sends request to :cloud: with temporary `token`, closes widget, first `onClose`
 ```
 onSuccess: async function (token) {
   console.log('token: ', token);
@@ -145,17 +206,8 @@ onClose: function () {
 },
 ```
 
-## <a id="step-6"></a>6. :cloud: sends API request to Citadel exchanging temporary `token` for `access_token`
+## <a id="step-8"></a>8. :cloud: sends API request to Citadel exchanging temporary `token` for `access_token`
 ```
-const getHeaders = () => {
-  return {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    "X-Access-Client-Id": API_CLIENT_ID,
-    "X-Access-Secret": API_SECRET,
-  }
-}
-
 const getAccessToken = async (public_token) => {
   const headers = getHeaders()
   const inputBody = JSON.stringify({
@@ -171,7 +223,7 @@ const getAccessToken = async (public_token) => {
   return body.access_tokens[0]
 }
 ```
-## <a id="step-7"></a>7. :cloud: sends API request to Citadel with `access_token` for employment/income verification
+## <a id="step-9"></a>9. :cloud: sends API request to Citadel with `access_token` for employment/income verification
 ```
 const getEmploymentInfoByToken = async (access_token) => {
   const requestBody = JSON.stringify({
@@ -180,31 +232,16 @@ const getEmploymentInfoByToken = async (access_token) => {
   return await sendRequest("verifications/employments/",requestBody)
 }
 
+...
+
 const getIncomeInfoByToken = async (access_token) => {
   const requestBody = JSON.stringify({
     access_token,
   })
   return await sendRequest("verifications/incomes/",requestBody)
 }
-
-const sendRequest = async (endpoint, body) => {
-  const headers = getHeaders()
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      method: "POST",
-      body,
-      headers,
-    })
-    const responseBody = await response.json()
-    return responseBody
-  } catch (e) {
-    console.error(`Error with ${endpoint} request`)
-    console.error(e)
-    throw e
-  }
-}
 ```
-## <a id="step-8"></a> 8. :cloud: sends employment/income verification information back to :computer:
+## <a id="step-10"></a> 10. :cloud: sends employment/income verification information back to :computer:
 ```
 app.get("/getVerifications/:token", async (req, res) => {
   // retrieve income verification information
@@ -222,7 +259,7 @@ app.get("/getVerifications/:token", async (req, res) => {
   }
 })
 ```
-## <a id="step-9"></a>9. :computer: renders the verification info sent back by :cloud: for :smiley: to view
+## <a id="step-11"></a>11. :computer: renders the verification info sent back by :cloud: for :smiley: to view
 ```
 function renderEmploymentHistory(employments) {
   const result = employments.map(createEmploymentCard).reduce((acc, cur) => {

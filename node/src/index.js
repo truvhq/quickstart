@@ -28,7 +28,7 @@ app.use(cors())
 app.get("/", htmlFile)
 
 app.get("/getBridgeToken", async (req, res) => {
-  // retrieve income verification information
+  // retrieve bridge token
   try {
     const bridgeToken = await getBridgeToken()
     res.json(bridgeToken)
