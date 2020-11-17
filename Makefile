@@ -16,4 +16,6 @@ python_venv:
  		set -a && source .env && set +a && ./quickstart_venv/bin/python3 -m python.src.server
 
 ruby_local:
+	cd ruby \
+	bundle install \
 	set -a && source ../.env && set +a && rails server

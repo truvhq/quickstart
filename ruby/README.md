@@ -9,9 +9,9 @@ Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app 
 *Requirements*: The latest LTS version of `nodejs`
 
 1. `git clone https://github.com/citadelid/quickstart`
-2. `cd quickstart/ruby`
-3. `bundle install`
-4. create a `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
+2. `cd quickstart`
+3. `make env`
+4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 ```
 API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
@@ -19,7 +19,6 @@ API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment OR income>
 ```
-5. `cd ..`
 5. `make ruby_local`
 
 After running this command, you should see:
