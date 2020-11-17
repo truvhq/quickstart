@@ -91,7 +91,7 @@ Here is the flow that a successful verification process takes in our example:
 ## <a id="step-1"></a>1. :computer: runs `CitadelBridge.init` with `public_key`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel NodeJS Quickstart',
+    clientName: 'Citadel Quickstart',
     companyMappingId: null,
     key: '{{public_key}}',
     product: 'income',

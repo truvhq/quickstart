@@ -5,7 +5,7 @@ You'll have two different API keys (`client_id`, `access_key`) and a `public_key
 
 
 # Set up the Ruby on Rails Quickstart
-Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app locally.
+Once you have your API keys, it's time to run the Citadel Ruby on Rails Quickstart app locally.
 *Requirements*: Ruby 2.6.5
 
 1. `git clone https://github.com/citadelid/quickstart`
@@ -45,7 +45,7 @@ If the verification isn't successful or the applicant decided to exit Citadel's 
 
 ## Successful verification
 
-After opening the NodeJS Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, eg `Facebook` and select any provider. 
+After opening the Ruby on Rails Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, eg `Facebook` and select any provider. 
 
 Use the Sandbox credentials to simulate a successful login.
 
@@ -85,7 +85,7 @@ Here is the flow that a successful verification process takes in our example:
 ## <a id="step-1"></a>1. :computer: runs `CitadelBridge.init` with `public_key`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel NodeJS Quickstart',
+    clientName: 'Citadel Quickstart',
     companyMappingId: null,
     key: '{{public_key}}',
     product: 'income',
