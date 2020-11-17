@@ -15,4 +15,5 @@ python_venv:
  		./quickstart_venv/bin/pip3 install -r python/requirements.txt && \
  		set -a && source .env && set +a && ./quickstart_venv/bin/python3 -m python.src.server
 
-
+ruby_local:
+	set -a && source ../.env && set +a && rails server
