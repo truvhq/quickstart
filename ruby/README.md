@@ -6,7 +6,7 @@ You'll have two different API keys (`client_id`, `access_key`) and a `public_key
 
 # Set up the Ruby on Rails Quickstart
 Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app locally.
-*Requirements*: The latest LTS version of `nodejs`
+*Requirements*: Ruby 2.6.5
 
 1. `git clone https://github.com/citadelid/quickstart`
 2. `cd quickstart`
