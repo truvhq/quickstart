@@ -391,11 +391,14 @@
 
         setFormItemValue('ssnInput', employmentItem.profile.ssn);
 
-        const [year, month, day] = employmentItem.profile.date_of_birth.split('-');
+        if (employmentItem.profile.date_of_birth)
+        {
+          const [year, month, day] = employmentItem.profile.date_of_birth.split('-');
 
-        setFormItemValue('birthDay', day);
-        setFormItemValue('birthMonth', month);
-        setFormItemValue('birthYear', year);
+          setFormItemValue('birthDay', day);
+          setFormItemValue('birthMonth', month);
+          setFormItemValue('birthYear', year);
+        }
       }
 
       /**

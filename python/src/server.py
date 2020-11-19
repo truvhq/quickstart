@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 import flask
 from flask import Flask, render_template
@@ -95,6 +96,9 @@ def get_admin_data_by_token(public_token: str):
 
     # Last, collect prepared payroll report
     payroll = api_client.get_payroll_report_by_id(report_id)
+    if payroll['status'] != 'success':
+        time.sleep(20)
+        payroll = api_client.get_payroll_report_by_id(report_id)
 
     return {
         'directory': directory,
