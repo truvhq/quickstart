@@ -151,12 +151,12 @@ end
 ...
 
 def self.sendRequest(endpoint, body)
-  uri = URI("#{ENV.fetch('API_URL')}#{endpoint}")
+  uri = URI("#{Citadel.api_url}#{endpoint}")
   req = Net::HTTP::Post.new uri
   req['Content-Type'] = 'application/json'
   req['Accept'] = 'application/json'
-  req['X-Access-Client-Id'] = ENV.fetch('API_CLIENT_ID')
-  req['X-Access-Secret'] = ENV.fetch('API_SECRET')
+  req['X-Access-Client-Id'] = Citadel.client_id
+  req['X-Access-Secret'] = Citadel.client_secret
   if body
     req.body = body
   end
