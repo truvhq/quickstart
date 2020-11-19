@@ -33,7 +33,7 @@ class NaiveApiClient:
 
     def get_bridge_token(self) -> Any:
         """
-        https://docs.citadelid.com/?python#exchange-token-flow
+        https://docs.citadelid.com/?python#bridge-tokens_create
         :param public_token:
         :return:
         """

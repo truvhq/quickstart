@@ -174,7 +174,6 @@
         const bridgeToken = await apiRequests.getBridgeToken()
         const bridge = CitadelBridge.init({
           clientName: 'Citadel Quickstart',
-          companyMappingId: bridgeToken.settings.company_mapping_id,
           bridgeToken: bridgeToken.bridge_token,
           product: '{{ product_type }}',
           trackingInfo: 'any data for tracking current user',
