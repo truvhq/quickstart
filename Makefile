@@ -1,4 +1,4 @@
-.PHONY: env python_docker python_venv
+.PHONY: env python_docker python_local
 
 env:
 	test -f .env || cp .env.example .env

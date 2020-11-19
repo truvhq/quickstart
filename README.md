@@ -70,7 +70,7 @@ API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=employment OR income
 ```
 
-- make python_venv
+- make python_local
 
 ```
 ======================================== ENVIRONMENT ======================================== 
