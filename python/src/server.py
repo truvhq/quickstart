@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 import flask
 from flask import Flask, render_template
@@ -46,6 +47,8 @@ def index():
     """Just render example with bridge.js"""
     if product_type == 'income':
         return render_template('income.html')
+    elif product_type == 'admin':
+        return render_template('admin.html')
     else:
         return render_template('employment.html')
 
@@ -76,6 +79,31 @@ def get_verification_info_by_token(public_token: str):
     else:
         raise Exception('Unsupported product type!')
     return verifications
+
+
+@app.route('/getAdminData/<public_token>', methods=['GET'])
+def get_admin_data_by_token(public_token: str):
+    """ getAdminDataByToken """
+
+    # First, exchange public_token to access_token
+    access_token = api_client.get_access_token(public_token)
+
+    # Second, request employee directory
+    directory = api_client.get_employee_directory_by_token(access_token)
+
+    # Third, create request for payroll report
+    report_id = api_client.request_payroll_report(access_token, '2020-01-01', '2020-10-31')['payroll_report_id']
+
+    # Last, collect prepared payroll report
+    payroll = api_client.get_payroll_report_by_id(report_id)
+    if payroll['status'] != 'success':
+        time.sleep(20)
+        payroll = api_client.get_payroll_report_by_id(report_id)
+
+    return {
+        'directory': directory,
+        'payroll': payroll
+    }
 
 
 if __name__ == '__main__':

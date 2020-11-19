@@ -90,3 +90,59 @@ class NaiveApiClient:
             json=request_data,
             headers=self.API_HEADERS,
         ).json()
+
+    def get_employee_directory_by_token(self, access_token: str) -> Any:
+        """
+        https://docs.citadelid.com/#payroll-admin
+        :param access_token:
+        :return:
+        """
+
+        class DirectoryRequest(TypedDict):
+            access_token: str
+
+        request_data: DirectoryRequest = {'access_token': access_token}
+
+        return requests.post(
+            self.API_URL + 'administrators/directories/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+
+    def request_payroll_report(self, access_token: str, start_date: str , end_date: str) -> Any:
+        """
+        https://docs.citadelid.com/#payroll-admin
+        :param access_token:
+        :param start_date:
+        :param end_date:
+        :return: Payroll report ID
+        """
+
+        class PayrollReportRequest(TypedDict):
+            access_token: str
+            start_date: str
+            end_date: str
+
+        request_data: PayrollReportRequest = {
+            'access_token': access_token,
+            'start_date': start_date,
+            'end_date': end_date
+        }
+
+        return requests.post(
+            self.API_URL + 'administrators/payrolls/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+
+    def get_payroll_report_by_id(self, report_id: str) -> Any:
+        """
+        https://docs.citadelid.com/#payroll-admin
+        :param report_id:
+        :return:
+        """
+
+        return requests.get(
+            self.API_URL + f'administrators/payrolls/{report_id}',
+            headers=self.API_HEADERS,
+        ).json()
