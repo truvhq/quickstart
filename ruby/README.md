@@ -87,8 +87,8 @@ Here is the flow that a successful verification process takes in our example:
   const bridge = CitadelBridge.init({
     clientName: 'Citadel Quickstart',
     companyMappingId: null,
-    key: '{{public_key}}',
-    product: 'income',
+    key: '{{ public_key }}',
+    product: '{{ product_type }}',
     trackingInfo: 'any data for tracking current user',
     ...
   });
