@@ -1,17 +1,17 @@
 # Introduction
-Let's get you started with Citadel by walking through this NodeJS Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
+Let's get you started with Citadel by walking through this Ruby on Rails Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
 
 You'll have two different API keys (`client_id`, `access_key`) and a `public_key` for initiating the widget, and we'll start in the Sandbox environment. 
 
 
-# Set up the NodeJS Quickstart
-Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app locally.
-*Requirements*: The latest LTS version of `nodejs`
+# Set up the Ruby on Rails Quickstart
+Once you have your API keys, it's time to run the Citadel Ruby on Rails Quickstart app locally.
+*Requirements*: Ruby 2.6.5
 
-1. `git clone https://github.com/citadelid/quickstart-node`
-2. `cd quickstart-node`
-3. `npm install`
-4. create a `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
+1. `git clone https://github.com/citadelid/quickstart`
+2. `cd quickstart`
+3. `make env`
+4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 ```
 API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
@@ -19,27 +19,21 @@ API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment OR income>
 ```
-5. `npm start`
+5. `make ruby_local`
 
 After running this command, you should see:
 ```
-======================================== ENVIRONMENT ========================================
-{
-  API_CLIENT_ID: <YOUR CLIENT ID HERE>,
-  API_SECRET: <YOUR SECRET KEY HERE>,
-  API_URL: 'https://prod.citadelid.com/v1',
-  API_PUBLIC_KEY: <YOUR PUBLIC KEY HERE>,
-  API_PRODUCT_TYPE: <YOUR PRODUCT TYPE HERE>
-}
-==============================================================================================
-listening on port 5000
+* Min threads: 5, max threads: 5
+* Environment: development
+* Listening on tcp://127.0.0.1:5000
+* Listening on tcp://[::1]:5000
 ```
 
 To access the app, open http://127.0.0.1:5000/ in your browser.
 
 # Run you first verification
 ## Overview
-The NodeJS Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
+The Ruby on Rails Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
 
 Before using Citadel for verification, applicants filled out the form. 
 
@@ -51,7 +45,7 @@ If the verification isn't successful or the applicant decided to exit Citadel's 
 
 ## Successful verification
 
-After opening the NodeJS Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, eg `Facebook` and select any provider. 
+After opening the Ruby on Rails Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, eg `Facebook` and select any provider. 
 
 Use the Sandbox credentials to simulate a successful login.
 
@@ -93,8 +87,8 @@ Here is the flow that a successful verification process takes in our example:
   const bridge = CitadelBridge.init({
     clientName: 'Citadel Quickstart',
     companyMappingId: null,
-    key: '{{public_key}}',
-    product: 'income',
+    key: '{{ public_key }}',
+    product: '{{ product_type }}',
     trackingInfo: 'any data for tracking current user',
     ...
   });
@@ -149,80 +143,57 @@ onClose: function () {
 
 ## <a id="step-6"></a>6. :cloud: sends API request to Citadel exchanging temporary `token` for `access_token`
 ```
-const getHeaders = () => {
-  return {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    "X-Access-Client-Id": API_CLIENT_ID,
-    "X-Access-Secret": API_SECRET,
-  }
-}
+def self.getAccessToken(public_token)
+  body = { "public_tokens" => [public_token] }.to_json
+  return sendRequest('access-tokens/', body)["access_tokens"][0]
+end
 
-const getAccessToken = async (public_token) => {
-  const headers = getHeaders()
-  const inputBody = JSON.stringify({
-    public_tokens: [public_token],
-  })
+...
 
-  const response = await fetch(`${API_URL}/access-tokens/`, {
-    method: "POST",
-    body: inputBody,
-    headers: headers,
-  })
-  const body = await response.json()
-  return body.access_tokens[0]
-}
+def self.sendRequest(endpoint, body)
+  uri = URI("#{Citadel.api_url}#{endpoint}")
+  req = Net::HTTP::Post.new uri
+  req['Content-Type'] = 'application/json'
+  req['Accept'] = 'application/json'
+  req['X-Access-Client-Id'] = Citadel.client_id
+  req['X-Access-Secret'] = Citadel.client_secret
+  if body
+    req.body = body
+  end
+
+  response = Net::HTTP.start(uri.hostname, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+    http.request req
+  end
+
+  case response
+    when Net::HTTPSuccess then
+    body = JSON.parse(response.body)
+    return body
+  else
+    puts "ERROR REACHING CITADEL".inspect
+    puts response.inspect
+    return JSON.parse('{}')
+  end
+end
 ```
 ## <a id="step-7"></a>7. :cloud: sends API request to Citadel with `access_token` for employment/income verification
 ```
-const getEmploymentInfoByToken = async (access_token) => {
-  const requestBody = JSON.stringify({
-    access_token,
-  })
-  return await sendRequest("verifications/employments/",requestBody)
-}
+def self.getEmploymentInfoByToken(access_token)
+  body = { "access_token" => access_token }.to_json
+  sendRequest('verifications/employments/', body)
+end
 
-const getIncomeInfoByToken = async (access_token) => {
-  const requestBody = JSON.stringify({
-    access_token,
-  })
-  return await sendRequest("verifications/incomes/",requestBody)
-}
-
-const sendRequest = async (endpoint, body) => {
-  const headers = getHeaders()
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      method: "POST",
-      body,
-      headers,
-    })
-    const responseBody = await response.json()
-    return responseBody
-  } catch (e) {
-    console.error(`Error with ${endpoint} request`)
-    console.error(e)
-    throw e
-  }
-}
+def self.getIncomeInfoByToken(access_token)
+  body = { "access_token" => access_token }.to_json
+  sendRequest('verifications/incomes/', body)
+end
 ```
 ## <a id="step-8"></a> 8. :cloud: sends employment/income verification information back to :computer:
 ```
-app.get("/getVerifications/:token", async (req, res) => {
-  // retrieve income verification information
-  try {
-    const accessToken = await getAccessToken(req.params.token)
-    let verifications
-    if(API_PRODUCT_TYPE === "employment") {
-      verifications = await getEmploymentInfoByToken(accessToken)
-    } else {
-      verifications = await getIncomeInfoByToken(accessToken)
-    }
-    res.json(verifications)
-  } catch (e) {
-    res.status(500).json({ success: false })
-  }
-})
+Rails.application.routes.draw do
+  root :to => 'main#index'
+  get 'getVerifications/:public_token', to: 'verification#get'
+end
 ```
 ## <a id="step-9"></a>9. :computer: renders the verification info sent back by :cloud: for :smiley: to view
 ```
