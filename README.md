@@ -1,7 +1,7 @@
 # Introduction
 Let's get you started with Citadel by walking through this Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
 
-You'll have two different API keys (`client_id`, `access_key`) and a `public_key` for initiating the widget, and we'll start in the Sandbox environment. 
+We'll start in the Sandbox environment with two different API keys (`client_id`, `access_key`).
 
 
 # Set up the Quickstart
@@ -15,12 +15,11 @@ You have two options - running with `docker` and `docker-compose` or starting wi
 -  cd quickstart
 -  make env
 
-After you have to write your `SECRET_KEY`, `CLIENT_ID` and `PUBLIC_KEY` to the `.env` file.
+After you have to write your `SECRET_KEY` and `CLIENT_ID` to the `.env` file.
 
 Content of `.env` has to look like this:
 ```
 API_URL=https://prod.citadelid.com/v1/
-API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=employment OR income
@@ -59,12 +58,11 @@ To access the app, open http://127.0.0.1:5000/ in your browser.
 - cd quickstart
 - make env
 
-After you have to write your `SECRET_KEY`, `CLIENT_ID` and `PUBLIC_KEY` to the `.env` file.
+After you have to write your `SECRET_KEY` and `CLIENT_ID` to the `.env` file.
 
 Content of `.env` have to look like this:
 ```
 API_URL=https://prod.citadelid.com/v1/
-API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=employment, income or admin
@@ -134,13 +132,13 @@ for the API Key and click `submit`. The API call will be executed and the data w
 # What happened under the hood
 ## Token exchange flow
 
-First we initiate the widget using your `public_key`. 
+First we make a call to our API to request a bridge token from Citadel and use this bridge token to initiate the Citadel Bridge.
 
 ```
+        const bridgeToken = await apiRequests.getBridgeToken()
         const bridge = CitadelBridge.init({
           clientName: 'Citadel Quickstart',
-          companyMappingId: null,
-          key: '{{ public_key }}',
+          bridgeToken: bridgeToken.bridge_token,
           product: '{{ product_type}}',
           trackingInfo: 'any data for tracking current user',
           onLoad: function () {

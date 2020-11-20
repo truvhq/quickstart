@@ -1,9 +1,5 @@
-require 'net/http'
-require 'json'
-
 class BridgeToken
-  def get
-    result = Citadel.sendRequest("bridge-tokens/")
-    return result
+  def self.get
+    return Citadel.getBridgeToken()
   end
 end
