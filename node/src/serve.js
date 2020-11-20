@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 dotenv.config()
 
 const { API_PRODUCT_TYPE } = process.env
-const validProductTypes = ["employment", "income"]
+const validProductTypes = ["employment", "income", "admin"]
 
 if (validProductTypes.indexOf(API_PRODUCT_TYPE) < 0) {
   console.error(

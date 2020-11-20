@@ -16,7 +16,7 @@ const getHeaders = () => {
 }
 
 const getBridgeToken = async () => {
-  const responseBody = await sendRequest("bridge-tokens/")
+  const responseBody = await sendRequest("bridge-tokens/", {})
   return responseBody
 }
 
@@ -27,10 +27,10 @@ const getBridgeToken = async () => {
  * @return The access token provided by citadel - https://docs.citadelid.com/#exchange-token-flow
  **/
 const getAccessToken = async (public_token) => {
-  const requestBody = JSON.stringify({
+  const body = JSON.stringify({
     public_tokens: [public_token],
   })
-  const responseBody = await sendRequest("access-tokens/",requestBody)
+  const responseBody = await sendRequest("access-tokens/", {body})
   return responseBody.access_tokens[0]
 }
 
@@ -40,10 +40,10 @@ const getAccessToken = async (public_token) => {
  * @return The response from Citadel - https://docs.citadelid.com/#schemaemploymentcheck
  */
 const getEmploymentInfoByToken = async (access_token) => {
-  const requestBody = JSON.stringify({
+  const body = JSON.stringify({
     access_token,
   })
-  return await sendRequest("verifications/employments/",requestBody)
+  return await sendRequest("verifications/employments/", {body})
 }
 
 /**
@@ -52,17 +52,39 @@ const getEmploymentInfoByToken = async (access_token) => {
  * @return The response from Citadel - https://docs.citadelid.com/#schemaincomecheck
  */
 const getIncomeInfoByToken = async (access_token) => {
-  const requestBody = JSON.stringify({
+  const body = JSON.stringify({
     access_token,
   })
-  return await sendRequest("verifications/incomes/",requestBody)
+  return await sendRequest("verifications/incomes/", { body })
 }
 
-const sendRequest = async (endpoint, body) => {
+const getEmployeeDirectoryByToken = async (access_token) => {
+  const body = JSON.stringify({
+    access_token,
+  })
+  return await sendRequest("administrators/directories/", { body })
+}
+
+const getPayrollReport = async (access_token, start_date, end_date) => {
+  const body = JSON.stringify({
+    access_token,
+    start_date,
+    end_date,
+  })
+  return await sendRequest("administrators/payrolls/", { body })
+}
+
+const getPayrollById = async (report_id) => {
+  return await sendRequest(`administrators/payrolls/${report_id}`, {
+    method: "GET",
+  })
+}
+
+const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
   const headers = getHeaders()
   try {
     const response = await fetch(`${API_URL}${endpoint}`, {
-      method: "POST",
+      method: method,
       body,
       headers,
     })
@@ -75,4 +97,12 @@ const sendRequest = async (endpoint, body) => {
   }
 }
 
-export { getEmploymentInfoByToken, getAccessToken, getBridgeToken, getIncomeInfoByToken }
+export {
+  getEmploymentInfoByToken,
+  getAccessToken,
+  getBridgeToken,
+  getIncomeInfoByToken,
+  getEmployeeDirectoryByToken,
+  getPayrollReport,
+  getPayrollById,
+}

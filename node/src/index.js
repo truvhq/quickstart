@@ -7,6 +7,9 @@ import {
   getBridgeToken,
   getEmploymentInfoByToken,
   getIncomeInfoByToken,
+  getEmployeeDirectoryByToken,
+  getPayrollById,
+  getPayrollReport
 } from "./citadel.js"
 
 const {
@@ -50,6 +53,26 @@ app.get("/getVerifications/:token", async (req, res) => {
       verifications = await getIncomeInfoByToken(accessToken)
     }
     res.json(verifications)
+  } catch (e) {
+    console.error("error with getVerifications")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
+app.get("/getAdminData/:token", async (req, res) => {
+  // retrieve income verification information
+  try {
+    const accessToken = await getAccessToken(req.params.token)
+
+    const directory = await getEmployeeDirectoryByToken(accessToken)
+
+    const reportId = (await getPayrollReport(accessToken, '2020-01-01', '2020-10-31')).payroll_report_id
+
+    const payroll = await getPayrollById(reportId)
+
+    const data = { directory, payroll }
+    res.json(data)
   } catch (e) {
     console.error("error with getVerifications")
     console.error(e)
