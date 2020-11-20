@@ -9,7 +9,7 @@ import {
   getIncomeInfoByToken,
   getEmployeeDirectoryByToken,
   getPayrollById,
-  getPayrollReport
+  requestPayrollReport
 } from "./citadel.js"
 
 const {
@@ -67,7 +67,7 @@ app.get("/getAdminData/:token", async (req, res) => {
 
     const directory = await getEmployeeDirectoryByToken(accessToken)
 
-    const reportId = (await getPayrollReport(accessToken, '2020-01-01', '2020-10-31')).payroll_report_id
+    const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-10-31')).payroll_report_id
 
     const payroll = await getPayrollById(reportId)
 

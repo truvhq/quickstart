@@ -87,7 +87,7 @@ const getEmployeeDirectoryByToken = async (access_token) => {
  * @param {String} end_date
  * @return The payroll report ID from Citadel - https://docs.citadelid.com/?javascript#create-payroll-admin-report-request-responseschema
  */
-const getPayrollReport = async (access_token, start_date, end_date) => {
+const requestPayrollReport = async (access_token, start_date, end_date) => {
   const body = JSON.stringify({
     access_token,
     start_date,
@@ -131,6 +131,6 @@ export {
   getBridgeToken,
   getIncomeInfoByToken,
   getEmployeeDirectoryByToken,
-  getPayrollReport,
+  requestPayrollReport,
   getPayrollById,
 }

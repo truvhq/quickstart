@@ -7,35 +7,42 @@ class Citadel
   class_attribute :client_secret
 
   def self.getBridgeToken()
+    # https://docs.citadelid.com/ruby#bridge-tokens_create
     return sendRequest('bridge-tokens/', nil, "POST")
   end
 
   def self.getAccessToken(public_token)
+    # https://docs.citadelid.com/?ruby#exchange-token-flow
     body = { "public_tokens" => [public_token] }.to_json
     return sendRequest('access-tokens/', body, "POST")["access_tokens"][0]
   end
 
   def self.getEmploymentInfoByToken(access_token)
+    # https://docs.citadelid.com/?ruby#employment-verification
     body = { "access_token" => access_token }.to_json
     sendRequest('verifications/employments/', body, "POST")
   end
 
   def self.getIncomeInfoByToken(access_token)
+    # https://docs.citadelid.com/?ruby#income-verification
     body = { "access_token" => access_token }.to_json
     sendRequest('verifications/incomes/', body, "POST")
   end
 
   def self.getEmployeeDirectoryByToken(access_token)
+    # * https://docs.citadelid.com/?ruby#employee-directory
     body = { "access_token" => access_token }.to_json
     sendRequest("administrators/directories/", body, "POST")
   end
 
-  def self.getPayrollReport(access_token, start_date, end_date)
+  def self.requestPayrollReport(access_token, start_date, end_date)
+    # https://docs.citadelid.com/?ruby#create-payroll-report
     body = { "access_token" => access_token, "start_date" => start_date, "end_date" => end_date }.to_json
     sendRequest("administrators/payrolls/", body, "POST")
   end
 
   def self.getPayrollById(report_id)
+    # https://docs.citadelid.com/?ruby#retrieve-payroll-report
     sendRequest("administrators/payrolls/#{report_id}", nil, "GET")
   end
 
