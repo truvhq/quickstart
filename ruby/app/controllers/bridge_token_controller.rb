@@ -1,5 +1,5 @@
 class BridgeTokenController < ApplicationController
   def get
-    @message = BridgeToken.new.get
+    @message = BridgeToken.get()
   end
 end

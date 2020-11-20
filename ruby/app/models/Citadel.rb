@@ -6,6 +6,10 @@ class Citadel
   class_attribute :client_id
   class_attribute :client_secret
 
+  def self.getBridgeToken()
+    return sendRequest('bridge-tokens/', nil)
+  end
+
   def self.getAccessToken(public_token)
     body = { "public_tokens" => [public_token] }.to_json
     return sendRequest('access-tokens/', body)["access_tokens"][0]
