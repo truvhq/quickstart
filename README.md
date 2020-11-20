@@ -15,15 +15,15 @@ You have two options - running with `docker` and `docker-compose` or starting wi
 -  cd quickstart
 -  make env
 
-After you have to write your `SECRET_KEY`, `CLIENT_ID` and `PUBLIC_KEY` to the `.env` file.
+After you've done that, you have to put your `SECRET_KEY`, `CLIENT_ID` and `PUBLIC_KEY` in the `.env` file.
 
-Content of `.env` has to look like this:
+The `.env` file should look like this:
 ```
 API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
-API_PRODUCT_TYPE=employment OR income
+API_PRODUCT_TYPE=employment, income or admin
 ```
 
 - make python_docker
@@ -59,9 +59,9 @@ To access the app, open http://127.0.0.1:5000/ in your browser.
 - cd quickstart
 - make env
 
-After you have to write your `SECRET_KEY`, `CLIENT_ID` and `PUBLIC_KEY` to the `.env` file.
+After you've done that, you have to put your `SECRET_KEY`, `CLIENT_ID` and `PUBLIC_KEY` in the `.env` file.
 
-Content of `.env` have to look like this:
+The `.env` file should look like this:
 ```
 API_URL=https://prod.citadelid.com/v1/
 API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
@@ -93,11 +93,11 @@ API_PRODUCT_TYPE=employment, income or admin
 
 To access the app, open http://127.0.0.1:5000/ in your browser.
 
-# Run you first verification
+# Run your first verification
 ## Overview
-Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
+The Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
 
-Before using Citadel for verification, applicants filled out the form. 
+Before using Citadel for verification, an applicant has filled out the form. 
 
 To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button. 
 
@@ -107,7 +107,7 @@ If the verification isn't successful or the applicant decided to exit Citadel's 
 
 ## Successful verification
 
-After opening the Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, eg `Facebook` and select any provider. 
+After opening the Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company (e.g., `Facebook`) and select a provider.
 
 Use the Sandbox credentials to simulate a successful login.
 
@@ -118,18 +118,17 @@ password: goodpassword
 
 Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
 
-The API call will be executed and the data will be loaded into the fields of the form.
+The API call will be executed and the data will be loaded into the form.
 
 ## No verification
 
-Now click `Add employer` button, search for a company, eg `Facebook` and select any provider. 
+Click the `Add employer` button, search for a company (e.g., `Facebook`) and select a provider.
 
-Click exit icon at the top right of the widget and you'll see the empty form.
+Click the exit icon at the top right of the widget and you'll see the empty form.
 
 ## Successful administration
 
-If using the `admin` product type, after opening the Quickstart app running locally click the `Connect` button and select any provider. Enter `Skx8LTnyrLiw4SYk8xfkRwOt5OGQbNulypqdsqd`
-for the API Key and click `submit`. The API call will be executed and the data will be loaded into the drop downs.
+If using the `admin` product, after opening the Quickstart app running locally, click the `Connect` button and select any provider. Enter `Skx8LTnyrLiw4SYk8xfkRwOt5OGQbNulypqdsqd` for the API Key and click `submit`. The API call will be executed and the data will be loaded into the drop-down input.
 
 # What happened under the hood
 ## Token exchange flow
@@ -190,7 +189,7 @@ First we initiate the widget using your `public_key`.
       })();
 ```
 
-Once widget is initiated, we receive `public_token` that can be exchange for `access_token` that will be used to access data via API and that will be unique for this verification.
+Once the widget is initiated, we receive a `public_token` that can be exchanged for an `access_token`, which will be used to access data via the API.  The `access_token` will be unique for this verification.
 
 ## API calls
 After receiving the `access_token` we can make API calls and pass the data to the frontend to show in the app.
@@ -209,7 +208,7 @@ After receiving the `access_token` we can make API calls and pass the data to th
         ).json()
 ```
 
-When verification was successful, we show the form and populate it with data that we received from the backend:
+When verification is successful, we show the form and populate it with data that we received from the backend:
 ```
           onSuccess: async function (token) {
             console.log('token: ', token);
