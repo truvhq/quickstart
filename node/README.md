@@ -151,8 +151,7 @@ Here is the flow that a successful verification process takes in our example:
 ## <a id="step-3"></a>3. :computer: runs `CitadelBridge.init` with `bridge_token`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel NodeJS Quickstart',
-    companyMappingId: bridgeToken.settings.company_mapping_id,
+    clientName: 'Citadel Quickstart',
     bridgeToken: bridgeToken.bridge_token,
     product: 'income',
     trackingInfo: 'any data for tracking current user',

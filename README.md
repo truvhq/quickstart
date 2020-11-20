@@ -138,7 +138,6 @@ First we make a call to our API to request a bridge token from Citadel and use t
         const bridgeToken = await apiRequests.getBridgeToken()
         const bridge = CitadelBridge.init({
           clientName: 'Citadel Quickstart',
-          companyMappingId: bridgeToken.settings.company_mapping_id,
           bridgeToken: bridgeToken.bridge_token,
           product: '{{ product_type}}',
           trackingInfo: 'any data for tracking current user',
