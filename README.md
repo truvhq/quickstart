@@ -11,11 +11,11 @@ Follow the `README.md` file for the language you would like to implement in. If 
 - [Node](https://github.com/citadelid/quickstart/blob/master/node/README.md)
 - [Ruby on Rails](https://github.com/citadelid/quickstart/blob/master/ruby/README.md)
 
-# Run you first verification
+# Run your first verification
 ## Overview
 The Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
 
-Before using Citadel for verification, applicants fill out the form. 
+Before using Citadel for verification, an applicant fills out the form. 
 
 To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button. 
 
@@ -25,7 +25,7 @@ If the verification isn't successful or the applicant decided to exit Citadel's 
 
 ## Successful verification
 
-After opening the Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, eg `Facebook` and select any provider. 
+After opening the Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, (e.g., `Facebook`) and select a provider. 
 
 Use the Sandbox credentials to simulate a successful login.
 
@@ -36,13 +36,13 @@ password: goodpassword
 
 Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
 
-The API call will be executed and the data will be loaded into the fields on the form.
+The API call will be executed and the data will be loaded into the form.
 
 ## No verification
 
 Now click the `Add employer` button, search for a company, eg `Facebook` and select any provider. 
 
-Click exit icon at the top right of the widget and you'll see the empty form.
+Click the exit icon at the top right of the widget and you'll see the empty form.
 
 # What happened under the hood
 
