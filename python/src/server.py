@@ -32,7 +32,10 @@ print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
 
 @app.context_processor
 def inject_product_type():
-    return dict(product_type=product_type, )
+    return dict(
+        product_type=product_type,
+        server_url=flask.request.url_root,
+    )
 
 
 @app.route('/')
