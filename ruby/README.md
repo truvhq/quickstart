@@ -1,11 +1,11 @@
 # Introduction
-Let's get you started with Citadel by walking through this Ruby on Rails Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
+Let's get you started with Citadel by walking through this Ruby on Rails Quickstart app. You'll need a set of API keys which you can request by emailing team@citadelid.com.
 
-You'll have two different API keys (`client_id`, `access_key`) and a `public_key` for initiating the widget, and we'll start in the Sandbox environment. 
-
+You'll have two different API keys used by the back end, `client_id` and `access_key`.
 
 # Set up the Ruby on Rails Quickstart
 Once you have your API keys, it's time to run the Citadel Ruby on Rails Quickstart app locally.
+
 *Requirements*: Ruby 2.6.5
 
 1. `git clone https://github.com/citadelid/quickstart`
@@ -14,7 +14,6 @@ Once you have your API keys, it's time to run the Citadel Ruby on Rails Quicksta
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 ```
 API_URL=https://prod.citadelid.com/v1/
-API_PUBLIC_KEY=<YOUR PUBLIC KEY HERE>
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment OR income>
@@ -35,7 +34,7 @@ To access the app, open http://127.0.0.1:5000/ in your browser.
 ## Overview
 The Ruby on Rails Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
 
-Before using Citadel for verification, applicants filled out the form. 
+Before using Citadel for verification, applicants fill out the form. 
 
 To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button. 
 
@@ -56,11 +55,11 @@ password: goodpassword
 
 Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
 
-The API call will be executed and the data will be loaded into the fields of the form.
+The API call will be executed and the data will be loaded into the fields on the form.
 
 ## No verification
 
-Now click `Add employer` button, search for a company, eg `Facebook` and select any provider. 
+Now click the `Add employer` button, search for a company, eg `Facebook` and select any provider. 
 
 Click exit icon at the top right of the widget and you'll see the empty form.
 

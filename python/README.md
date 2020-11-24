@@ -1,8 +1,7 @@
 # Introduction
 Let's get you started with Citadel by walking through this Python Quickstart app. You'll need a set of API keys which you can request by emailing team@citadelid.com.
 
-You'll have two different API keys. `client_id` and `access_key`.
-
+You'll have two different API keys used by the back end, `client_id` and `access_key`.
 
 # Set up the Python Quickstart
 Once you have your API keys, it's time to run the Citadel Python Quickstart app locally.
@@ -68,11 +67,11 @@ password: goodpassword
 
 Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
 
-The API call will be executed and the data will be loaded into the fields of the form.
+The API call will be executed and the data will be loaded into the fields on the form.
 
 ## No verification
 
-Now click `Add employer` button, search for a company, eg `Facebook` and select any provider. 
+Now click the `Add employer` button, search for a company, eg `Facebook` and select any provider. 
 
 Click exit icon at the top right of the widget and you'll see the empty form.
 

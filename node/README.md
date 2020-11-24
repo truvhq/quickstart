@@ -1,24 +1,24 @@
 # Introduction
 Let's get you started with Citadel by walking through this NodeJS Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
 
-We'll start in the Sandbox environment with two different API keys (`client_id`, `access_key`).
+You'll have two different API keys used by the back end, `client_id` and `access_key`.
 
 
 # Set up the NodeJS Quickstart
 Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app locally.
 *Requirements*: The latest LTS version of `nodejs`
 
-1. `git clone https://github.com/citadelid/quickstart-node`
-2. `cd quickstart-node`
-3. `npm install`
-4. create a `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
+1. `git clone https://github.com/citadelid/quickstart`
+2. `cd quickstart`
+3. `make env`
+4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 ```
 API_URL=https://prod.citadelid.com/v1/
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment OR income>
 ```
-5. `npm start`
+5. `make node_local`
 
 After running this command, you should see:
 ```
@@ -39,7 +39,7 @@ To access the app, open http://127.0.0.1:5000/ in your browser.
 ## Overview
 The NodeJS Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
 
-Before using Citadel for verification, applicants filled out the form. 
+Before using Citadel for verification, applicants fill out the form. 
 
 To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button. 
 
