@@ -1,12 +1,12 @@
 # Introduction
-Let's get you started with Citadel by walking through this NodeJS Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
+Let's get you started with Citadel by walking through this Python Quickstart app. You'll need a set of API keys which you can request by emailing team@citadelid.com.
 
 You'll have two different API keys used by the back end, `client_id` and `access_key`.
 
+# Set up the Python Quickstart
+Once you have your API keys, it's time to run the Citadel Python Quickstart app locally.
 
-# Set up the NodeJS Quickstart
-Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app locally.
-*Requirements*: The latest LTS version of `nodejs`
+*Requirements*: Python 3.8+
 
 1. `git clone https://github.com/citadelid/quickstart`
 2. `cd quickstart`
@@ -18,26 +18,33 @@ API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment, income or admin>
 ```
-5. `make node_local`
+5. `make python_local`
 
 After running this command, you should see:
 ```
-======================================== ENVIRONMENT ========================================
-{
-  API_CLIENT_ID: <YOUR CLIENT ID HERE>,
-  API_SECRET: <YOUR SECRET KEY HERE>,
-  API_URL: 'https://prod.citadelid.com/v1',
-  API_PRODUCT_TYPE: <YOUR PRODUCT TYPE HERE>
-}
-==============================================================================================
-listening on port 5000
+web_1  | ======================================== ENVIRONMENT ======================================== 
+web_1  |  https://prod.citadelid.com/v1/ 
+web_1  |  {
+web_1  |     "X-Access-Secret": "<YOUR SECRET_KEY HERE>",
+web_1  |     "X-Access-Client-Id": "<YOUR CLIENT_ID HERE>",
+web_1  |     "Content-Type": "application/json;charset=UTF-8"
+web_1  | } 
+web_1  |  ============================================================================================== 
+web_1  | 
+web_1  |  * Serving Flask app "server" (lazy loading)
+web_1  |  * Environment: development
+web_1  |  * Debug mode: on
+web_1  |  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+web_1  |  * Restarting with stat
+web_1  |  * Debugger is active!
+web_1  |  * Debugger PIN: 593-914-178
 ```
 
 To access the app, open http://127.0.0.1:5000/ in your browser.
 
 # Run your first verification
 ## Overview
-The NodeJS Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
+The Python Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
 
 Before using Citadel for verification, an applicant fills out the form. 
 
@@ -49,7 +56,7 @@ If the verification isn't successful or the applicant decided to exit Citadel's 
 
 ## Successful verification
 
-After opening the NodeJS Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, (e.g., `Facebook`) and select a provider. 
+After opening the Python Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, (e.g., `Facebook`) and select a provider. 
 
 Use the Sandbox credentials to simulate a successful login.
 
@@ -64,7 +71,7 @@ The API call will be executed and the data will be loaded into the form.
 
 ## No verification
 
-Now click `Add employer` button, search for a company, eg `Facebook` and select any provider. 
+Now click the `Add employer` button, search for a company, eg `Facebook` and select any provider. 
 
 Click the exit icon at the top right of the widget and you'll see the empty form.
 
@@ -100,58 +107,27 @@ Here is the flow that a successful verification process takes in our example:
 ```
 ## <a id="step-2"></a>2. :cloud: sends API request to Citadel for `bridge_token`, sends response to :computer:
 ```
-  const getHeaders = () => {
-    return {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-Access-Client-Id": API_CLIENT_ID,
-      "X-Access-Secret": API_SECRET,
-    }
-  }
-
-  ...
-
-  const getBridgeToken = async () => {
-    const responseBody = await sendRequest("bridge-tokens/")
-    return responseBody
-  }
-
-  ...
-
-  const sendRequest = async (endpoint, body) => {
-    const headers = getHeaders()
-    try {
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: "POST",
-        body,
-        headers,
-      })
-      const responseBody = await response.json()
-      return responseBody
-    } catch (e) {
-      console.error(`Error with ${endpoint} request`)
-      console.error(e)
-      throw e
-    }
-  }
+  def get_bridge_token(self) -> Any:
+    """
+    https://docs.citadelid.com/?python#bridge-tokens_create
+    :param public_token:
+    :return:
+    """
+    tokens: Any = requests.post(
+        self.API_URL + 'bridge-tokens/',
+        headers=self.API_HEADERS,
+    ).json()
+    return tokens
 ```
 ```
-  app.get("/getBridgeToken", async (req, res) => {
-    // retrieve bridge token
-    try {
-      const bridgeToken = await getBridgeToken()
-      res.json(bridgeToken)
-    } catch (e) {
-      console.error("error with getBridgeToken")
-      console.error(e)
-      res.status(500).json({ success: false })
-    }
-  })
+  @app.route('/getBridgeToken', methods=['GET'])
+  def create_bridge_token():
+    return api_client.get_bridge_token()
 ```
 ## <a id="step-3"></a>3. :computer: runs `CitadelBridge.init` with `bridge_token`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel Quickstart',
+    clientName: 'Citadel NodeJS Quickstart',
     bridgeToken: bridgeToken.bridge_token,
     product: 'income',
     trackingInfo: 'any data for tracking current user',
@@ -159,6 +135,7 @@ Here is the flow that a successful verification process takes in our example:
   });
   window.bridge = bridge;
 ```
+
 ## <a id="step-4"></a>4. :smiley: clicks `Verify Income/`Verify Employment` button
 ## <a id="step-5"></a>5. :computer: displays Citadel widget, fires `onLoad` function executed
 ```
@@ -207,56 +184,85 @@ onClose: function () {
 
 ## <a id="step-8"></a>8. :cloud: sends API request to Citadel exchanging temporary `token` for `access_token`
 ```
-const getAccessToken = async (public_token) => {
-  const headers = getHeaders()
-  const inputBody = JSON.stringify({
-    public_tokens: [public_token],
-  })
+def get_access_token(self, public_token: str) -> str:
+  """
+  https://docs.citadelid.com/?python#exchange-token-flow
+  :param public_token:
+  :return:
+  """
 
-  const response = await fetch(`${API_URL}/access-tokens/`, {
-    method: "POST",
-    body: inputBody,
-    headers: headers,
-  })
-  const body = await response.json()
-  return body.access_tokens[0]
-}
+  class AccessTokenRequest(TypedDict):
+      public_tokens: List[str]
+
+  class AccessTokenResponse(TypedDict):
+      access_tokens: List[str]
+
+  request_data: AccessTokenRequest = {
+      'public_tokens': [public_token],
+  }
+
+  tokens: AccessTokenResponse = requests.post(
+      self.API_URL + 'access-tokens/',
+      json=request_data,
+      headers=self.API_HEADERS,
+  ).json()
+  return tokens['access_tokens'][0]
 ```
 ## <a id="step-9"></a>9. :cloud: sends API request to Citadel with `access_token` for employment/income verification
 ```
-const getEmploymentInfoByToken = async (access_token) => {
-  const requestBody = JSON.stringify({
-    access_token,
-  })
-  return await sendRequest("verifications/employments/",requestBody)
-}
+def get_employment_info_by_token(self, access_token: str) -> Any:
+    """
+    https://docs.citadelid.com/#employment-verification
+    :param access_token:
+    :return:
+    """
 
-...
+    class VerificationRequest(TypedDict):
+        access_token: str
 
-const getIncomeInfoByToken = async (access_token) => {
-  const requestBody = JSON.stringify({
-    access_token,
-  })
-  return await sendRequest("verifications/incomes/",requestBody)
-}
+    request_data: VerificationRequest = {'access_token': access_token}
+
+    return requests.post(
+        self.API_URL + 'verifications/employments/',
+        json=request_data,
+        headers=self.API_HEADERS,
+    ).json()
+
+def get_income_info_by_token(self, access_token: str) -> Any:
+    """
+    https://docs.citadelid.com/#income-verification
+    :param access_token:
+    :return:
+    """
+
+    class VerificationRequest(TypedDict):
+        access_token: str
+
+    request_data: VerificationRequest = {'access_token': access_token}
+
+    return requests.post(
+        self.API_URL + 'verifications/incomes/',
+        json=request_data,
+        headers=self.API_HEADERS,
+    ).json()
 ```
-## <a id="step-10"></a> 10. :cloud: sends employment/income verification information back to :computer:
+## <a id="step-10"></a>10. :cloud: sends employment/income verification information back to :computer:
 ```
-app.get("/getVerifications/:token", async (req, res) => {
-  // retrieve income verification information
-  try {
-    const accessToken = await getAccessToken(req.params.token)
-    let verifications
-    if(API_PRODUCT_TYPE === "employment") {
-      verifications = await getEmploymentInfoByToken(accessToken)
-    } else {
-      verifications = await getIncomeInfoByToken(accessToken)
-    }
-    res.json(verifications)
-  } catch (e) {
-    res.status(500).json({ success: false })
-  }
-})
+@app.route('/getVerifications/<public_token>', methods=['GET'])
+def get_verification_info_by_token(public_token: str):
+    """ getVerificationInfoByToken """
+
+    # First exchange public_token to access_token
+    access_token = api_client.get_access_token(public_token)
+
+    # Use access_token to retrieve the data
+    if product_type == 'employment':
+        verifications = api_client.get_employment_info_by_token(access_token)
+    elif product_type == 'income':
+        verifications = api_client.get_income_info_by_token(access_token)
+    else:
+        raise Exception('Unsupported product type!')
+    return verifications
 ```
 ## <a id="step-11"></a>11. :computer: renders the verification info sent back by :cloud: for :smiley: to view
 ```
