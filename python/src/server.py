@@ -32,7 +32,10 @@ print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
 
 @app.context_processor
 def inject_product_type():
-    return dict(product_type=product_type, )
+    return dict(
+        product_type=product_type,
+        server_url=flask.request.url_root,
+    )
 
 
 @app.route('/')
@@ -45,9 +48,26 @@ def index():
     else:
         return render_template('employment.html')
 
+
+@app.route('/employment')
+def employment():
+    return render_template('employment.html', product_type='employment')
+
+
+@app.route('/income')
+def income():
+    return render_template('income.html', product_type='income')
+
+
+@app.route('/admin')
+def admin():
+    return render_template('admin.html', product_type='admin')
+
+
 @app.route('/getBridgeToken', methods=['GET'])
 def create_bridge_token():
     return api_client.get_bridge_token()
+
 
 @app.route('/createAccessToken', methods=['POST'])
 def create_access_token():
