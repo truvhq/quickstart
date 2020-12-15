@@ -11,6 +11,9 @@ python_docker:
 node_docker:
 	docker-compose --file docker-compose.yml up --build node
 
+csharp_docker:
+	docker-compose --file docker-compose.yml up --build csharp
+
 node_local:
 	cd node && \
 	npm install && \
