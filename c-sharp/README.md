@@ -1,10 +1,11 @@
 # Introduction
+
 Let's get you started with Citadel by walking through this C# Quickstart app. You'll need a set of API keys which you can request via email team@citadelid.com.
 
 You'll have two different API keys used by the back end, `client_id` and `access_key`.
 
-
 # Set up the C# Quickstart
+
 Once you have your API keys, it's time to run the Citadel C# Quickstart app locally.
 *Requirements*: .NET Core 5.0, .NET SDK 5.0
 
@@ -12,16 +13,19 @@ Once you have your API keys, it's time to run the Citadel C# Quickstart app loca
 2. `cd quickstart`
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
-```
-API_URL=https://prod.citadelid.com/v1/
-API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-API_CLIENT_ID=<YOUR CLIENT_ID HERE>
-API_PRODUCT_TYPE=<employment, income or admin>
-```
+
+    ```bash
+    API_URL=https://prod.citadelid.com/v1/
+    API_SECRET=<YOUR SECRET KEY MUST BE HERE>
+    API_CLIENT_ID=<YOUR CLIENT_ID HERE>
+    API_PRODUCT_TYPE=<employment, income or admin>
+    ```
+
 5. `make csharp_local`
 
 After running this command, you should see:
-```
+
+```output
 info: Microsoft.Hosting.Lifetime[0]
       Now listening on: http://localhost:5000
 info: Microsoft.Hosting.Lifetime[0]
@@ -30,17 +34,19 @@ info: Microsoft.Hosting.Lifetime[0]
       Hosting environment: Development
 ```
 
-To access the app, open http://127.0.0.1:5000/ in your browser.
+To access the app, open `http://127.0.0.1:5000/` in your browser.
 
 # Run your first verification
+
 ## Overview
+
 The C# Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
 
-Before using Citadel for verification, an applicant fills out the form. 
+Before using Citadel for verification, an applicant fills out the form.
 
-To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button. 
+To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button.
 
-If the verification is successful via Citadel, then we show to the applicant the data that we found in their payroll account. 
+If the verification is successful via Citadel, then we show to the applicant the data that we found in their payroll account.
 
 If the verification isn't successful or the applicant decided to exit Citadel's widget, the applicant will see the form, fill it out and the verification can be done via an existing verification process.
 
