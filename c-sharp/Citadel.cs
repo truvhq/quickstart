@@ -37,22 +37,38 @@ namespace c_sharp {
       return await SendRequest("bridge-tokens/");
     }
 
-    private async Task<string> GetAccessToken(string publicToken) {
+    public async Task<string> GetAccessToken(string publicToken) {
       var response = await SendRequest("access-tokens/", "{\"public_tokens\": [\"" + publicToken + "\"] }");
       var parsedResponse = JsonDocument.Parse(response);
       return parsedResponse.RootElement.GetProperty("access_tokens").EnumerateArray().First().GetString();
     }
 
-    public async Task<string>GetEmploymentInfoByToken(string publicToken) {
-      var employmentVerificationUrl = "verifications/employments/";
-      var accessToken = await GetAccessToken(publicToken);
-      return await SendRequest(employmentVerificationUrl, "{\"access_token\": \"" + accessToken + "\" }");
+    public async Task<string>GetEmploymentInfoByToken(string accessToken) {
+      return await SendRequest("verifications/employments/", "{\"access_token\": \"" + accessToken + "\" }");
     }
 
-    public async Task<string>GetIncomeInfoByToken(string publicToken) {
-      var incomeVerificationUrl = "verifications/incomes/";
-      var accessToken = await GetAccessToken(publicToken);
-      return await SendRequest(incomeVerificationUrl, "{\"access_token\": \"" + accessToken + "\" }");
+    public async Task<string>GetIncomeInfoByToken(string accessToken) {
+      return await SendRequest("verifications/incomes/", "{\"access_token\": \"" + accessToken + "\" }");
+    }
+
+    public async Task<string> GetEmployeeDirectoryByToken(string accessToken) {
+      return await SendRequest("administrators/directories/", "{\"access_token\": \"" + accessToken + "\" }");
+    }
+
+    public async Task<string> RequestPayrollReport(string accessToken, string startDate, string endDate) {
+      var body = "{ \"access_token\": \"" + accessToken + "\"," +
+                 " \"start_date\": \"" + startDate + "\"," +
+                 " \"end_date\": \"" + endDate + "\"" +
+                 "}";
+      Console.WriteLine(body);
+      var response = await SendRequest("administrators/payrolls/", body);
+      Console.WriteLine(response);
+      var parsedResponse = JsonDocument.Parse(response);
+      return parsedResponse.RootElement.GetProperty("payroll_report_id").GetString();
+    }
+
+    public async Task<string> GetPayrollById(string reportId) {
+      return await SendRequest($"administrators/payrolls/{reportId}","","GET");
     }
   }
 

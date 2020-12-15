@@ -19,10 +19,11 @@ namespace c_sharp.Controllers
         [HttpGet]
         public async Task<string> Get(string token)
         {
+            var accessToken = await _citadel.GetAccessToken(token);
             if(_productType == "employment") {
-                return await _citadel.GetEmploymentInfoByToken(token);
+                return await _citadel.GetEmploymentInfoByToken(accessToken);
             } else {
-                return await _citadel.GetIncomeInfoByToken(token);
+                return await _citadel.GetIncomeInfoByToken(accessToken);
             }
         }
     }
