@@ -7,17 +7,17 @@ using Microsoft.Extensions.Logging;
 
 namespace c_sharp.Controllers
 {
-    [ApiController]
-    [Route("getBridgeToken")]
-    public class BridgeTokenController : ControllerBase
+  [ApiController]
+  [Route("getBridgeToken")]
+  public class BridgeTokenController : ControllerBase
+  {
+
+    private Citadel _citadel = new Citadel();
+
+    [HttpGet]
+    public async Task<string> Get()
     {
-
-        private Citadel _citadel = new Citadel();
-
-        [HttpGet]
-        public async Task<string> Get()
-        {
-            return await _citadel.GetBridgeToken();
-        }
+      return await _citadel.GetBridgeToken();
     }
+  }
 }
