@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 .PHONY: env python_docker python_local
 
 env:
@@ -25,3 +27,8 @@ ruby_local:
 	bundle install && \
 	set -a && source ../.env && set +a && \
 	rails server
+
+csharp_local:
+	cd c-sharp && \
+	set -a && source ../.env && set +a && \
+	dotnet run
