@@ -19,6 +19,5 @@ const html = readFileSync(`../html/${API_PRODUCT_TYPE}.html`)
 
 export default (req, res) => {
   // return the HTML based on what product type is specified
-  console.log(req.headers.host)
   res.send(html.replace("{{ server_url }}", `http://${req.headers.host}/`))
 }
