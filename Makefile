@@ -11,6 +11,9 @@ python_docker:
 node_docker:
 	docker-compose --file docker-compose.yml up --build node
 
+ruby_docker:
+	docker-compose --file docker-compose.yml up --build ruby
+
 csharp_docker:
 	docker-compose --file docker-compose.yml up --build csharp
 
