@@ -11,6 +11,9 @@ python_docker:
 node_docker:
 	docker-compose --file docker-compose.yml up --build node
 
+csharp_docker:
+	docker-compose --file docker-compose.yml up --build csharp
+
 node_local:
 	cd node && \
 	npm install && \
@@ -27,3 +30,8 @@ ruby_local:
 	bundle install && \
 	set -a && source ../.env && set +a && \
 	rails server
+
+csharp_local:
+	cd c-sharp && \
+	set -a && source ../.env && set +a && \
+	dotnet run

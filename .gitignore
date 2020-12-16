@@ -4,3 +4,7 @@ __pycache__
 .env
 quickstart_venv
 node_modules
+
+[Bb]in/
+[Oo]bj/
+c-sharp/[Oo]ut/
