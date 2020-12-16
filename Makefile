@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 .PHONY: env python_docker python_local
 
 env:
