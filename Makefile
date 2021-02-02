@@ -17,6 +17,9 @@ ruby_docker:
 csharp_docker:
 	docker-compose --file docker-compose.yml up --build csharp
 
+go_docker:
+	docker-compose --file docker-compose.yml up --build go
+
 node_local:
 	cd node && \
 	npm install && \
