@@ -1,28 +1,28 @@
 package main
 
 import (
-    "fmt"
-    "log"
-		"net/http"
-		"io/ioutil"
-		"os"
-		"strings"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"strings"
 )
 
 func check(e error) {
 	if e != nil {
-			panic(e)
+		panic(e)
 	}
 }
 
-func homePage(w http.ResponseWriter, r *http.Request){
+func homePage(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s.html", productType))
 	check(err)
 	html := string(dat)
 	html = strings.ReplaceAll(html, "{{ product_type }}", productType)
 	html = strings.ReplaceAll(html, "{{ server_url }}", r.URL.Host)
-  fmt.Fprintf(w, html)
+	fmt.Fprintf(w, html)
 }
 
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
@@ -69,12 +69,12 @@ func handleRequests() {
 	fmt.Println(fmt.Sprintf("API_SECRET: %s", os.Getenv("API_SECRET")))
 	fmt.Println(fmt.Sprintf("API_URL: %s", os.Getenv("API_URL")))
 	fmt.Println(fmt.Sprintf("API_PRODUCT_TYPE: %s", os.Getenv("API_PRODUCT_TYPE")))
-  fmt.Println(strings.Repeat("=", 94))
+	fmt.Println(strings.Repeat("=", 94))
 	fmt.Println("listening on port 5000")
-	
-  log.Fatal(http.ListenAndServe(":5000", nil))
+
+	log.Fatal(http.ListenAndServe(":5000", nil))
 }
 
 func main() {
-    handleRequests()
+	handleRequests()
 }
