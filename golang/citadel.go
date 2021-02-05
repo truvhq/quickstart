@@ -9,18 +9,25 @@ import (
 	"os"
 )
 
+// PublicTokenRequest is used to define the body for requesting an
+// access token with a public token
 type PublicTokenRequest struct {
 	PublicTokens []string `json:"public_tokens"`
 }
 
+// AccessTokenRequest is used to define the body for multiple
+// Citadel API endpoints requesting data with an access token
 type AccessTokenRequest struct {
 	AccessToken string `json:"access_token"`
 }
 
+// AccessTokenResponse is used to define the body for the
+// response of requesting an access token
 type AccessTokenResponse struct {
 	AccessTokens []string `json:"access_tokens"`
 }
 
+// getRequest creates an http request with the required HTTP headers
 func getRequest(endpoint string, method string, body []byte) (*http.Request, error) {
 	apiUrl := os.Getenv("API_URL")
 	clientId := os.Getenv("API_CLIENT_ID")
@@ -33,6 +40,7 @@ func getRequest(endpoint string, method string, body []byte) (*http.Request, err
 	return request, nil
 }
 
+// getBridgeToken requests a bridge token from the Citadel API
 func getBridgeToken() (string, error) {
 	request, err := getRequest("bridge-tokens/", "POST", nil)
 	if err != nil {
@@ -44,10 +52,12 @@ func getBridgeToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-		data, _ := ioutil.ReadAll(response.Body)
-		return (string(data)), nil
+	data, _ := ioutil.ReadAll(response.Body)
+	return (string(data)), nil
 }
 
+// getAccessToken requests an access token from the Citadel API
+// with the given public token
 func getAccessToken(public_token string) (string, error) {
 	publicTokens := PublicTokenRequest{PublicTokens: []string{public_token}}
 	jsonPublicTokens, _ := json.Marshal(publicTokens)
@@ -70,6 +80,8 @@ func getAccessToken(public_token string) (string, error) {
 	return accessTokens.AccessTokens[0], nil
 }
 
+// getEmploymentInfoByToken uses the given access token to request
+// the associated employment verification info
 func getEmploymentInfoByToken(access_token string) (string, error) {
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
@@ -88,6 +100,8 @@ func getEmploymentInfoByToken(access_token string) (string, error) {
 	return string(data), nil
 }
 
+// getIncomeInfoByToken uses the given access token to request
+// the associated income verification info
 func getIncomeInfoByToken(access_token string) (string, error) {
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
@@ -106,11 +120,13 @@ func getIncomeInfoByToken(access_token string) (string, error) {
 	return string(data), nil
 }
 
+// getEmployeeDirectoryByToken uses the given access token to request
+// the associated employee directory info
 func getEmployeeDirectoryByToken(access_token string) (string, error) {
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("administrators/directories", "POST", jsonAccessToken)
-	if(err != nil) {
+	if err != nil {
 		return "", err
 	}
 	client := &http.Client{}
@@ -124,16 +140,22 @@ func getEmployeeDirectoryByToken(access_token string) (string, error) {
 	return string(data), nil
 }
 
+// PayrollReportRequest defines the body of the request when requesting
+// a payroll report
 type PayrollReportRequest struct {
 	AccessToken string `json:"access_token"`
 	StartDate   string `json:"start_date"`
 	EndDate     string `json:"end_date"`
 }
 
+// PayrollReportResponse defines the body of the response when requesting
+// a payroll report
 type PayrollReportResponse struct {
 	PayrollReportId string `json:"payroll_report_id"`
 }
 
+// requestPayrollReport uses the given access token to request
+// the associated payroll report
 func requestPayrollReport(access_token, start_date, end_date string) (*PayrollReportResponse, error) {
 	reportRequest := PayrollReportRequest{AccessToken: access_token, StartDate: start_date, EndDate: end_date}
 	jsonReportRequest, _ := json.Marshal(reportRequest)
@@ -156,6 +178,7 @@ func requestPayrollReport(access_token, start_date, end_date string) (*PayrollRe
 	return &payrollReport, nil
 }
 
+// getPayrollById requests the payroll report associated to the given id
 func getPayrollById(reportId string) (string, error) {
 	request, err := getRequest(fmt.Sprintf("administrators/payrolls/%s", reportId), "GET", nil)
 	if err != nil {

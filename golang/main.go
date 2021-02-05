@@ -9,12 +9,15 @@ import (
 	"strings"
 )
 
+// check will cause a panic if there an error given
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
+// homePage writes the html page for the product type
+// given in the API_PRODUCT_TYPE environment variable
 func homePage(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s.html", productType))
@@ -25,6 +28,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, html)
 }
 
+// bridgeToken accepts requests for a bridge token and sends the response
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
 	bridgeData, err := getBridgeToken()
 	if err != nil {
@@ -35,13 +39,14 @@ func bridgeToken(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// verifications accepts requests for a verification and sends the response
 func verifications(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err := getAccessToken(token)
 	if err != nil {
-		fmt.Println("Error getting access token", err)	
+		fmt.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
@@ -52,38 +57,39 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 		verificationResponse, err = getIncomeInfoByToken(accessToken)
 	}
 	if err != nil {
-		fmt.Println("Error getting verification", err)	
+		fmt.Println("Error getting verification", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
 		fmt.Fprintf(w, verificationResponse)
 	}
 }
 
+// adminData accepts requests for admin data and sends the response
 func adminData(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err := getAccessToken(token)
 	if err != nil {
-		fmt.Println("Error getting access token", err)	
+		fmt.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
 	directory, err := getEmployeeDirectoryByToken(accessToken)
 	if err != nil {
-		fmt.Println("Error getting Employee Directory", err)	
+		fmt.Println("Error getting Employee Directory", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
 	report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-10-31")
 	if err != nil {
-		fmt.Println("Error requesting payroll report", err)	
+		fmt.Println("Error requesting payroll report", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
 	reportId := report.PayrollReportId
 	payroll, err := getPayrollById(reportId)
 	if err != nil {
-		fmt.Println("Error getting payroll by id", err)	
+		fmt.Println("Error getting payroll by id", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
@@ -93,6 +99,7 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, data)
 }
 
+// checkEnv ensures all required environment variables have been set
 func checkEnv() {
 	apiUrl := os.Getenv("API_URL")
 	if apiUrl == "" {
@@ -120,6 +127,7 @@ func checkEnv() {
 	}
 }
 
+// handleRequests sets up all endpoint handlers
 func handleRequests() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/getBridgeToken", bridgeToken)
