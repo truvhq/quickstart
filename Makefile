@@ -17,6 +17,9 @@ ruby_docker:
 csharp_docker:
 	docker-compose --file docker-compose.yml up --build csharp
 
+go_docker:
+	docker-compose --file docker-compose.yml up --build go
+
 node_local:
 	cd node && \
 	npm install && \
@@ -38,3 +41,10 @@ csharp_local:
 	cd c-sharp && \
 	set -a && source ../.env && set +a && \
 	dotnet run
+
+go_local:
+	cd golang && \
+	go get && \
+	set -a && source ../.env && set +a && \
+	go install && \
+	go run citadel
