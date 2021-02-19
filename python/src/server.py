@@ -19,6 +19,7 @@ api_client = NaiveApiClient(
     api_url=os.environ.get('API_URL', 'https://prod.citadelid.com/v1/'),
     secret=secret,
     client_id=client_id,
+    product_type=product_type,
 )
 
 if not secret or not client_id:
@@ -33,7 +34,6 @@ print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
 @app.context_processor
 def inject_product_type():
     return dict(
-        product_type=product_type,
         server_url=flask.request.url_root,
     )
 

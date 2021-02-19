@@ -191,10 +191,7 @@
 
         const bridgeToken = await apiRequests.getBridgeToken()
         const bridge = CitadelBridge.init({
-          clientName: 'Citadel Quickstart',
           bridgeToken: bridgeToken.bridge_token,
-          product: '{{ product_type }}',
-          trackingInfo: 'any data for tracking current user',
           onLoad: function () {
             console.log('loaded');
             successClosing = null

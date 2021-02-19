@@ -1,6 +1,6 @@
 import fetch from "node-fetch"
 
-const { API_CLIENT_ID, API_SECRET, API_URL } = process.env
+const { API_CLIENT_ID, API_SECRET, API_URL, API_PRODUCT_TYPE } = process.env
 
 /**
  * Returns the default headers used when interacting with Citadel
@@ -21,7 +21,11 @@ const getHeaders = () => {
  * @return The response from Citadel - https://docs.citadelid.com/javascript#schemabridgetoken
  */
 const getBridgeToken = async () => {
-  const responseBody = await sendRequest("bridge-tokens/", {})
+  const body = JSON.stringify({
+    product_type: API_PRODUCT_TYPE,
+    client_name: "Citadel Quickstart"
+  })
+  const responseBody = await sendRequest("bridge-tokens/", {body})
   return responseBody
 }
 

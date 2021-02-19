@@ -27,6 +27,13 @@ type AccessTokenResponse struct {
 	AccessTokens []string `json:"access_tokens"`
 }
 
+// PayrollReportRequest defines the body of the request when requesting
+// a payroll report
+type BridgeTokenRequest struct {
+	ProductType string `json:"product_type"`
+	ClientName   string `json:"client_name"`
+}
+
 // getRequest creates an http request with the required HTTP headers
 func getRequest(endpoint string, method string, body []byte) (*http.Request, error) {
 	apiUrl := os.Getenv("API_URL")
@@ -42,7 +49,10 @@ func getRequest(endpoint string, method string, body []byte) (*http.Request, err
 
 // getBridgeToken requests a bridge token from the Citadel API
 func getBridgeToken() (string, error) {
-	request, err := getRequest("bridge-tokens/", "POST", nil)
+	productType := os.Getenv("API_PRODUCT_TYPE")
+	bridgeTokenRequest := BridgeTokenRequest{ProductType: productType, ClientName: "Citadel Quickstart"}
+	bridgeJson, _ := json.Marshal(bridgeTokenRequest)
+	request, err := getRequest("bridge-tokens/", "POST", bridgeJson)
 	if err != nil {
 		return "", err
 	}
