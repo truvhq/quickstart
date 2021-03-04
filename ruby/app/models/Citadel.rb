@@ -9,7 +9,7 @@ class Citadel
 
   def self.getBridgeToken()
     # https://docs.citadelid.com/ruby#bridge-tokens_create
-    body = { "product_type" => Citadel.product_type, "client_name" => "Citadel Quickstart" }.to_json
+    body = { "product_type" => Citadel.product_type, "client_name" => "Citadel Quickstart", "tracking_info" => "1337" }.to_json
     return sendRequest('bridge-tokens/', body, "POST")
   end
 

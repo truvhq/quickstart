@@ -42,6 +42,7 @@ namespace c_sharp
     public async Task<string> GetBridgeToken()
     {
       var body = "{ \"product_type\": \"" + productType + "\"," +
+                 " \"tracking_info\": \"1337\"," +
                  " \"client_name\": \"Citadel Quickstart\"" +
                  "}";
       return await SendRequest("bridge-tokens/", body);

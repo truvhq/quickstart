@@ -25,7 +25,6 @@ namespace c_sharp.Controllers
     {
       var productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
       var fileContent = System.IO.File.ReadAllText($"../html/{productType}.html");
-      fileContent = fileContent.Replace("{{ product_type }}", productType);
       fileContent = fileContent.Replace("{{ server_url }}", $"http://{Request.Host.Value}/");
       return base.Content(fileContent, "text/html");
     }

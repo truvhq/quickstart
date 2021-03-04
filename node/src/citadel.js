@@ -23,7 +23,8 @@ const getHeaders = () => {
 const getBridgeToken = async () => {
   const body = JSON.stringify({
     product_type: API_PRODUCT_TYPE,
-    client_name: "Citadel Quickstart"
+    client_name: "Citadel Quickstart",
+    tracking_info: "1337"
   })
   const responseBody = await sendRequest("bridge-tokens/", {body})
   return responseBody

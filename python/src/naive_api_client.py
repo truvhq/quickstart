@@ -43,10 +43,12 @@ class NaiveApiClient:
         class BridgeTokenRequest(TypedDict):
             product_type: str
             client_name: str
+            tracking_info: str
 
         request_data: BridgeTokenRequest = {
             'product_type': self.PRODUCT_TYPE,
-            'client_name': 'Citadel Quickstart'
+            'client_name': 'Citadel Quickstart',
+            'tracking_info': '1337'
         }
 
         tokens: Any = requests.post(

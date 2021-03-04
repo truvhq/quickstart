@@ -16,7 +16,7 @@ namespace c_sharp.Controllers
     {
       var accessToken = await _citadel.GetAccessToken(token);
       var directory = await _citadel.GetEmployeeDirectoryByToken(accessToken);
-      var reportId = await _citadel.RequestPayrollReport(accessToken, "2020-01-01", "2020-10-31");
+      var reportId = await _citadel.RequestPayrollReport(accessToken, "2020-01-01", "2020-02-01");
       var payroll = await _citadel.GetPayrollById(reportId);
       var finalResponse = "{ \"directory\": " + directory + ", \"payroll\": " + payroll + "}";
       return finalResponse;
