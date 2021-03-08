@@ -17,6 +17,7 @@ namespace c_sharp
     private string clientId = Environment.GetEnvironmentVariable("API_CLIENT_ID");
     private string clientSecret = Environment.GetEnvironmentVariable("API_SECRET");
     private string apiUrl = Environment.GetEnvironmentVariable("API_URL");
+    private string productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
     private readonly HttpClient client;
 
     public Citadel()
@@ -40,7 +41,11 @@ namespace c_sharp
 
     public async Task<string> GetBridgeToken()
     {
-      return await SendRequest("bridge-tokens/");
+      var body = "{ \"product_type\": \"" + productType + "\"," +
+                 " \"tracking_info\": \"1337\"," +
+                 " \"client_name\": \"Citadel Quickstart\"" +
+                 "}";
+      return await SendRequest("bridge-tokens/", body);
     }
 
     public async Task<string> GetAccessToken(string publicToken)

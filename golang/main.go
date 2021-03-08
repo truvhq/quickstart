@@ -23,7 +23,6 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s.html", productType))
 	check(err)
 	html := string(dat)
-	html = strings.ReplaceAll(html, "{{ product_type }}", productType)
 	html = strings.ReplaceAll(html, "{{ server_url }}", r.URL.Host)
 	fmt.Fprintf(w, html)
 }
@@ -80,7 +79,7 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
-	report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-10-31")
+	report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
 	if err != nil {
 		fmt.Println("Error requesting payroll report", err)
 		fmt.Fprintf(w, `{ "success": false }`)

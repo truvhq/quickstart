@@ -18,13 +18,16 @@ class NaiveApiClient:
     """
     API_URL: str
     API_HEADERS: ApiHeaders
+    PRODUCT_TYPE: str
 
     def __init__(self,
                  api_url: str,
                  secret: str,
                  client_id: str,
+                 product_type: str,
                  ):
         self.API_URL = api_url
+        self.PRODUCT_TYPE = product_type
         self.API_HEADERS = {
             'X-Access-Secret': secret,
             'X-Access-Client-Id': client_id,
@@ -37,8 +40,20 @@ class NaiveApiClient:
         :param public_token:
         :return:
         """
+        class BridgeTokenRequest(TypedDict):
+            product_type: str
+            client_name: str
+            tracking_info: str
+
+        request_data: BridgeTokenRequest = {
+            'product_type': self.PRODUCT_TYPE,
+            'client_name': 'Citadel Quickstart',
+            'tracking_info': '1337'
+        }
+
         tokens: Any = requests.post(
             self.API_URL + 'bridge-tokens/',
+            json=request_data,
             headers=self.API_HEADERS,
         ).json()
         return tokens

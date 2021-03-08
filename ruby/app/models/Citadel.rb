@@ -5,10 +5,12 @@ class Citadel
   class_attribute :api_url
   class_attribute :client_id
   class_attribute :client_secret
+  class_attribute :product_type
 
   def self.getBridgeToken()
     # https://docs.citadelid.com/ruby#bridge-tokens_create
-    return sendRequest('bridge-tokens/', nil, "POST")
+    body = { "product_type" => Citadel.product_type, "client_name" => "Citadel Quickstart", "tracking_info" => "1337" }.to_json
+    return sendRequest('bridge-tokens/', body, "POST")
   end
 
   def self.getAccessToken(public_token)
