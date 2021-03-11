@@ -27,11 +27,17 @@ If the verification isn't successful or the applicant decided to exit Citadel's 
 
 After opening the Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, (e.g., `Facebook`) and select a provider. 
 
-Use the Sandbox credentials to simulate a successful login.
+Use the Sandbox credentials to simulate a successful login. If you are performing an employment or income verification, use the following credentials:
 
 ```
 username: goodlogin
 password: goodpassword
+```
+
+If you are performing an admin function, use the following API key:
+
+```
+Skx8LTnyrLiw4SYk8xfkRwOt5OGQbNulypqdsqd
 ```
 
 Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
