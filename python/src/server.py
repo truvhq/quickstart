@@ -112,7 +112,7 @@ def get_admin_data_by_token(public_token: str):
 
     # Last, collect prepared payroll report
     payroll = api_client.get_payroll_report_by_id(report_id)
-    if payroll['status'] != 'success':
+    if payroll['status'] != 'done':
         time.sleep(20)
         payroll = api_client.get_payroll_report_by_id(report_id)
 
