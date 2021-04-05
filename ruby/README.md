@@ -1,5 +1,5 @@
 # Introduction
-Let's get you started with Citadel by walking through this Ruby on Rails Quickstart app. You'll need a set of API keys which you can request by emailing team@citadelid.com.
+Let's get you started with Citadel by walking through this Ruby on Rails Quickstart app. You'll need a set of API keys which you can get by signing up at https://dashboard.citadelid.com
 
 You'll have two different API keys used by the back end, `client_id` and `access_key`.
 
