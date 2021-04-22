@@ -196,10 +196,10 @@ def get_verification_info_by_token(public_token: str):
         raise Exception('Unsupported product type!')
     return verifications
 ```
-## <a id="step-11"></a>11. Front end renders the verification info sent back by back end for user to view
+## <a id="step-11"></a>11. Front end renders the payroll data sent back by back end for user to view
 ```
-function renderPayrollData(employments) {
+function renderPayrollData(data) {
   const historyContainer = document.querySelector("#history")
-  historyContainer.innerHTML = JSON.stringify(employments, null, 2)
+  historyContainer.innerHTML = JSON.stringify(data, null, 2)
 }
 ```
