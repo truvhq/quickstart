@@ -284,7 +284,6 @@ def get_verification_info_by_token(public_token: str):
 ```
 function renderPayrollData(data) {
   const historyContainer = document.querySelector("#history")
-  console.log("Container", historyContainer)
   historyContainer.innerHTML = JSON.stringify(data, null, 2)
 }
 ```

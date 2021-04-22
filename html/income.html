@@ -225,8 +225,9 @@
 
             renderPayrollData(verificationInfo)
           },
-          onClose: function (employer) {
+          onClose: function () {
             console.log("onClose callback called.")
+            console.log("First Value:", employer)
             if (successClosing !== true) {
               renderPayrollData([{ company: { address: {} } }])
             }
@@ -241,7 +242,6 @@
        */
       function renderPayrollData(data) {
         const historyContainer = document.querySelector("#history")
-        console.log("Container", historyContainer)
         historyContainer.innerHTML = JSON.stringify(data, null, 2)
       }
     </script>
