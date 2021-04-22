@@ -102,49 +102,61 @@ Here is the flow that a successful verification process takes in our example:
 
 ## <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
 ```
-  const getBridgeToken = async () => {
-    const response = await fetch(apiEnpoint + `getBridgeToken`, {
-      method: 'get',
-      headers,
-    }).then((r) => r.json());
-    return response;
-  }
+const getBridgeToken = async () => {
+  const response = await fetch(apiEnpoint + `getBridgeToken`, {
+    method: 'get',
+    headers,
+  }).then((r) => r.json());
+  return response;
+}
 ```
 ## <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
 ```
-  def get_bridge_token(self) -> Any:
+def get_bridge_token(self) -> Any:
     """
     https://docs.citadelid.com/?python#bridge-tokens_create
     :param public_token:
     :return:
     """
+    logging.info("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
+    class BridgeTokenRequest(TypedDict):
+        product_type: str
+        client_name: str
+        tracking_info: str
+    request_data: BridgeTokenRequest = {
+        'product_type': self.PRODUCT_TYPE,
+        'client_name': 'Citadel Quickstart',
+        'tracking_info': '1337'
+    }
     tokens: Any = requests.post(
         self.API_URL + 'bridge-tokens/',
+        json=request_data,
         headers=self.API_HEADERS,
     ).json()
     return tokens
 ```
 ```
-  @app.route('/getBridgeToken', methods=['GET'])
-  def create_bridge_token():
+@app.route('/getBridgeToken', methods=['GET'])
+def create_bridge_token():
+    """Back end API endpoint to request a bridge token"""
     return api_client.get_bridge_token()
 ```
 ## <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
 ```
-  const bridge = CitadelBridge.init({
-    bridgeToken: bridgeToken.bridge_token,
-    ...
-  });
-  window.bridge = bridge;
+const bridge = CitadelBridge.init({
+  bridgeToken: bridgeToken.bridge_token,
+  ...
+});
+window.bridge = bridge;
 ```
 
 ## <a id="step-4"></a>4. User clicks `Connect` button
 ## <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
 ```
-  onLoad: function () {
-    console.log('loaded');
-    successClosing = null
-  },
+onLoad: function () {
+  console.log('loaded');
+  successClosing = null
+},
 ```
 
 ## <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
@@ -187,28 +199,26 @@ onClose: function () {
 ## <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
 ```
 def get_access_token(self, public_token: str) -> str:
-  """
-  https://docs.citadelid.com/?python#exchange-token-flow
-  :param public_token:
-  :return:
-  """
-
-  class AccessTokenRequest(TypedDict):
-      public_tokens: List[str]
-
-  class AccessTokenResponse(TypedDict):
-      access_tokens: List[str]
-
-  request_data: AccessTokenRequest = {
-      'public_tokens': [public_token],
-  }
-
-  tokens: AccessTokenResponse = requests.post(
-      self.API_URL + 'access-tokens/',
-      json=request_data,
-      headers=self.API_HEADERS,
-  ).json()
-  return tokens['access_tokens'][0]
+    """
+    https://docs.citadelid.com/?python#exchange-token-flow
+    :param public_token:
+    :return:
+    """
+    logging.info("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens")
+    logging.info("CITADEL: Public Token - %s", public_token)
+    class AccessTokenRequest(TypedDict):
+        public_tokens: List[str]
+    class AccessTokenResponse(TypedDict):
+        access_tokens: List[str]
+    request_data: AccessTokenRequest = {
+        'public_tokens': [public_token],
+    }
+    tokens: AccessTokenResponse = requests.post(
+        self.API_URL + 'access-tokens/',
+        json=request_data,
+        headers=self.API_HEADERS,
+    ).json()
+    return tokens['access_tokens'][0]
 ```
 ## <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
 ```
@@ -218,7 +228,8 @@ def get_employment_info_by_token(self, access_token: str) -> Any:
     :param access_token:
     :return:
     """
-
+    logging.info("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments")
+    logging.info("CITADEL: Access Token - %s", access_token)
     class VerificationRequest(TypedDict):
         access_token: str
 
@@ -237,6 +248,8 @@ def get_income_info_by_token(self, access_token: str) -> Any:
     :return:
     """
 
+    logging.info("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes")
+    logging.info("CITADEL: Access Token - %s", access_token)
     class VerificationRequest(TypedDict):
         access_token: str
 
@@ -252,7 +265,8 @@ def get_income_info_by_token(self, access_token: str) -> Any:
 ```
 @app.route('/getVerifications/<public_token>', methods=['GET'])
 def get_verification_info_by_token(public_token: str):
-    """ getVerificationInfoByToken """
+    """ Back end API endpoint to retrieve employment or income verification
+        data using a front end public_token """
 
     # First exchange public_token to access_token
     access_token = api_client.get_access_token(public_token)
