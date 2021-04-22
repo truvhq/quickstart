@@ -13,7 +13,6 @@ Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app 
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 ```
-API_URL=https://prod.citadelid.com/v1/
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment, income or admin>
@@ -26,7 +25,6 @@ After running this command, you should see:
 {
   API_CLIENT_ID: <YOUR CLIENT ID HERE>,
   API_SECRET: <YOUR SECRET KEY HERE>,
-  API_URL: 'https://prod.citadelid.com/v1',
   API_PRODUCT_TYPE: <YOUR PRODUCT TYPE HERE>
 }
 ==============================================================================================
@@ -127,7 +125,7 @@ Here is the flow that a successful verification process takes in our example:
   const sendRequest = async (endpoint, body) => {
     const headers = getHeaders()
     try {
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const response = await fetch(`https://prod.citadelid.com/v1/${endpoint}`, {
         method: "POST",
         body,
         headers,
@@ -157,10 +155,7 @@ Here is the flow that a successful verification process takes in our example:
 ## <a id="step-3"></a>3. :computer: runs `CitadelBridge.init` with `bridge_token`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel Quickstart',
     bridgeToken: bridgeToken.bridge_token,
-    product: 'income',
-    trackingInfo: 'any data for tracking current user',
     ...
   });
   window.bridge = bridge;
@@ -214,18 +209,11 @@ onClose: function () {
 ## <a id="step-8"></a>8. :cloud: sends API request to Citadel exchanging temporary `token` for `access_token`
 ```
 const getAccessToken = async (public_token) => {
-  const headers = getHeaders()
-  const inputBody = JSON.stringify({
+  const body = JSON.stringify({
     public_tokens: [public_token],
   })
-
-  const response = await fetch(`${API_URL}/access-tokens/`, {
-    method: "POST",
-    body: inputBody,
-    headers: headers,
-  })
-  const body = await response.json()
-  return body.access_tokens[0]
+  const responseBody = await sendRequest("access-tokens/", {body})
+  return responseBody.access_tokens[0]
 }
 ```
 ## <a id="step-9"></a>9. :cloud: sends API request to Citadel with `access_token` for employment/income verification

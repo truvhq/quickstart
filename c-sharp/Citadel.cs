@@ -16,7 +16,6 @@ namespace c_sharp
 
     private string clientId = Environment.GetEnvironmentVariable("API_CLIENT_ID");
     private string clientSecret = Environment.GetEnvironmentVariable("API_SECRET");
-    private string apiUrl = Environment.GetEnvironmentVariable("API_URL");
     private string productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
     private readonly HttpClient client;
 
@@ -31,7 +30,7 @@ namespace c_sharp
     {
       var request = new HttpRequestMessage
       {
-        RequestUri = new Uri(apiUrl + endpoint),
+        RequestUri = new Uri("https://prod.citadelid.com/v1/" + endpoint),
         Method = method == "POST" ? HttpMethod.Post : HttpMethod.Get,
         Content = new StringContent(content, Encoding.UTF8, "application/json"),
       };

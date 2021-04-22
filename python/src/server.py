@@ -1,6 +1,7 @@
 import json
 import os
 import time
+import logging
 
 import flask
 from flask import Flask, render_template
@@ -8,6 +9,10 @@ from flask_cors import CORS
 
 from .naive_api_client import NaiveApiClient
 
+logging.basicConfig(level=logging.INFO)
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 app = Flask(__name__)
 CORS(app)
 
@@ -16,7 +21,6 @@ client_id = os.environ.get('API_CLIENT_ID')
 product_type = os.environ.get('API_PRODUCT_TYPE', 'employment')
 
 api_client = NaiveApiClient(
-    api_url=os.environ.get('API_URL', 'https://prod.citadelid.com/v1/'),
     secret=secret,
     client_id=client_id,
     product_type=product_type,
@@ -26,7 +30,6 @@ if not secret or not client_id:
     raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID'")
 
 print("=" * 40, "ENVIRONMENT", "=" * 40, "\n",
-      api_client.API_URL, "\n",
       json.dumps(api_client.API_HEADERS, indent=4), "\n",
       "=" * 94, "\n", )
 
@@ -48,41 +51,16 @@ def index():
     else:
         return render_template('employment.html')
 
-
-@app.route('/employment')
-def employment():
-    return render_template('employment.html', product_type='employment')
-
-
-@app.route('/income')
-def income():
-    return render_template('income.html', product_type='income')
-
-
-@app.route('/admin')
-def admin():
-    return render_template('admin.html', product_type='admin')
-
-
 @app.route('/getBridgeToken', methods=['GET'])
 def create_bridge_token():
+    """Back end API endpoint to request a bridge token"""
     return api_client.get_bridge_token()
-
-
-@app.route('/createAccessToken', methods=['POST'])
-def create_access_token():
-    """Handler to exchange public_key from widget check with access_token"""
-    json_data = flask.request.json
-
-    return {
-        'access_token': api_client.get_access_token(
-            public_token=json_data.get('public_token'))
-    }
 
 
 @app.route('/getVerifications/<public_token>', methods=['GET'])
 def get_verification_info_by_token(public_token: str):
-    """ getVerificationInfoByToken """
+    """ Back end API endpoint to retrieve employment or income verification
+        data using a front end public_token """
 
     # First exchange public_token to access_token
     access_token = api_client.get_access_token(public_token)
@@ -99,7 +77,8 @@ def get_verification_info_by_token(public_token: str):
 
 @app.route('/getAdminData/<public_token>', methods=['GET'])
 def get_admin_data_by_token(public_token: str):
-    """ getAdminDataByToken """
+    """ Back end API endpoint to retrieve payroll admin data
+        using a front end public_token """
 
     # First, exchange public_token to access_token
     access_token = api_client.get_access_token(public_token)
@@ -113,7 +92,8 @@ def get_admin_data_by_token(public_token: str):
     # Last, collect prepared payroll report
     payroll = api_client.get_payroll_report_by_id(report_id)
     if payroll['status'] != 'done':
-        time.sleep(20)
+        logging.info("CITADEL: Report not complete. Waiting and trying again")
+        time.sleep(5)
         payroll = api_client.get_payroll_report_by_id(report_id)
 
     return {

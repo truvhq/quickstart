@@ -2,15 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
     <meta name="theme-color" content="#000000" />
 
-    <title>payroll admin applicant portal</title>
+    <title>Admin payroll data portal</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <!-- Step 1 - add the bridge library to your app with a script tag -->
     <script src="https://cdn.citadelid.com/bridge.js"></script>
     <style>
       header {
@@ -120,114 +127,109 @@
       }
 
       .container {
-            padding-bottom: 30px;
-            border-bottom: 1px solid #e2e2e2;
-            margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #e2e2e2;
+        margin-bottom: 30px;
       }
       .container:last-child {
-          padding-bottom: 0px;
-          border-bottom: 0px solid #e2e2e2;
-          margin-bottom: 0px;
+        padding-bottom: 0px;
+        border-bottom: 0px solid #e2e2e2;
+        margin-bottom: 0px;
       }
-      .collapsible {
-        background-color: #eee;
-        color: #444;
-        cursor: pointer;
-        padding: 18px;
-        width: 100%;
-        border: none;
-        text-align: left;
-        outline: none;
-        font-size: 15px;
-      }
-      .active, .collapsible:hover {
-        background-color: #ccc;
-      }
-      .content {
-        padding: 0 18px;
-        display: none;
-        overflow: hidden;
-        background-color: #f1f1f1;
-      }
-
     </style>
   </head>
   <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
     <script>
       function getApiRequests(apiEnpoint) {
         const headers = {
-          'Content-Type': 'application/json;charset=UTF-8',
-        };
+          "Content-Type": "application/json;charset=UTF-8",
+        }
 
         const getBridgeToken = async () => {
           const response = await fetch(apiEnpoint + `getBridgeToken`, {
-            method: 'get',
+            method: "get",
             headers,
-          }).then((r) => r.json());
-          return response;
+          }).then((r) => r.json())
+          return response
         }
 
         const getAdminInfoByToken = async (public_token) => {
-          const response = await fetch(apiEnpoint + `getAdminData/${public_token}`, {
-            method: 'get',
-            headers,
-          }).then((r) => r.json());
-          return response;
-        };
+          const response = await fetch(
+            apiEnpoint + `getAdminData/${public_token}`,
+            {
+              method: "get",
+              headers,
+            }
+          ).then((r) => r.json())
+          return response
+        }
 
         return {
           getAdminInfoByToken,
-          getBridgeToken
-        };
+          getBridgeToken,
+        }
       }
 
-      (async function () {
-        const apiRequests = getApiRequests('{{ server_url }}');
+      ;(async function () {
+        const apiRequests = getApiRequests("{{ server_url }}")
 
         let successClosing
 
+        // Step 2 - Call your back end to retrieve a bridge token from citadel
         const bridgeToken = await apiRequests.getBridgeToken()
+
+        // Step 3 - Initialize the Citadel Bridge
         const bridge = CitadelBridge.init({
           bridgeToken: bridgeToken.bridge_token,
           onLoad: function () {
-            console.log('loaded');
+            console.log("onLoad callback called")
             successClosing = null
           },
-          onEvent: function (eventType) {
-            console.log('event: ', eventType);
+          onEvent: function (eventType, payload) {
+            console.log(`onEvent callback called. Event Type: ${eventType}`)
+            if (payload) console.log("onEvent payload:", payload)
           },
-          onSuccess: async function (token) {
-            console.log('token: ', token);
+          onSuccess: async function (public_token, meta) {
+            console.log(
+              `onSuccess callback called. public_token: ${public_token}`
+            )
+            console.log("onSuccess meta: ", meta)
 
             successClosing = true
 
-            const content = document.querySelector('.spinnerContainer');
+            const content = document.querySelector(".spinnerContainer")
 
-            content.classList.remove('hidden');
-            let verificationInfo;
+            content.classList.remove("hidden")
+            let adminInfo
             try {
-              adminInfo = await apiRequests.getAdminInfoByToken(token);
-            } catch(e) {
+              console.log(
+                "Requesting Admin payroll information from the back end with public_token"
+              )
+              adminInfo = await apiRequests.getAdminInfoByToken(public_token)
+            } catch (e) {
               console.error(e)
-              content.classList.add('hidden');
-              return;
+              content.classList.add("hidden")
+              return
             }
-            content.classList.add('hidden');
+            content.classList.add("hidden")
 
-            renderAdminData(adminInfo);
+            renderPayrollData(adminInfo)
           },
           onClose: function () {
-            console.log('closed');
+            console.log("onClose callback called.")
             if (successClosing !== true) {
-              renderAdminData();
+              renderPayrollData({})
             }
           },
-        });
-        window.bridge = bridge;
-      })();
+        })
+        window.bridge = bridge
+      })()
+
+      function renderPayrollData(data) {
+        const historyContainer = document.querySelector("#history")
+        historyContainer.innerHTML = JSON.stringify(data, null, 2)
+      }
     </script>
 
     <div class="spinnerContainer hidden">
@@ -241,7 +243,7 @@
         <img
           src="https://citadelid-resources.s3-us-west-2.amazonaws.com/Citadel.svg"
           alt="Citadel"
-          style="width:100px;height:50px;"
+          style="width: 100px; height: 50px"
         />
       </div>
     </header>
@@ -249,7 +251,12 @@
     <div id="content" class="container">
       <div class="titleContainer">
         <div class="img">
-          <svg viewBox="0 0 16 16" class="bi bi-person-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            viewBox="0 0 16 16"
+            class="bi bi-person-check"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               fill-rule="evenodd"
               d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm4.854-7.85a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"
@@ -257,88 +264,25 @@
           </svg>
         </div>
         <div>
-          <h2>Enter Company Information</h2>
-          <span>All fields are required.</span>
+          <h2>Request payroll administrative data</h2>
+          <span
+            >Click the Connect button below, choose "Bamboo HR" for your payroll
+            provider. Follow the instructions to see what payroll data you'll
+            get back.
+          </span>
         </div>
       </div>
       <form>
-        <div class="formSection">
-          <h3>Company Information</h3>
-
-          <div class="form-group">
-            <label for="companyNameInput">Company Name</label>
-            <input required type="text" class="form-control" id="companyNameInput" placeholder="Company Name" />
-          </div>
-
-          <div class="form-group">
-            <label for="companyEmployeesInput">Number of employees</label>
-            <input required type="text" class="form-control" id="companyEmployeesInput" placeholder="Number of Employees" />
-          </div>
-
-          <div class="form-group">
-            <label for="einInput">EIN</label>
-            <input required type="text" class="form-control" id="einInput" placeholder="Digits, No Dashes" />
-          </div>
-        </div>
-
         <div class="formSection historyContainer">
-          <h3>Connect to your payroll provider</h3>
-          <span class="historyText">This will perform the sync of employee directory and payroll data</span>
-
-          <div id="history"></div>
-          <button type="button" id="verify-button" onclick="bridge.open()">
+          <div>
+            <pre><code id="history"></code></pre>
+          </div>
+          <!-- Step 4 - Create a button or action that calls bridge.open() to open the Citadel Bridge -->
+          <button type="button" id="button" onclick="bridge.open()">
             Connect
           </button>
         </div>
       </form>
     </div>
-
-    <script>
-      function renderAdminData(data) {
-        mapping = {
-          "directory": "Employee Directory",
-          "payroll": "Payroll Report"
-        }
-
-        const historyContainer = document.querySelector('#history');
-        const result = document.createElement('div');
-        result.classList.add("container")
-
-        if (data) {
-          for (var key in data) {
-            var report = JSON.stringify(data[key], null, 2);
-            reportHeader = document.createElement('button');
-            reportHeader.setAttribute('type', 'button');
-            reportHeader.className = 'collapsible'
-            reportHeader.innerHTML = '<b>' + mapping[key] + '</b>'
-
-            reportHeader.addEventListener("click", function() {
-              this.classList.toggle("active");
-              var content = this.nextElementSibling;
-              if (content.style.display === "block") {
-                content.style.display = "none";
-              } else {
-                content.style.display = "block";
-              }
-            });
-
-            reportContainer = document.createElement('pre');
-            reportContainer.className = 'content'
-            reportContainer.innerHTML = report
-            result.appendChild(reportHeader);
-            result.appendChild(reportContainer);
-          }
-        }
-        else {
-          manualInstruction = document.createElement('div');
-          manualInstruction.innerHTML = '<label><b>Please email us last 5 paystubs for each employee.</b></label>';
-          result.appendChild(manualInstruction);
-        }
-
-        historyContainer.appendChild(result);
-        const button = document.getElementById('verify-button')
-        button.style.display = 'none'
-      }
-    </script>
   </body>
 </html>

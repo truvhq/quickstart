@@ -37,10 +37,9 @@ type BridgeTokenRequest struct {
 
 // getRequest creates an http request with the required HTTP headers
 func getRequest(endpoint string, method string, body []byte) (*http.Request, error) {
-	apiUrl := os.Getenv("API_URL")
 	clientId := os.Getenv("API_CLIENT_ID")
 	accessKey := os.Getenv("API_SECRET")
-	fullEndpoint := fmt.Sprintf("%s%s", apiUrl, endpoint)
+	fullEndpoint := fmt.Sprintf("%s%s", "https://prod.citadelid.com/v1/", endpoint)
 	request, _ := http.NewRequest(method, fullEndpoint, bytes.NewBuffer(body))
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("X-Access-Client-Id", clientId)

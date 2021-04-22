@@ -15,7 +15,6 @@ import {
 const {
   API_CLIENT_ID,
   API_SECRET,
-  API_URL,
   API_PRODUCT_TYPE,
 } = process.env
 
@@ -86,7 +85,6 @@ app.listen(5000, () => {
   const environment = {
     API_CLIENT_ID,
     API_SECRET,
-    API_URL,
     API_PRODUCT_TYPE,
   }
   console.log(environment)

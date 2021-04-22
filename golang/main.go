@@ -100,11 +100,6 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 
 // checkEnv ensures all required environment variables have been set
 func checkEnv() {
-	apiUrl := os.Getenv("API_URL")
-	if apiUrl == "" {
-		fmt.Println("No API_URL provided")
-		os.Exit(1)
-	}
 	clientId := os.Getenv("API_CLIENT_ID")
 	if clientId == "" {
 		fmt.Println("No API_CLIENT_ID provided")
@@ -144,7 +139,6 @@ func main() {
 	fmt.Println(strings.Repeat("=", 40), "ENVIRONMENT", strings.Repeat("=", 40))
 	fmt.Println(fmt.Sprintf("API_CLIENT_ID: %s", os.Getenv("API_CLIENT_ID")))
 	fmt.Println(fmt.Sprintf("API_SECRET: %s", os.Getenv("API_SECRET")))
-	fmt.Println(fmt.Sprintf("API_URL: %s", os.Getenv("API_URL")))
 	fmt.Println(fmt.Sprintf("API_PRODUCT_TYPE: %s", os.Getenv("API_PRODUCT_TYPE")))
 	fmt.Println(strings.Repeat("=", 94))
 

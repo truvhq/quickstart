@@ -13,7 +13,6 @@ Once you have your API keys, it's time to run the Citadel Go Quickstart app loca
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 ```
-API_URL=https://prod.citadelid.com/v1/
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment, income or admin>
@@ -25,7 +24,6 @@ After running this command, you should see:
 ======================================== ENVIRONMENT ========================================
   API_CLIENT_ID: <YOUR CLIENT ID HERE>,
   API_SECRET: <YOUR SECRET KEY HERE>,
-  API_URL: 'https://prod.citadelid.com/v1',
   API_PRODUCT_TYPE: <YOUR PRODUCT TYPE HERE>
 ==============================================================================================
 listening on port 5000
@@ -105,10 +103,9 @@ Here is the flow that a successful verification process takes in our example:
 ## <a id="step-2"></a>2. :cloud: sends API request to Citadel for `bridge_token`, sends response to :computer:
 ```
 func getRequest(endpoint string, method string, body []byte) (*http.Request) {
-  apiUrl := os.Getenv("API_URL")
   clientId := os.Getenv("API_CLIENT_ID")
   accessKey := os.Getenv("API_SECRET")
-  fullEndpoint := fmt.Sprintf("%s%s", apiUrl, endpoint)
+  fullEndpoint := fmt.Sprintf("%s%s", "https://prod.citadelid.com/v1/", endpoint)
   request, _ := http.NewRequest(method, fullEndpoint, bytes.NewBuffer(body))
   request.Header.Set("Content-Type", "application/json")
   request.Header.Set("X-Access-Client-Id", clientId)
@@ -138,10 +135,7 @@ func bridgeToken(w http.ResponseWriter, r *http.Request) {
 ## <a id="step-3"></a>3. :computer: runs `CitadelBridge.init` with `bridge_token`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel Quickstart',
     bridgeToken: bridgeToken.bridge_token,
-    product: 'income',
-    trackingInfo: 'any data for tracking current user',
     ...
   });
   window.bridge = bridge;

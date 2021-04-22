@@ -2,7 +2,6 @@ require 'net/http'
 require 'json'
 
 class Citadel
-  class_attribute :api_url
   class_attribute :client_id
   class_attribute :client_secret
   class_attribute :product_type
@@ -49,7 +48,7 @@ class Citadel
   end
 
   def self.sendRequest(endpoint, body, method)
-    uri = URI("#{Citadel.api_url}#{endpoint}")
+    uri = URI("https://prod.citadelid.com/v1/#{endpoint}")
     puts "accessing #{endpoint}".inspect
     if method == "POST"
       req = Net::HTTP::Post.new uri

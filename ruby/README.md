@@ -13,7 +13,6 @@ Once you have your API keys, it's time to run the Citadel Ruby on Rails Quicksta
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 ```
-API_URL=https://prod.citadelid.com/v1/
 API_SECRET=<YOUR SECRET KEY MUST BE HERE>
 API_CLIENT_ID=<YOUR CLIENT_ID HERE>
 API_PRODUCT_TYPE=<employment, income or admin>
@@ -108,7 +107,7 @@ Here is the flow that a successful verification process takes in our example:
   ...
 
   def self.sendRequest(endpoint, body, method)
-    uri = URI("#{Citadel.api_url}#{endpoint}")
+    uri = URI("https://prod.citadelid.com/v1/#{endpoint}")
     puts "accessing #{endpoint}".inspect
     if method == "POST"
       req = Net::HTTP::Post.new uri
@@ -144,10 +143,7 @@ Here is the flow that a successful verification process takes in our example:
 ## <a id="step-3"></a>3. :computer: runs `CitadelBridge.init` with `bridge_token`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel NodeJS Quickstart',
     bridgeToken: bridgeToken.bridge_token,
-    product: 'income',
-    trackingInfo: 'any data for tracking current user',
     ...
   });
   window.bridge = bridge;
@@ -209,7 +205,7 @@ end
 ...
 
 def self.sendRequest(endpoint, body)
-  uri = URI("#{Citadel.api_url}#{endpoint}")
+  uri = URI("https://prod.citadelid.com/v1/#{endpoint}")
   req = Net::HTTP::Post.new uri
   req['Content-Type'] = 'application/json'
   req['Accept'] = 'application/json'

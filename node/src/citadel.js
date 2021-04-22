@@ -1,6 +1,6 @@
 import fetch from "node-fetch"
 
-const { API_CLIENT_ID, API_SECRET, API_URL, API_PRODUCT_TYPE } = process.env
+const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env
 
 /**
  * Returns the default headers used when interacting with Citadel
@@ -116,7 +116,7 @@ const getPayrollById = async (report_id) => {
 const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
   const headers = getHeaders()
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(`https://prod.citadelid.com/v1/${endpoint}`, {
       method: method,
       body,
       headers,

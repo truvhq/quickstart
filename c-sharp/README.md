@@ -15,7 +15,6 @@ Once you have your API keys, it's time to run the Citadel C# Quickstart app loca
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 
     ```bash
-    API_URL=https://prod.citadelid.com/v1/
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_PRODUCT_TYPE=<employment, income or admin>
@@ -120,7 +119,7 @@ public Citadel() {
 
 public async Task<string> SendRequest(string endpoint, string content = "", string method = "POST") {
   var request = new HttpRequestMessage {
-    RequestUri = new Uri(apiUrl + endpoint),
+    RequestUri = new Uri("https://prod.citadelid.com/v1/" + endpoint),
     Method = method == "POST" ? HttpMethod.Post : HttpMethod.Get,
     Content = new StringContent(content, Encoding.UTF8, "application/json"),
   };
@@ -153,10 +152,7 @@ public class BridgeTokenController : ControllerBase
 
 ```javascript
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel Quickstart',
     bridgeToken: bridgeToken.bridge_token,
-    product: 'income',
-    trackingInfo: 'any data for tracking current user',
     ...
   });
   window.bridge = bridge;

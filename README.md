@@ -1,77 +1,36 @@
 # Introduction
-Let's get you started with Citadel by walking through this Quickstart app. You'll need a set of API keys which you can get by signing up at https://dashboard.citadelid.com
+Let's get you started with Citadel by walking through this Quickstart app. You'll need a set of API keys which you can get by signing up at https://dashboard.citadelid.com/signup
 
-You'll have two different API keys used by the back end, `client_id` and `access_key`.
+You'll have two different API keys used by the back end, `Client ID` and `Access key`.
 
 # Set up the Quickstart
 
 Follow the `README.md` file for the language you would like to implement in. If you don't see the language you are working with, send an email to developer-relations@citadelid.com
 
+- [C#](https://github.com/citadelid/quickstart/blob/master/c-sharp/README.md)
+- [Go](https://github.com/citadelid/quickstart/blob/master/golang/README.md)
 - [Python](https://github.com/citadelid/quickstart/blob/master/python/README.md)
 - [Node](https://github.com/citadelid/quickstart/blob/master/node/README.md)
 - [Ruby on Rails](https://github.com/citadelid/quickstart/blob/master/ruby/README.md)
 
-# Run your first verification
-## Overview
-The Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
+# What happens under the hood
 
-Before using Citadel for verification, an applicant fills out the form. 
-
-To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button. 
-
-If the verification is successful via Citadel, then we show to the applicant the data that we found in their payroll account. 
-
-If the verification isn't successful or the applicant decided to exit Citadel's widget, the applicant will see the form, fill it out and the verification can be done via an existing verification process.
-
-## Successful verification
-
-After opening the Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, (e.g., `Facebook`) and select a provider. 
-
-Use the Sandbox credentials to simulate a successful login. If you are performing an employment or income verification, use the following credentials:
-
-```
-username: goodlogin
-password: goodpassword
-```
-
-If you are performing an admin function, use the following API key:
-
-```
-Skx8LTnyrLiw4SYk8xfkRwOt5OGQbNulypqdsqd
-```
-
-Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
-
-The API call will be executed and the data will be loaded into the form.
-
-## No verification
-
-Now click the `Add employer` button, search for a company, eg `Facebook` and select any provider. 
-
-Click the exit icon at the top right of the widget and you'll see the empty form.
-
-# What happened under the hood
-
-- :smiley: = User
-- :computer: = Front End/Client App
-- :cloud: = Back End/Server
-
-Here is the flow that a successful verification process takes in our example. The below code will be shown in Python but each language has it's own
+Here is the flow that a successful payroll connection process takes in our example. The below code will be shown in Python but each language has it's own
 examples in the respective `README.md` files:
 
-1. [:computer: sends request to :cloud: for `bridge_token`](#step-1)
-2. [:cloud: sends API request to Citadel for `bridge_token`, sends response to :computer:](#step-2)
-3. [:computer: runs `CitadelBridge.init` with `bridge_token`](#step-3)
-4. [:smiley: clicks `Verify Income/`Verify Employment` button](#step-4)
-5. [:computer: displays Citadel widget, fires `onLoad` function executed](#step-5)
-6. [:smiley: selects employer, choses provider, logs in, clicks `Done`](#step-6)
-7. [:computer: first onSuccess function, sends request to :cloud: with temporary `token`, closes widget, first `onClose`](#step-7)
-8. [:cloud: sends API request to Citadel exchanging temporary `token` for `access_token`](#step-8)
-9. [:cloud: sends API request to Citadel with `access_token` for employment/income verification](#step-9)
-10. [:cloud: sends employment/income verification information back to :computer:](#step-10)
-11. [:computer: renders the verification info sent back by :cloud: for :smiley: to view](#step-11)
+1. [Front end sends request to back end for `bridge_token`](#step-1)
+2. [Back end sends API request to Citadel for `bridge_token`, sends response to front end](#step-2)
+3. [Front end runs `CitadelBridge.init` with `bridge_token`](#step-3)
+4. [User clicks `Connect` button](#step-4)
+5. [Front end displays Citadel widget, executes `onLoad` callback function](#step-5)
+6. [User follows instructions, choses provider, logs in, clicks `Done`](#step-6)
+7. [Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget](#step-7)
+8. [Back end sends API request to Citadel exchanging `public_token` for `access_token`](#step-8)
+9. [Back end sends API request to Citadel with `access_token` for payroll data](#step-9)
+10. [Back end sends payroll data back to front end](#step-10)
+11. [Front end renders the verification info sent back by back end for user to view](#step-11)
 
-## <a id="step-1"></a>1. :computer: sends request to :cloud: for `bridge_token`
+## <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
 ```
   const getBridgeToken = async () => {
     const response = await fetch(apiEnpoint + `getBridgeToken`, {
@@ -81,7 +40,7 @@ examples in the respective `README.md` files:
     return response;
   }
 ```
-## <a id="step-2"></a>2. :cloud: sends API request to Citadel for `bridge_token`, sends response to :computer:
+## <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
 ```
   def get_bridge_token(self) -> Any:
     """
@@ -100,20 +59,17 @@ examples in the respective `README.md` files:
   def create_bridge_token():
     return api_client.get_bridge_token()
 ```
-## <a id="step-3"></a>3. :computer: runs `CitadelBridge.init` with `bridge_token`
+## <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
 ```
   const bridge = CitadelBridge.init({
-    clientName: 'Citadel NodeJS Quickstart',
     bridgeToken: bridgeToken.bridge_token,
-    product: 'income',
-    trackingInfo: 'any data for tracking current user',
     ...
   });
   window.bridge = bridge;
 ```
 
-## <a id="step-4"></a>4. :smiley: clicks `Verify Income/`Verify Employment` button
-## <a id="step-5"></a>5. :computer: displays Citadel widget, fires `onLoad` function executed
+## <a id="step-4"></a>4. User clicks `Connect` button
+## <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
 ```
   onLoad: function () {
     console.log('loaded');
@@ -121,8 +77,8 @@ examples in the respective `README.md` files:
   },
 ```
 
-## <a id="step-6"></a>6. :smiley: selects employer, choses provider, logs in, clicks `Done`
-## <a id="step-7"></a>7. :computer: first onSuccess function, sends request to :cloud: with temporary `token`, closes widget, first `onClose`
+## <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
+## <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
 ```
 onSuccess: async function (token) {
   console.log('token: ', token);
@@ -158,7 +114,7 @@ onClose: function () {
 },
 ```
 
-## <a id="step-8"></a>8. :cloud: sends API request to Citadel exchanging temporary `token` for `access_token`
+## <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
 ```
 def get_access_token(self, public_token: str) -> str:
   """
@@ -184,7 +140,7 @@ def get_access_token(self, public_token: str) -> str:
   ).json()
   return tokens['access_tokens'][0]
 ```
-## <a id="step-9"></a>9. :cloud: sends API request to Citadel with `access_token` for employment/income verification
+## <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
 ```
 def get_employment_info_by_token(self, access_token: str) -> Any:
     """
@@ -222,7 +178,7 @@ def get_income_info_by_token(self, access_token: str) -> Any:
         headers=self.API_HEADERS,
     ).json()
 ```
-## <a id="step-10"></a>10. :cloud: sends employment/income verification information back to :computer:
+## <a id="step-10"></a>10. Back end sends payroll data back to front end
 ```
 @app.route('/getVerifications/<public_token>', methods=['GET'])
 def get_verification_info_by_token(public_token: str):
@@ -240,17 +196,11 @@ def get_verification_info_by_token(public_token: str):
         raise Exception('Unsupported product type!')
     return verifications
 ```
-## <a id="step-11"></a>11. :computer: renders the verification info sent back by :cloud: for :smiley: to view
+## <a id="step-11"></a>11. Front end renders the verification info sent back by back end for user to view
 ```
-function renderEmploymentHistory(employments) {
-  const result = employments.map(createEmploymentCard).reduce((acc, cur) => {
-    acc.appendChild(cur);
-    return acc;
-  }, document.createDocumentFragment());
-
-  const historyContainer = document.querySelector('#history');
-  historyContainer.appendChild(result);
-  const button = document.getElementById('verify-button')
-  button.style.display = 'none'
+function renderPayrollData(employments) {
+  const historyContainer = document.querySelector("#history")
+  console.log("Container", historyContainer)
+  historyContainer.innerHTML = JSON.stringify(employments, null, 2)
 }
 ```
