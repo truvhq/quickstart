@@ -31,7 +31,9 @@ examples in the respective `README.md` files:
 11. [Front end renders the verification info sent back by back end for user to view](#step-11)
 
 ## <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
-[admin](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/admin.html#L165) | [employment](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/employment.html#L144) | [income](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/income.html#L144)
+[Admin](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/admin.html#L165) |
+[Employment](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/employment.html#L144) |
+[Income](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/income.html#L144) |
 ```
   const getBridgeToken = async () => {
     const response = await fetch(apiEnpoint + `getBridgeToken`, {
@@ -42,11 +44,11 @@ examples in the respective `README.md` files:
   }
 ```
 ## <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
-[c#](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/c-sharp/Citadel.cs#L42)
-[go](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/golang/citadel.go#L52)
-[node](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/node/src/citadel.js#L23)
-[python](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/python/src/naive_api_client.py#L37)
-[ruby](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/ruby/app/models/Citadel.rb#L10)
+[C#](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/c-sharp/Citadel.cs#L42) |
+[Go](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/golang/citadel.go#L52) |
+[NodeJS](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/node/src/citadel.js#L23) |
+[Python](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/python/src/naive_api_client.py#L37) |
+[Ruby](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/ruby/app/models/Citadel.rb#L10)
 ```
   def get_bridge_token(self) -> Any:
     """
@@ -60,11 +62,11 @@ examples in the respective `README.md` files:
     ).json()
     return tokens
 ```
-[c#](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/c-sharp/Controllers/BridgeTokenController.cs#L10)
-[go](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/golang/main.go#L31)
-[node](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/node/src/index.js#L33)
-[python](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/python/src/server.py#L67)
-[ruby](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/ruby/config/routes.rb#L5)
+[C#](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/c-sharp/Controllers/BridgeTokenController.cs#L10) |
+[Go](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/golang/main.go#L31) |
+[NodeJS](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/node/src/index.js#L33) |
+[Python](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/python/src/server.py#L67) |
+[Ruby](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/ruby/config/routes.rb#L5)
 ```
   @app.route('/getBridgeToken', methods=['GET'])
   def create_bridge_token():
