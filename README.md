@@ -1,9 +1,12 @@
-# Introduction
-Let's get you started with Citadel by walking through this Quickstart app. You'll need a set of API keys which you can get by signing up at https://dashboard.citadelid.com/signup
+# Quickstart
+
+## Introduction
+
+Let's get you started with Citadel by walking through this Quickstart app. You'll need a set of API keys which you can get by signing up at [https://dashboard.citadelid.com/signup](https://dashboard.citadelid.com/signup)
 
 You'll have two different API keys used by the back end, `Client ID` and `Access key`.
 
-# Set up the Quickstart
+## Set up the Quickstart
 
 Follow the `README.md` file for the language you would like to implement in. If you don't see the language you are working with, send an email to developer-relations@citadelid.com
 
@@ -13,7 +16,7 @@ Follow the `README.md` file for the language you would like to implement in. If 
 - [Node](https://github.com/citadelid/quickstart/blob/master/node/README.md)
 - [Ruby on Rails](https://github.com/citadelid/quickstart/blob/master/ruby/README.md)
 
-# What happens under the hood
+## What happens under the hood
 
 Here is the flow that a successful payroll connection process takes in our example. The below code will be shown in Python but each language has it's own
 examples in the respective `README.md` files:
@@ -30,10 +33,12 @@ examples in the respective `README.md` files:
 10. [Back end sends payroll data back to front end](#step-10)
 11. [Front end renders the verification info sent back by back end for user to view](#step-11)
 
-## <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
+### <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
+
 [Admin](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/admin.html#L165) |
 [Employment](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/employment.html#L144) |
 [Income](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/income.html#L144) |
+
 ```javascript
   const getBridgeToken = async () => {
     const response = await fetch(apiEnpoint + `getBridgeToken`, {
@@ -43,12 +48,15 @@ examples in the respective `README.md` files:
     return response;
   }
 ```
-## <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
+
+### <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
+
 [C#](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/c-sharp/Citadel.cs#L42) |
 [Go](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/golang/citadel.go#L52) |
 [NodeJS](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/node/src/citadel.js#L23) |
 [Python](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/python/src/naive_api_client.py#L37) |
 [Ruby](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/ruby/app/models/Citadel.rb#L10)
+
 ```python
   def get_bridge_token(self) -> Any:
     """
@@ -62,17 +70,21 @@ examples in the respective `README.md` files:
     ).json()
     return tokens
 ```
+
 [C#](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/c-sharp/Controllers/BridgeTokenController.cs#L10) |
 [Go](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/golang/main.go#L31) |
 [NodeJS](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/node/src/index.js#L33) |
 [Python](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/python/src/server.py#L67) |
 [Ruby](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/ruby/config/routes.rb#L5)
+
 ```python
   @app.route('/getBridgeToken', methods=['GET'])
   def create_bridge_token():
     return api_client.get_bridge_token()
 ```
-## <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
+
+### <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
+
 ```javascript
   const bridge = CitadelBridge.init({
     bridgeToken: bridgeToken.bridge_token,
@@ -81,8 +93,10 @@ examples in the respective `README.md` files:
   window.bridge = bridge;
 ```
 
-## <a id="step-4"></a>4. User clicks `Connect` button
-## <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
+### <a id="step-4"></a>4. User clicks `Connect` button
+
+### <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
+
 ```javascript
   onLoad: function () {
     console.log('loaded');
@@ -90,8 +104,10 @@ examples in the respective `README.md` files:
   },
 ```
 
-## <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
-## <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
+### <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
+
+### <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
+
 ```javascript
 onSuccess: async function (token) {
   console.log('token: ', token);
@@ -127,7 +143,8 @@ onClose: function () {
 },
 ```
 
-## <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
+### <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
+
 ```python
 def get_access_token(self, public_token: str) -> str:
   """
@@ -153,7 +170,9 @@ def get_access_token(self, public_token: str) -> str:
   ).json()
   return tokens['access_tokens'][0]
 ```
-## <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
+
+### <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
+
 ```python
 def get_employment_info_by_token(self, access_token: str) -> Any:
     """
@@ -191,7 +210,9 @@ def get_income_info_by_token(self, access_token: str) -> Any:
         headers=self.API_HEADERS,
     ).json()
 ```
-## <a id="step-10"></a>10. Back end sends payroll data back to front end
+
+### <a id="step-10"></a>10. Back end sends payroll data back to front end
+
 ```python
 @app.route('/getVerifications/<public_token>', methods=['GET'])
 def get_verification_info_by_token(public_token: str):
@@ -209,7 +230,9 @@ def get_verification_info_by_token(public_token: str):
         raise Exception('Unsupported product type!')
     return verifications
 ```
-## <a id="step-11"></a>11. Front end renders the payroll data sent back by back end for user to view
+
+### <a id="step-11"></a>11. Front end renders the payroll data sent back by back end for user to view
+
 ```javascript
 function renderPayrollData(data) {
   const historyContainer = document.querySelector("#history")

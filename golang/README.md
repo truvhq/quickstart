@@ -1,10 +1,13 @@
-# Introduction
-Let's get you started with Citadel by walking through this Go Quickstart app. You'll need a set of API keys which you can get by signing up at https://dashboard.citadelid.com
+# Go Quickstart
+
+## Introduction
+
+Let's get you started with Citadel by walking through this Go Quickstart app. You'll need a set of API keys which you can get by signing up at [https://dashboard.citadelid.com](https://dashboard.citadelid.com)
 
 You'll have two different API keys used by the back end, `Client ID` and `Access key`.
 
+## Set up the Go Quickstart
 
-# Set up the Go Quickstart
 Once you have your API keys, it's time to run the Citadel Go Quickstart app locally.
 *Requirements*: The latest version of `golang`
 
@@ -13,15 +16,16 @@ Once you have your API keys, it's time to run the Citadel Go Quickstart app loca
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 
-  ```bash
-  API_CLIENT_ID=<YOUR CLIENT_ID HERE>
-  API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-  API_PRODUCT_TYPE=<employment, income or admin>
-  ```
+    ```bash
+    API_CLIENT_ID=<YOUR CLIENT_ID HERE>
+    API_SECRET=<YOUR SECRET KEY MUST BE HERE>
+    API_PRODUCT_TYPE=<employment, income or admin>
+    ```
 
 5. `make go_local`
 
 After running this command, you should see:
+
 ```output
 ======================================== ENVIRONMENT ========================================
   API_CLIENT_ID: <YOUR CLIENT ID HERE>,
@@ -31,9 +35,9 @@ After running this command, you should see:
 listening on port 5000
 ```
 
-To access the app, open http://127.0.0.1:5000/ in your browser.
+To access the app, open [http://127.0.0.1:5000/](http://127.0.0.1:5000/) in your browser.
 
-# What happens under the hood
+## What happens under the hood
 
 Here is the flow that a successful verification process takes in our example:
 
@@ -49,7 +53,8 @@ Here is the flow that a successful verification process takes in our example:
 10. [Back end sends payroll data back to front end](#step-10)
 11. [Front end renders the verification info sent back by back end for user to view](#step-11)
 
-## <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
+### <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
+
 ```javascript
   const getBridgeToken = async () => {
     const response = await fetch(apiEnpoint + `getBridgeToken`, {
@@ -59,7 +64,9 @@ Here is the flow that a successful verification process takes in our example:
     return response;
   }
 ```
-## <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
+
+### <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
+
 ```go
 func getRequest(endpoint string, method string, body []byte) (*http.Request) {
   clientId := os.Getenv("API_CLIENT_ID")
@@ -85,13 +92,16 @@ func getBridgeToken() (string) {
   return ""
 }
 ```
+
 ```go
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
   bridgeData := getBridgeToken()
   fmt.Fprintf(w, bridgeData)
 }
 ```
-## <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
+
+### <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
+
 ```javascript
   const bridge = CitadelBridge.init({
     bridgeToken: bridgeToken.bridge_token,
@@ -99,8 +109,11 @@ func bridgeToken(w http.ResponseWriter, r *http.Request) {
   });
   window.bridge = bridge;
 ```
-## <a id="step-4"></a>4. User clicks `Connect` button
-## <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
+
+### <a id="step-4"></a>4. User clicks `Connect` button
+
+### <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
+
 ```javascript
   onLoad: function () {
     console.log('loaded');
@@ -108,8 +121,10 @@ func bridgeToken(w http.ResponseWriter, r *http.Request) {
   },
 ```
 
-## <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
-## <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
+### <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
+
+### <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
+
 ```javascript
 onSuccess: async function (token) {
   console.log('token: ', token);
@@ -145,7 +160,8 @@ onClose: function () {
 },
 ```
 
-## <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
+### <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
+
 ```go
 
 type PublicTokenRequest struct {
@@ -179,7 +195,9 @@ func getAccessToken(public_token string) (string) {
     return accessTokens.AccessTokens[0]
 }
 ```
-## <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
+
+### <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
+
 ```go
 type AccessTokenRequest struct {
   AccessToken string `json:"access_token"`
@@ -217,7 +235,9 @@ func getIncomeInfoByToken(access_token string) (string) {
     return string(data)
 }
 ```
-## <a id="step-10"></a> 10. Back end sends payroll data back to front end
+
+### <a id="step-10"></a> 10. Back end sends payroll data back to front end
+
 ```go
 func verifications(w http.ResponseWriter, r *http.Request) {
   productType := os.Getenv("API_PRODUCT_TYPE")
@@ -233,7 +253,9 @@ func verifications(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintf(w, verificationResponse)
 }
 ```
-## <a id="step-11"></a>11. Front end renders the payroll data sent back by back end for user to view
+
+### <a id="step-11"></a>11. Front end renders the payroll data sent back by back end for user to view
+
 ```javascript
 function renderPayrollData(data) {
   const historyContainer = document.querySelector("#history")
