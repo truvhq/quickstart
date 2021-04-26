@@ -78,20 +78,20 @@ Click the exit icon at the top right of the widget and you'll see the empty form
 
 Here is the flow that a successful verification process takes in our example:
 
-1. [:computer: sends request to :cloud: for `bridge_token`](#step-1)
-2. [:cloud: sends API request to Citadel for `bridge_token`, sends response to :computer:](#step-2)
-3. [:computer: runs `CitadelBridge.init` with `bridge_token`](#step-3)
-4. [:smiley: clicks `Verify Income`/`Verify Employment` button](#step-4)
-5. [:computer: displays Citadel widget, fires `onLoad` function executed](#step-5)
-6. [:smiley: selects employer, choses provider, logs in, clicks `Done`](#step-6)
-7. [:computer: first onSuccess function, sends request to :cloud: with temporary `token`, closes widget, first `onClose`](#step-7)
-8. [:cloud: sends API request to Citadel exchanging temporary `token` for `access_token`](#step-8)
-9. [:cloud: sends API request to Citadel with `access_token` for employment/income verification](#step-9)
-10. [:cloud: sends employment/income verification information back to :computer:](#step-10)
-11. [:computer: renders the verification info sent back by :cloud: for :smiley: to view](#step-11)
+1. [Front end sends request to back end for `bridge_token`](#step-1)
+2. [Back end sends API request to Citadel for `bridge_token`, sends response to front end](#step-2)
+3. [Front end runs `CitadelBridge.init` with `bridge_token`](#step-3)
+4. [User clicks `Connect` button](#step-4)
+5. [Front end displays Citadel widget, executes `onLoad` callback function](#step-5)
+6. [User follows instructions, choses provider, logs in, clicks `Done`](#step-6)
+7. [Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget](#step-7)
+8. [Back end sends API request to Citadel exchanging `public_token` for `access_token`](#step-8)
+9. [Back end sends API request to Citadel with `access_token` for payroll data](#step-9)
+10. [Back end sends payroll data back to front end](#step-10)
+11. [Front end renders the verification info sent back by back end for user to view](#step-11)
 
-## <a id="step-1"></a>1. :computer: sends request to :cloud: for `bridge_token`
-```
+## <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
+```javascript
   const getBridgeToken = async () => {
     const response = await fetch(apiEnpoint + `getBridgeToken`, {
       method: 'get',
@@ -100,8 +100,8 @@ Here is the flow that a successful verification process takes in our example:
     return response;
   }
 ```
-## <a id="step-2"></a>2. :cloud: sends API request to Citadel for `bridge_token`, sends response to :computer:
-```
+## <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
+```go
 func getRequest(endpoint string, method string, body []byte) (*http.Request) {
   clientId := os.Getenv("API_CLIENT_ID")
   accessKey := os.Getenv("API_SECRET")
@@ -126,32 +126,32 @@ func getBridgeToken() (string) {
   return ""
 }
 ```
-```
+```go
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
   bridgeData := getBridgeToken()
   fmt.Fprintf(w, bridgeData)
 }
 ```
-## <a id="step-3"></a>3. :computer: runs `CitadelBridge.init` with `bridge_token`
-```
+## <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
+```javascript
   const bridge = CitadelBridge.init({
     bridgeToken: bridgeToken.bridge_token,
     ...
   });
   window.bridge = bridge;
 ```
-## <a id="step-4"></a>4. :smiley: clicks `Verify Income`/`Verify Employment` button
-## <a id="step-5"></a>5. :computer: displays Citadel widget, fires `onLoad` function executed
-```
+## <a id="step-4"></a>4. User clicks `Connect` button
+## <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
+```javascript
   onLoad: function () {
     console.log('loaded');
     successClosing = null
   },
 ```
 
-## <a id="step-6"></a>6. :smiley: selects employer, choses provider, logs in, clicks `Done`
-## <a id="step-7"></a>7. :computer: first onSuccess function, sends request to :cloud: with temporary `token`, closes widget, first `onClose`
-```
+## <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
+## <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
+```javascript
 onSuccess: async function (token) {
   console.log('token: ', token);
 
@@ -186,8 +186,8 @@ onClose: function () {
 },
 ```
 
-## <a id="step-8"></a>8. :cloud: sends API request to Citadel exchanging temporary `token` for `access_token`
-```
+## <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
+```go
 
 type PublicTokenRequest struct {
   PublicTokens []string `json:"public_tokens"`
@@ -220,8 +220,8 @@ func getAccessToken(public_token string) (string) {
     return accessTokens.AccessTokens[0]
 }
 ```
-## <a id="step-9"></a>9. :cloud: sends API request to Citadel with `access_token` for employment/income verification
-```
+## <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
+```go
 type AccessTokenRequest struct {
   AccessToken string `json:"access_token"`
 }
@@ -258,8 +258,8 @@ func getIncomeInfoByToken(access_token string) (string) {
     return string(data)
 }
 ```
-## <a id="step-10"></a> 10. :cloud: sends employment/income verification information back to :computer:
-```
+## <a id="step-10"></a> 10. Back end sends payroll data back to front end
+```go
 func verifications(w http.ResponseWriter, r *http.Request) {
   productType := os.Getenv("API_PRODUCT_TYPE")
   splitPath := strings.Split(r.URL.Path, "/")
@@ -274,17 +274,10 @@ func verifications(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintf(w, verificationResponse)
 }
 ```
-## <a id="step-11"></a>11. :computer: renders the verification info sent back by :cloud: for :smiley: to view
-```
-function renderEmploymentHistory(employments) {
-  const result = employments.map(createEmploymentCard).reduce((acc, cur) => {
-    acc.appendChild(cur);
-    return acc;
-  }, document.createDocumentFragment());
-
-  const historyContainer = document.querySelector('#history');
-  historyContainer.appendChild(result);
-  const button = document.getElementById('verify-button')
-  button.style.display = 'none'
+## <a id="step-11"></a>11. Front end renders the payroll data sent back by back end for user to view
+```javascript
+function renderPayrollData(data) {
+  const historyContainer = document.querySelector("#history")
+  historyContainer.innerHTML = JSON.stringify(data, null, 2)
 }
 ```
