@@ -15,8 +15,8 @@ Once you have your API keys, it's time to run the Citadel C# Quickstart app loca
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
 
     ```bash
-    API_SECRET=<YOUR SECRET KEY MUST BE HERE>
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
+    API_SECRET=<YOUR SECRET KEY MUST BE HERE>
     API_PRODUCT_TYPE=<employment, income or admin>
     ```
 
@@ -36,10 +36,6 @@ info: Microsoft.Hosting.Lifetime[0]
 To access the app, open `http://127.0.0.1:5000/` in your browser.
 
 # What happens under the hood
-
-- :smiley: = User
-- :computer: = Front End/Client App
-- :cloud: = Back End/Server
 
 Here is the flow that a successful verification process takes in our example:
 

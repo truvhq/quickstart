@@ -12,15 +12,18 @@ Once you have your API keys, it's time to run the Citadel Ruby on Rails Quicksta
 2. `cd quickstart`
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
-```
-API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-API_CLIENT_ID=<YOUR CLIENT_ID HERE>
-API_PRODUCT_TYPE=<employment, income or admin>
-```
+
+  ```bash
+  API_CLIENT_ID=<YOUR CLIENT_ID HERE>
+  API_SECRET=<YOUR SECRET KEY MUST BE HERE>
+  API_PRODUCT_TYPE=<employment, income or admin>
+  ```
+
 5. `make ruby_local`
 
 After running this command, you should see:
-```
+
+```output
 * Min threads: 5, max threads: 5
 * Environment: development
 * Listening on tcp://127.0.0.1:5000
@@ -30,10 +33,6 @@ After running this command, you should see:
 To access the app, open http://127.0.0.1:5000/ in your browser.
 
 # What happens under the hood
-
-- :smiley: = User
-- :computer: = Front End/Client App
-- :cloud: = Back End/Server
 
 Here is the flow that a successful verification process takes in our example:
 
