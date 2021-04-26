@@ -34,7 +34,7 @@ examples in the respective `README.md` files:
 [Admin](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/admin.html#L165) |
 [Employment](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/employment.html#L144) |
 [Income](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/html/income.html#L144) |
-```
+```javascript
   const getBridgeToken = async () => {
     const response = await fetch(apiEnpoint + `getBridgeToken`, {
       method: 'get',
@@ -49,7 +49,7 @@ examples in the respective `README.md` files:
 [NodeJS](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/node/src/citadel.js#L23) |
 [Python](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/python/src/naive_api_client.py#L37) |
 [Ruby](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/ruby/app/models/Citadel.rb#L10)
-```
+```python
   def get_bridge_token(self) -> Any:
     """
     https://docs.citadelid.com/?python#bridge-tokens_create
@@ -67,13 +67,13 @@ examples in the respective `README.md` files:
 [NodeJS](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/node/src/index.js#L33) |
 [Python](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/python/src/server.py#L67) |
 [Ruby](https://github.com/citadelid/quickstart/blob/d95e781d928cc38f79186b1e05dc7d96acf7a8b9/ruby/config/routes.rb#L5)
-```
+```python
   @app.route('/getBridgeToken', methods=['GET'])
   def create_bridge_token():
     return api_client.get_bridge_token()
 ```
 ## <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
-```
+```javascript
   const bridge = CitadelBridge.init({
     bridgeToken: bridgeToken.bridge_token,
     ...
@@ -83,7 +83,7 @@ examples in the respective `README.md` files:
 
 ## <a id="step-4"></a>4. User clicks `Connect` button
 ## <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
-```
+```javascript
   onLoad: function () {
     console.log('loaded');
     successClosing = null
@@ -92,7 +92,7 @@ examples in the respective `README.md` files:
 
 ## <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
 ## <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
-```
+```javascript
 onSuccess: async function (token) {
   console.log('token: ', token);
 
@@ -128,7 +128,7 @@ onClose: function () {
 ```
 
 ## <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
-```
+```python
 def get_access_token(self, public_token: str) -> str:
   """
   https://docs.citadelid.com/?python#exchange-token-flow
@@ -154,7 +154,7 @@ def get_access_token(self, public_token: str) -> str:
   return tokens['access_tokens'][0]
 ```
 ## <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
-```
+```python
 def get_employment_info_by_token(self, access_token: str) -> Any:
     """
     https://docs.citadelid.com/#employment-verification
@@ -192,7 +192,7 @@ def get_income_info_by_token(self, access_token: str) -> Any:
     ).json()
 ```
 ## <a id="step-10"></a>10. Back end sends payroll data back to front end
-```
+```python
 @app.route('/getVerifications/<public_token>', methods=['GET'])
 def get_verification_info_by_token(public_token: str):
     """ getVerificationInfoByToken """
@@ -210,7 +210,7 @@ def get_verification_info_by_token(public_token: str):
     return verifications
 ```
 ## <a id="step-11"></a>11. Front end renders the payroll data sent back by back end for user to view
-```
+```javascript
 function renderPayrollData(data) {
   const historyContainer = document.querySelector("#history")
   historyContainer.innerHTML = JSON.stringify(data, null, 2)

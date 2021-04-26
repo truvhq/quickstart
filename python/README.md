@@ -101,7 +101,7 @@ Here is the flow that a successful verification process takes in our example:
 11. [Front end renders the verification info sent back by back end for user to view](#step-11)
 
 ## <a id="step-1"></a>1. Front end sends request to back end for `bridge_token`
-```
+```javascript
 const getBridgeToken = async () => {
   const response = await fetch(apiEnpoint + `getBridgeToken`, {
     method: 'get',
@@ -111,7 +111,7 @@ const getBridgeToken = async () => {
 }
 ```
 ## <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
-```
+```python
 def get_bridge_token(self) -> Any:
     """
     https://docs.citadelid.com/?python#bridge-tokens_create
@@ -135,14 +135,14 @@ def get_bridge_token(self) -> Any:
     ).json()
     return tokens
 ```
-```
+```python
 @app.route('/getBridgeToken', methods=['GET'])
 def create_bridge_token():
     """Back end API endpoint to request a bridge token"""
     return api_client.get_bridge_token()
 ```
 ## <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
-```
+```javascript
 const bridge = CitadelBridge.init({
   bridgeToken: bridgeToken.bridge_token,
   ...
@@ -152,7 +152,7 @@ window.bridge = bridge;
 
 ## <a id="step-4"></a>4. User clicks `Connect` button
 ## <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
-```
+```javascript
 onLoad: function () {
   console.log('loaded');
   successClosing = null
@@ -161,7 +161,7 @@ onLoad: function () {
 
 ## <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
 ## <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
-```
+```javascript
 onSuccess: async function (token) {
   console.log('token: ', token);
 
@@ -197,7 +197,7 @@ onClose: function () {
 ```
 
 ## <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
-```
+```python
 def get_access_token(self, public_token: str) -> str:
     """
     https://docs.citadelid.com/?python#exchange-token-flow
@@ -221,7 +221,7 @@ def get_access_token(self, public_token: str) -> str:
     return tokens['access_tokens'][0]
 ```
 ## <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
-```
+```python
 def get_employment_info_by_token(self, access_token: str) -> Any:
     """
     https://docs.citadelid.com/#employment-verification
@@ -262,7 +262,7 @@ def get_income_info_by_token(self, access_token: str) -> Any:
     ).json()
 ```
 ## <a id="step-10"></a>10. Back end sends payroll data back to front end
-```
+```python
 @app.route('/getVerifications/<public_token>', methods=['GET'])
 def get_verification_info_by_token(public_token: str):
     """ Back end API endpoint to retrieve employment or income verification
@@ -281,7 +281,7 @@ def get_verification_info_by_token(public_token: str):
     return verifications
 ```
 ## <a id="step-11"></a>11. Front end renders the payrol data sent back by back end for user to view
-```
+```javascript
 function renderPayrollData(data) {
   const historyContainer = document.querySelector("#history")
   historyContainer.innerHTML = JSON.stringify(data, null, 2)
