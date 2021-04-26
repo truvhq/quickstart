@@ -116,13 +116,13 @@ onSuccess: async function (token) {
   }
             
   setUserInfo(verificationInfo[0]);
-  renderEmploymentHistory(verificationInfo);
+  renderPayrollData(verificationInfo);
 },
 ...
 onClose: function () {
   console.log('closed');
   if (successClosing !== true) {
-    renderEmploymentHistory([{ company: { address: {} } }]);
+    renderPayrollData([{ company: { address: {} } }]);
   }
 },
 ```
