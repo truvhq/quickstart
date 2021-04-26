@@ -41,46 +41,7 @@ web_1  |  * Debugger PIN: 593-914-178
 
 To access the app, open http://127.0.0.1:5000/ in your browser.
 
-# Run your first verification
-## Overview
-The Python Quickstart app emulates the experience of an applicant going through a background check/income verification and visiting the applicant portal.
-
-Before using Citadel for verification, an applicant fills out the form. 
-
-To streamline the process and make employment/income verification easy and instant, we "hide" the form behind the button. 
-
-If the verification is successful via Citadel, then we show to the applicant the data that we found in their payroll account. 
-
-If the verification isn't successful or the applicant decided to exit Citadel's widget, the applicant will see the form, fill it out and the verification can be done via an existing verification process.
-
-## Successful verification
-
-After opening the Python Quickstart app running locally, click the `Verify employment`/`Verify income` button, search for a company, (e.g., `Facebook`) and select a provider. 
-
-Use the Sandbox credentials to simulate a successful login. If you are performing an employment or income verification, use the following credentials:
-
-```
-username: goodlogin
-password: goodpassword
-```
-
-If you are performing an admin function, use the following API key:
-
-```
-Skx8LTnyrLiw4SYk8xfkRwOt5OGQbNulypqdsqd
-```
-
-Once you have entered your credentials and moved to the next screen, you have succesfully done your first verification. 
-
-The API call will be executed and the data will be loaded into the form.
-
-## No verification
-
-Now click the `Add employer` button, search for a company, eg `Facebook` and select any provider. 
-
-Click the exit icon at the top right of the widget and you'll see the empty form.
-
-# What happened under the hood
+# What happens under the hood
 
 - :smiley: = User
 - :computer: = Front End/Client App
