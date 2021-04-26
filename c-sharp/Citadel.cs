@@ -1,9 +1,6 @@
 using System;
-using System.IO;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Collections.Generic;
@@ -40,6 +37,7 @@ namespace c_sharp
 
     public async Task<string> GetBridgeToken()
     {
+      Console.WriteLine("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens");
       var body = "{ \"product_type\": \"" + productType + "\"," +
                  " \"tracking_info\": \"1337\"," +
                  " \"client_name\": \"Citadel Quickstart\"" +
@@ -49,6 +47,8 @@ namespace c_sharp
 
     public async Task<string> GetAccessToken(string publicToken)
     {
+      Console.WriteLine("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens");
+      Console.WriteLine("CITADEL: Public Token - {0}", publicToken);
       var response = await SendRequest("access-tokens/", "{\"public_tokens\": [\"" + publicToken + "\"] }");
       var parsedResponse = JsonDocument.Parse(response);
       return parsedResponse.RootElement.GetProperty("access_tokens").EnumerateArray().First().GetString();
@@ -56,34 +56,42 @@ namespace c_sharp
 
     public async Task<string> GetEmploymentInfoByToken(string accessToken)
     {
+      Console.WriteLine("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       return await SendRequest("verifications/employments/", "{\"access_token\": \"" + accessToken + "\" }");
     }
 
     public async Task<string> GetIncomeInfoByToken(string accessToken)
     {
+      Console.WriteLine("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       return await SendRequest("verifications/incomes/", "{\"access_token\": \"" + accessToken + "\" }");
     }
 
     public async Task<string> GetEmployeeDirectoryByToken(string accessToken)
     {
+      Console.WriteLine("CITADEL: Requesting employee directory data using an access_token from https://prod.citadelid.com/v1/administrators/directories");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       return await SendRequest("administrators/directories/", "{\"access_token\": \"" + accessToken + "\" }");
     }
 
     public async Task<string> RequestPayrollReport(string accessToken, string startDate, string endDate)
     {
+      Console.WriteLine("CITADEL: Requesting a payroll report be created using an access_token from https://prod.citadelid.com/v1/administrators/payrolls");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       var body = "{ \"access_token\": \"" + accessToken + "\"," +
                  " \"start_date\": \"" + startDate + "\"," +
                  " \"end_date\": \"" + endDate + "\"" +
                  "}";
-      Console.WriteLine(body);
       var response = await SendRequest("administrators/payrolls/", body);
-      Console.WriteLine(response);
       var parsedResponse = JsonDocument.Parse(response);
       return parsedResponse.RootElement.GetProperty("payroll_report_id").GetString();
     }
 
     public async Task<string> GetPayrollById(string reportId)
     {
+      Console.WriteLine("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}");
+      Console.WriteLine("CITADEL: Report ID - {0}", reportId);
       return await SendRequest($"administrators/payrolls/{reportId}", "", "GET");
     }
   }
