@@ -2,15 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
     <meta name="theme-color" content="#000000" />
 
-    <title>income verification applicant portal</title>
+    <title>Income verification portal</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <!-- Step 1 - add the bridge library to your app with a script tag -->
     <script src="https://cdn.citadelid.com/bridge.js"></script>
     <style>
       header {
@@ -120,103 +127,123 @@
       }
 
       .container {
-            padding-bottom: 30px;
-            border-bottom: 1px solid #e2e2e2;
-            margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #e2e2e2;
+        margin-bottom: 30px;
       }
-        .container:last-child {
-            padding-bottom: 0px;
-            border-bottom: 0px solid #e2e2e2;
-            margin-bottom: 0px;
-        }
+      .container:last-child {
+        padding-bottom: 0px;
+        border-bottom: 0px solid #e2e2e2;
+        margin-bottom: 0px;
+      }
     </style>
   </head>
   <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
     <script>
       function getApiRequests(apiEnpoint) {
         const headers = {
-          'Content-Type': 'application/json;charset=UTF-8',
-        };
+          "Content-Type": "application/json;charset=UTF-8",
+        }
 
         const getBridgeToken = async () => {
           const response = await fetch(apiEnpoint + `getBridgeToken`, {
-            method: 'get',
+            method: "get",
             headers,
-          }).then((r) => r.json());
-          return response;
+          }).then((r) => r.json())
+          return response
         }
 
         /**
-         * @return {Promise<EmploymentItem[]>}
+         * @return {Promise<IncomeItem[]>}
          */
         const getVerificationInfoByToken = async (public_token) => {
-          const response = await fetch(apiEnpoint + `getVerifications/${public_token}`, {
-            method: 'get',
-            headers,
-          }).then((r) => r.json());
-          return response.employments;
-        };
+          const response = await fetch(
+            apiEnpoint + `getVerifications/${public_token}`,
+            {
+              method: "get",
+              headers,
+            }
+          ).then((r) => r.json())
+          return response.employments
+        }
 
         return {
           getVerificationInfoByToken,
-          getBridgeToken
-        };
+          getBridgeToken,
+        }
       }
 
-      (async function () {
-        const apiRequests = getApiRequests('{{ server_url }}');
+      ;(async function () {
+        const apiRequests = getApiRequests("{{ server_url }}")
 
         let successClosing
 
+        // Step 2 - Call your back end to retrieve a bridge token from citadel
         const bridgeToken = await apiRequests.getBridgeToken()
+
+        // Step 3 - Initialize the Citadel Bridge
         const bridge = CitadelBridge.init({
           bridgeToken: bridgeToken.bridge_token,
           onLoad: function () {
-            console.log('loaded');
+            console.log("onLoad callback called")
             successClosing = null
           },
-          onEvent: function (eventType) {
-            console.log('event: ', eventType);
+          onEvent: function (eventType, payload) {
+            console.log(`onEvent callback called. Event Type: ${eventType}`)
+            if (payload) console.log("onEvent payload:", payload)
           },
-          onSuccess: async function (token) {
-            console.log('token: ', token);
+          onSuccess: async function (public_token, meta) {
+            console.log(
+              `onSuccess callback called. public_token: ${public_token}`
+            )
+            console.log("onSuccess meta: ", meta)
 
             successClosing = true
 
-            const content = document.querySelector('.spinnerContainer');
+            const content = document.querySelector(".spinnerContainer")
 
-            content.classList.remove('hidden');
-            let verificationInfo;
+            content.classList.remove("hidden")
+            let verificationInfo
             try {
-              verificationInfo = await apiRequests.getVerificationInfoByToken(token);
-            } catch(e) {
+              console.log(
+                "Requesting Income verification information from the back end with public_token"
+              )
+              verificationInfo = await apiRequests.getVerificationInfoByToken(
+                public_token
+              )
+            } catch (e) {
               console.error(e)
-              content.classList.add('hidden');
-              return;
+              content.classList.add("hidden")
+              return
             }
-            content.classList.add('hidden');
+            content.classList.add("hidden")
 
             if (!verificationInfo.length) {
-              return;
+              return
             }
 
-            setUserInfo(verificationInfo[0]);
-
-            renderEmploymentHistory(verificationInfo);
+            renderPayrollData(verificationInfo)
           },
-
           onClose: function () {
-            console.log('closed');
+            console.log("onClose callback called.")
+            console.log("First Value:", employer)
             if (successClosing !== true) {
-              renderEmploymentHistory([{ company: { address: {} } }]);
+              renderPayrollData([{ company: { address: {} } }])
             }
           },
-        });
-        window.bridge = bridge;
-      })();
+        })
+        window.bridge = bridge
+      })()
+
+      /**
+       *
+       * @param {IncomeItem[]} incomes
+       */
+      function renderPayrollData(data) {
+        const historyContainer = document.querySelector("#history")
+        historyContainer.innerHTML = JSON.stringify(data, null, 2)
+      }
     </script>
 
     <div class="spinnerContainer hidden">
@@ -230,7 +257,7 @@
         <img
           src="https://citadelid-resources.s3-us-west-2.amazonaws.com/Citadel.svg"
           alt="Citadel"
-          style="width:100px;height:50px;"
+          style="width: 100px; height: 50px"
         />
       </div>
     </header>
@@ -238,7 +265,12 @@
     <div id="content" class="container">
       <div class="titleContainer">
         <div class="img">
-          <svg viewBox="0 0 16 16" class="bi bi-person-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            viewBox="0 0 16 16"
+            class="bi bi-person-check"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               fill-rule="evenodd"
               d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm4.854-7.85a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"
@@ -246,250 +278,25 @@
           </svg>
         </div>
         <div>
-          <h2>Enter Your Information</h2>
-          <span>All fields are required. Please check for accuracy and spelling to avoid delays</span>
+          <h2>Verifying income</h2>
+          <span
+            >Click the Connect button below, search for an employer and choose
+            "ADP" for your payroll provider. Follow the instructions to see what
+            income data you'll get back.
+          </span>
         </div>
       </div>
       <form>
-        <div class="formSection">
-          <h3>Personal Information</h3>
-
-          <div class="form-group">
-            <label for="firstNameInput">First name</label>
-            <input required type="text" class="form-control" id="firstNameInput" placeholder="First Name" />
-          </div>
-
-          <div class="form-group">
-            <label for="middleNameInput">Middle Name</label>
-            <input required type="text" class="form-control" id="middleNameInput" placeholder="Middle Name" />
-          </div>
-
-          <div class="form-group">
-            <label for="lastNameInput">Last name</label>
-            <input required type="text" class="form-control" id="lastNameInput" placeholder="Last Name" />
-          </div>
-
-          <div class="form-group">
-            <label for="homeAdrressInput">Current home address</label>
-            <input required type="text" class="form-control" id="homeAdrressInput" placeholder="Street Address" />
-
-            <div class="row row-cols-1 row-cols-md-4">
-              <div class="col">
-                <input required type="text" class="form-control" id="cityInput" placeholder="City" />
-              </div>
-
-              <div class="col">
-                <input required type="text" class="form-control" id="stateInput" placeholder="State" />
-              </div>
-
-              <div class="col">
-                <input required type="text" class="form-control" id="zipInput" placeholder="Zipcode" />
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Date of Birth</label>
-
-            <div class="row row-cols-1 row-cols-md-4">
-              <div class="col">
-                <input required type="text" class="form-control" id="birthMonth" placeholder="Month" />
-              </div>
-
-              <div class="col">
-                <input required type="text" class="form-control" id="birthDay" placeholder="Day" />
-              </div>
-
-              <div class="col">
-                <input required type="text" class="form-control" id="birthYear" placeholder="Year" />
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="ssnInput">Social Security Number (SSN)</label>
-            <input required type="text" class="form-control" id="ssnInput" placeholder="Digits, No Dashes" />
-          </div>
-        </div>
-
         <div class="formSection historyContainer">
-          <h3>Verify Your Income Information</h3>
-          <span class="historyText">Please provide 2 recent paystubs and annual income</span>
-
-          <div id="history"></div>
-          <button type="button" id="verify-button" onclick="bridge.open()">
-            Verify income
+          <div>
+            <pre><code id="history"></code></pre>
+          </div>
+          <!-- Step 4 - Create a button or action that calls bridge.open() to open the Citadel Bridge -->
+          <button type="button" id="button" onclick="bridge.open()">
+            Connect
           </button>
         </div>
-
-        <div class="formSection">
-          <h3>Applicant Consent & E-Signature:</h3>
-
-          <div class="custom-control custom-checkbox">
-            <input required type="checkbox" class="custom-control-input" id="agreement" />
-            <label class="custom-control-label" for="agreement"
-              >I am providing my electronic signature to certify all information entered is complete accurate.
-            </label>
-          </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-lg">I agree, submit</button>
       </form>
     </div>
-
-    <script>
-      /**
-       * @typedef {Object} Address
-       * @property {string | null} zip
-       * @property {string | null} city
-       * @property {string | null} state
-       * @property {string | null} street
-       * @property {string | null} country
-       */
-
-      /**
-       * @typedef {Object} Company
-       * @property {Address | null} address
-       * @property {string | null} name
-       * @property {string | null} phone
-       */
-
-      /**
-       * @typedef {Object} Profile
-       * @property {string | null} first_name
-       * @property {string | null} last_name
-       * @property {string | null} middle_initials
-       * @property {string | null} email
-       * @property {string | null} ssn
-       * @property {string | null} date_of_birth
-       */
-
-      /**
-       * @typedef {Object} EmploymentItem
-       * @property {string} id
-       * @property {string} job_title
-       * @property {string} job_type
-       * @property {string} start_date
-       * @property {string} end_date
-       * @property {Company} company
-       * @property {Profile} profile
-       */
-
-      /**
-       * @param {string} id
-       * @param {string} value
-       */
-      function setFormItemValue(id, value) {
-        const element = document.querySelector(`#${id}`);
-        if (element && value) {
-          element.value = value;
-          element.setAttribute('readOnly', true);
-        }
-      }
-
-      /**
-       *
-       * @param {EmploymentItem} employmentItem
-       */
-      function setUserInfo(employmentItem) {
-        setFormItemValue('firstNameInput', employmentItem.profile.first_name);
-        setFormItemValue('middleNameInput', employmentItem.profile.middle_initials);
-        setFormItemValue('lastNameInput', employmentItem.profile.last_name);
-
-        setFormItemValue('ssnInput', employmentItem.profile.ssn);
-
-        const [year, month, day] = employmentItem.profile.date_of_birth.split('-');
-
-        setFormItemValue('birthDay', day);
-        setFormItemValue('birthMonth', month);
-        setFormItemValue('birthYear', year);
-      }
-
-      /**
-       * @param {string} id
-       * @param {string | undefined} title
-       * @param {string | undefined} value
-       */
-      function createInput(id, value, title) {
-        const container = document.createElement('div');
-        const label = title && document.createElement('label');
-        const input = document.createElement('input');
-
-        container.classList.add('form-group');
-        input.id = id;
-        input.classList.add('form-control');
-
-        if (value) {
-          input.value = value.replace(/_/g, ' ');
-          input.setAttribute('readOnly', true);
-        }
-        if (label) {
-          label.setAttribute('for', id);
-          label.innerText = title;
-        }
-
-        label && container.appendChild(label);
-        container.appendChild(input);
-
-        return container;
-      }
-
-      /**
-       *
-       * @param {EmploymentItem} employment
-       */
-      function createEmploymentCard(employment) {
-        const container = document.createElement('div');
-        container.classList.add("container")
-
-        const company = employment.company;
-
-        const name = createInput(`${company.name}-name`, company.name, 'Employer Name');
-
-        const annualIncome = createInput(`${company.name}-annualIncome`, employment.annual_salary || '', 'Annual Income');
-        const hourlyIncome = createInput(`${company.name}-hourlyIncome`, employment.hourly_salary || '', 'Hourly Income');
-
-        const paystubContainer = document.createElement('div');
-        paystubContainer.innerHTML = '<label>Most recent paystubs:</label>';
-
-        if (employment.statements) {
-          const paystubs = employment.statements.reduce((acc, cur) => {
-            if (cur.file) {
-              const paystub = document.createElement('div')
-              const el = document.createElement('a');
-              el.textContent = cur.pay_date
-              el.setAttribute('href', cur.file);
-              el.setAttribute('target', '_blank');
-              paystub.appendChild(el)
-              acc.appendChild(paystub);
-            }
-            return acc;
-          }, paystubContainer);
-        }
-
-        container.appendChild(name);
-        container.appendChild(annualIncome);
-        container.appendChild(hourlyIncome);
-        container.appendChild(paystubContainer);
-
-        return container;
-      }
-
-      /**
-       *
-       * @param {EmploymentItem[]} employments
-       */
-      function renderEmploymentHistory(employments) {
-        const result = employments.map(createEmploymentCard).reduce((acc, cur) => {
-          acc.appendChild(cur);
-          return acc;
-        }, document.createDocumentFragment());
-
-        const historyContainer = document.querySelector('#history');
-        historyContainer.appendChild(result);
-        const button = document.getElementById('verify-button')
-        button.style.display = 'none'
-      }
-    </script>
   </body>
 </html>

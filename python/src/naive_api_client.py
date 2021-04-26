@@ -1,6 +1,7 @@
 from typing import TypedDict, List, Any
 
 import requests
+import logging
 
 # https://docs.citadelid.com
 # Header which using in private api calls
@@ -13,7 +14,7 @@ ApiHeaders = TypedDict('ApiHeaders', {
 
 class NaiveApiClient:
     """
-    Just naive api client to show how flow works,
+    A naive api client to show how flow works,
     without errors processing and other like that
     """
     API_URL: str
@@ -21,12 +22,11 @@ class NaiveApiClient:
     PRODUCT_TYPE: str
 
     def __init__(self,
-                 api_url: str,
                  secret: str,
                  client_id: str,
                  product_type: str,
                  ):
-        self.API_URL = api_url
+        self.API_URL = 'https://prod.citadelid.com/v1/'
         self.PRODUCT_TYPE = product_type
         self.API_HEADERS = {
             'X-Access-Secret': secret,
@@ -40,6 +40,7 @@ class NaiveApiClient:
         :param public_token:
         :return:
         """
+        logging.info("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
         class BridgeTokenRequest(TypedDict):
             product_type: str
             client_name: str
@@ -64,7 +65,8 @@ class NaiveApiClient:
         :param public_token:
         :return:
         """
-
+        logging.info("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens")
+        logging.info("CITADEL: Public Token - %s", public_token)
         class AccessTokenRequest(TypedDict):
             public_tokens: List[str]
 
@@ -88,7 +90,8 @@ class NaiveApiClient:
         :param access_token:
         :return:
         """
-
+        logging.info("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments")
+        logging.info("CITADEL: Access Token - %s", access_token)
         class VerificationRequest(TypedDict):
             access_token: str
 
@@ -107,6 +110,8 @@ class NaiveApiClient:
         :return:
         """
 
+        logging.info("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes")
+        logging.info("CITADEL: Access Token - %s", access_token)
         class VerificationRequest(TypedDict):
             access_token: str
 
@@ -125,6 +130,8 @@ class NaiveApiClient:
         :return:
         """
 
+        logging.info("CITADEL: Requesting employee directory data using an access_token from https://prod.citadelid.com/v1/administrators/directories")
+        logging.info("CITADEL: Access Token - %s", access_token)
         class DirectoryRequest(TypedDict):
             access_token: str
 
@@ -145,6 +152,8 @@ class NaiveApiClient:
         :return: Payroll report ID
         """
 
+        logging.info("CITADEL: Requesting a payroll report be created using an access_token from https://prod.citadelid.com/v1/administrators/payrolls")
+        logging.info("CITADEL: Access Token - %s", access_token)
         class PayrollReportRequest(TypedDict):
             access_token: str
             start_date: str
@@ -169,6 +178,8 @@ class NaiveApiClient:
         :return:
         """
 
+        logging.info("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}")
+        logging.info("CITADEL: Report ID - %s", report_id)
         return requests.get(
             self.API_URL + f'administrators/payrolls/{report_id}',
             headers=self.API_HEADERS,
