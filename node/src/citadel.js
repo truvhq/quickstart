@@ -21,6 +21,7 @@ const getHeaders = () => {
  * @return The response from Citadel - https://docs.citadelid.com/javascript#schemabridgetoken
  */
 const getBridgeToken = async () => {
+  console.log("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
   const body = JSON.stringify({
     product_type: API_PRODUCT_TYPE,
     client_name: "Citadel Quickstart",
@@ -38,6 +39,8 @@ const getBridgeToken = async () => {
  * @return The access token provided by citadel
  **/
 const getAccessToken = async (public_token) => {
+  console.log("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens")
+  console.log(`CITADEL: Public Token - ${public_token}`)
   const body = JSON.stringify({
     public_tokens: [public_token],
   })
@@ -52,6 +55,8 @@ const getAccessToken = async (public_token) => {
  * @return The response from Citadel - https://docs.citadelid.com/javascript#schemaemploymentcheck
  */
 const getEmploymentInfoByToken = async (access_token) => {
+  console.log("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments")
+  console.log(`CITADEL: Access Token - ${access_token}`)
   const body = JSON.stringify({
     access_token,
   })
@@ -65,6 +70,8 @@ const getEmploymentInfoByToken = async (access_token) => {
  * @return The response from Citadel - https://docs.citadelid.com/javascript#schemaincomecheck
  */
 const getIncomeInfoByToken = async (access_token) => {
+  console.log("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes")
+  console.log(`CITADEL: Access Token - ${access_token}`)
   const body = JSON.stringify({
     access_token,
   })
@@ -78,6 +85,8 @@ const getIncomeInfoByToken = async (access_token) => {
  * @return The response from Citadel - https://docs.citadelid.com/?javascript#schemadirectoryresponse
  */
 const getEmployeeDirectoryByToken = async (access_token) => {
+  console.log("CITADEL: Requesting employee directory data using an access_token from https://prod.citadelid.com/v1/administrators/directories")
+  console.log( `CITADEL: Access Token - ${access_token}`)
   const body = JSON.stringify({
     access_token,
   })
@@ -93,6 +102,8 @@ const getEmployeeDirectoryByToken = async (access_token) => {
  * @return The payroll report ID from Citadel - https://docs.citadelid.com/?javascript#create-payroll-admin-report-request-responseschema
  */
 const requestPayrollReport = async (access_token, start_date, end_date) => {
+  console.log("CITADEL: Requesting a payroll report be created using an access_token from https://prod.citadelid.com/v1/administrators/payrolls")
+  console.log(`CITADEL: Access Token - ${access_token}`)
   const body = JSON.stringify({
     access_token,
     start_date,
@@ -108,6 +119,8 @@ const requestPayrollReport = async (access_token, start_date, end_date) => {
  * @return The payroll report ID from Citadel - https://docs.citadelid.com/?javascript#create-payroll-admin-report-request-responseschema
  */
 const getPayrollById = async (report_id) => {
+  console.log("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}")
+  console.log(`CITADEL: Report ID - ${report_id}`)
   return await sendRequest(`administrators/payrolls/${report_id}`, {
     method: "GET",
   })
