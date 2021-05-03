@@ -165,22 +165,22 @@ onClose: function () {
 ```go
 
 type PublicTokenRequest struct {
-  PublicTokens []string `json:"public_tokens"`
+  PublicToken string `json:"public_token"`
 }
 
 ...
 
 type AccessTokenResponse struct {
-  AccessTokens []string `json:"access_tokens"`
+  AccessToken string `json:"access_token"`
 }
 
 ...
 
 func getAccessToken(public_token string) (string) {
-  publicTokens := PublicTokenRequest{PublicTokens: []string{public_token}}
-  jsonPublicTokens, _ := json.Marshal(publicTokens)
-  accessTokens := AccessTokenResponse{}
-  request := getRequest("access-tokens/", "POST", jsonPublicTokens)
+  publicToken := PublicTokenRequest{PublicToken: public_token}
+  jsonPublicToken, _ := json.Marshal(publicToken)
+  accessToken := AccessTokenResponse{}
+  request := getRequest("link-access-tokens/", "POST", jsonPublicToken)
   client := &http.Client{}
   res, err := client.Do(request)
     defer res.Body.Close()
@@ -188,11 +188,11 @@ func getAccessToken(public_token string) (string) {
     if err != nil {
         fmt.Printf("The HTTP request failed with error %s\n", err)
     }
-    err = json.NewDecoder(res.Body).Decode(&accessTokens)
+    err = json.NewDecoder(res.Body).Decode(&accessToken)
     if err != nil {
         panic(err)
     }
-    return accessTokens.AccessTokens[0]
+    return accessToken.AccessToken
 }
 ```
 

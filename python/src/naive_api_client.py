@@ -65,24 +65,25 @@ class NaiveApiClient:
         :param public_token:
         :return:
         """
-        logging.info("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens")
+        logging.info("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens")
         logging.info("CITADEL: Public Token - %s", public_token)
         class AccessTokenRequest(TypedDict):
-            public_tokens: List[str]
+            public_token: str
 
         class AccessTokenResponse(TypedDict):
-            access_tokens: List[str]
+            access_token: str
+            link_id: str
 
         request_data: AccessTokenRequest = {
-            'public_tokens': [public_token],
+            'public_token': public_token,
         }
 
         tokens: AccessTokenResponse = requests.post(
-            self.API_URL + 'access-tokens/',
+            self.API_URL + 'link-access-tokens/',
             json=request_data,
             headers=self.API_HEADERS,
         ).json()
-        return tokens['access_tokens'][0]
+        return tokens['access_token']
 
     def get_employment_info_by_token(self, access_token: str) -> Any:
         """

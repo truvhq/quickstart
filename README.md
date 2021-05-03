@@ -160,15 +160,15 @@ def get_access_token(self, public_token: str) -> str:
       access_tokens: List[str]
 
   request_data: AccessTokenRequest = {
-      'public_tokens': [public_token],
+      'public_token': public_token,
   }
 
   tokens: AccessTokenResponse = requests.post(
-      self.API_URL + 'access-tokens/',
+      self.API_URL + 'link-access-tokens/',
       json=request_data,
       headers=self.API_HEADERS,
   ).json()
-  return tokens['access_tokens'][0]
+  return tokens['access_token']
 ```
 
 ### <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data

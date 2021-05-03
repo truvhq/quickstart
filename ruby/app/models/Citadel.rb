@@ -15,10 +15,10 @@ class Citadel
 
   def self.getAccessToken(public_token)
     # https://docs.citadelid.com/?ruby#exchange-token-flow
-    puts "CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens"
+    puts "CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens"
     puts "CITADEL: Public Token - #{public_token}"
-    body = { "public_tokens" => [public_token] }.to_json
-    return sendRequest('access-tokens/', body, "POST")["access_tokens"][0]
+    body = { "public_token" => public_token }.to_json
+    return sendRequest('link-access-tokens/', body, "POST")["access_token"]
   end
 
   def self.getEmploymentInfoByToken(access_token)
