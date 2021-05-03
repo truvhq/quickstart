@@ -173,8 +173,8 @@ onClose: function () {
 
 ```ruby
 def self.getAccessToken(public_token)
-  body = { "public_tokens" => [public_token] }.to_json
-  return sendRequest('access-tokens/', body)["access_tokens"][0]
+  body = { "public_token" => public_token }.to_json
+  return sendRequest('link-access-tokens/', body)["access_token"]
 end
 
 ...

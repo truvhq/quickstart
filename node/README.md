@@ -185,10 +185,10 @@ onClose: function () {
 ```javascript
 const getAccessToken = async (public_token) => {
   const body = JSON.stringify({
-    public_tokens: [public_token],
+    public_token: public_token,
   })
-  const responseBody = await sendRequest("access-tokens/", {body})
-  return responseBody.access_tokens[0]
+  const responseBody = await sendRequest("link-access-tokens/", {body})
+  return responseBody.access_token
 }
 ```
 

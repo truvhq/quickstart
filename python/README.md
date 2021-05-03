@@ -179,21 +179,22 @@ def get_access_token(self, public_token: str) -> str:
     :param public_token:
     :return:
     """
-    logging.info("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens")
+    logging.info("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens")
     logging.info("CITADEL: Public Token - %s", public_token)
     class AccessTokenRequest(TypedDict):
-        public_tokens: List[str]
+        public_token: str
     class AccessTokenResponse(TypedDict):
-        access_tokens: List[str]
+        access_token: str
+        link_id: str
     request_data: AccessTokenRequest = {
-        'public_tokens': [public_token],
+        'public_token': public_token,
     }
-    tokens: AccessTokenResponse = requests.post(
-        self.API_URL + 'access-tokens/',
+    token: AccessTokenResponse = requests.post(
+        self.API_URL + 'link-access-tokens/',
         json=request_data,
         headers=self.API_HEADERS,
     ).json()
-    return tokens['access_tokens'][0]
+    return token['access_token']
 ```
 
 ### <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data

@@ -47,11 +47,11 @@ namespace c_sharp
 
     public async Task<string> GetAccessToken(string publicToken)
     {
-      Console.WriteLine("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens");
+      Console.WriteLine("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens");
       Console.WriteLine("CITADEL: Public Token - {0}", publicToken);
-      var response = await SendRequest("access-tokens/", "{\"public_tokens\": [\"" + publicToken + "\"] }");
+      var response = await SendRequest("link-access-tokens/", "{\"public_token\": \"" + publicToken + "\" }");
       var parsedResponse = JsonDocument.Parse(response);
-      return parsedResponse.RootElement.GetProperty("access_tokens").EnumerateArray().First().GetString();
+      return parsedResponse.RootElement.GetProperty("access_token").GetString();
     }
 
     public async Task<string> GetEmploymentInfoByToken(string accessToken)

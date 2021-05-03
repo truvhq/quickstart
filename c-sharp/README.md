@@ -169,9 +169,9 @@ onClose: function () {
 
 ```c#
 public async Task<string> GetAccessToken(string publicToken) {
-  var response = await SendRequest("access-tokens/", "{\"public_tokens\": [\"" + publicToken + "\"] }");
+  var response = await SendRequest("link-access-tokens/", "{\"public_tokens\": \"" + publicToken + "\" }");
   var parsedResponse = JsonDocument.Parse(response);
-  return parsedResponse.RootElement.GetProperty("access_tokens").EnumerateArray().First().GetString();
+  return parsedResponse.RootElement.GetProperty("access_token").GetString();
 }
 ```
 

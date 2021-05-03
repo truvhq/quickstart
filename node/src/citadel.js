@@ -39,13 +39,13 @@ const getBridgeToken = async () => {
  * @return The access token provided by citadel
  **/
 const getAccessToken = async (public_token) => {
-  console.log("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens")
+  console.log("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens")
   console.log(`CITADEL: Public Token - ${public_token}`)
   const body = JSON.stringify({
-    public_tokens: [public_token],
+    public_token: public_token,
   })
-  const responseBody = await sendRequest("access-tokens/", {body})
-  return responseBody.access_tokens[0]
+  const responseBody = await sendRequest("link-access-tokens/", {body})
+  return responseBody.access_token
 }
 
 /**

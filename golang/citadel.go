@@ -12,7 +12,7 @@ import (
 // PublicTokenRequest is used to define the body for requesting an
 // access token with a public token
 type PublicTokenRequest struct {
-	PublicTokens []string `json:"public_tokens"`
+	PublicToken string `json:"public_token"`
 }
 
 // AccessTokenRequest is used to define the body for multiple
@@ -24,7 +24,8 @@ type AccessTokenRequest struct {
 // AccessTokenResponse is used to define the body for the
 // response of requesting an access token
 type AccessTokenResponse struct {
-	AccessTokens []string `json:"access_tokens"`
+	AccessToken string `json:"access_token"`
+	LinkId string `json:"link_id"`
 }
 
 // PayrollReportRequest defines the body of the request when requesting
@@ -70,12 +71,12 @@ func getBridgeToken() (string, error) {
 // getAccessToken requests an access token from the Citadel API
 // with the given public token
 func getAccessToken(public_token string) (string, error) {
-	fmt.Println("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/access-tokens")
+	fmt.Println("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens")
 	fmt.Printf("CITADEL: Public Token - %v\n", public_token)
-	publicTokens := PublicTokenRequest{PublicTokens: []string{public_token}}
-	jsonPublicTokens, _ := json.Marshal(publicTokens)
-	accessTokens := AccessTokenResponse{}
-	request, err := getRequest("access-tokens/", "POST", jsonPublicTokens)
+	publicToken := PublicTokenRequest{PublicToken: public_token}
+	jsonPublicToken, _ := json.Marshal(publicToken)
+	accessToken := AccessTokenResponse{}
+	request, err := getRequest("link-access-tokens/", "POST", jsonPublicToken)
 	if err != nil {
 		return "", err
 	}
@@ -86,11 +87,11 @@ func getAccessToken(public_token string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	err = json.NewDecoder(res.Body).Decode(&accessTokens)
+	err = json.NewDecoder(res.Body).Decode(&accessToken)
 	if err != nil {
 		return "", err
 	}
-	return accessTokens.AccessTokens[0], nil
+	return accessToken.AccessToken, nil
 }
 
 // getEmploymentInfoByToken uses the given access token to request
