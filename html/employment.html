@@ -235,11 +235,10 @@
         window.bridge = bridge
       })()
 
-      
       function renderPayrollData(data) {
         const historyContainer = document.querySelector("#history")
         historyContainer.innerHTML = JSON.stringify(data, null, 2)
-        document.getElementById('connectButton').hidden = true
+        document.getElementById("connectButton").hidden = true
       }
     </script>
 
@@ -277,9 +276,9 @@
         <div>
           <h2>Verifying employment</h2>
           <span
-            >Click the Connect button below, search for an employer and choose
-            "ADP" for your payroll provider. Follow the instructions to see what
-            employment data you'll get back.
+            >Click the Connect button below and follow the instructions at the
+            top of the window and in the widget to see what employment data
+            you'll get back.
           </span>
         </div>
       </div>
