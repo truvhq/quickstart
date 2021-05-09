@@ -89,5 +89,5 @@ app.listen(5000, () => {
   }
   console.log(environment)
   console.log("=".repeat(94))
-  console.log("listening on port 5000")
+  console.log("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")
 })

@@ -101,7 +101,9 @@ def get_admin_data_by_token(public_token: str):
         'payroll': payroll
     }
 
+print("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.", )
 
 if __name__ == '__main__':
     app.debug = True
     app.run()
+    
