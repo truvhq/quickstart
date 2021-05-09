@@ -243,6 +243,7 @@
       function renderPayrollData(data) {
         const historyContainer = document.querySelector("#history")
         historyContainer.innerHTML = JSON.stringify(data, null, 2)
+        document.getElementById('connectButton').hidden = true
       }
     </script>
 
@@ -292,7 +293,7 @@
             <pre><code id="history"></code></pre>
           </div>
           <!-- Step 4 - Create a button or action that calls bridge.open() to open the Citadel Bridge -->
-          <button type="button" id="button" onclick="bridge.open()">
+          <button type="button" id="connectButton" onclick="bridge.open()">
             Connect
           </button>
         </div>
