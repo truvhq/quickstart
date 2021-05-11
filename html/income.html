@@ -243,6 +243,7 @@
       function renderPayrollData(data) {
         const historyContainer = document.querySelector("#history")
         historyContainer.innerHTML = JSON.stringify(data, null, 2)
+        document.getElementById("connectButton").hidden = true
       }
     </script>
 
@@ -280,9 +281,9 @@
         <div>
           <h2>Verifying income</h2>
           <span
-            >Click the Connect button below, search for an employer and choose
-            "ADP" for your payroll provider. Follow the instructions to see what
-            income data you'll get back.
+            >Click the Connect button below and follow the instructions at the
+            top of the window and in the widget to see what income data you'll
+            get back.
           </span>
         </div>
       </div>
@@ -292,7 +293,7 @@
             <pre><code id="history"></code></pre>
           </div>
           <!-- Step 4 - Create a button or action that calls bridge.open() to open the Citadel Bridge -->
-          <button type="button" id="button" onclick="bridge.open()">
+          <button type="button" id="connectButton" onclick="bridge.open()">
             Connect
           </button>
         </div>

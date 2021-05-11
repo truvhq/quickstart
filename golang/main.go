@@ -128,7 +128,7 @@ func handleRequests() {
 	http.HandleFunc("/getVerifications/", verifications)
 	http.HandleFunc("/getAdminData/", adminData)
 
-	fmt.Println("listening on port 5000")
+	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")
 
 	log.Fatal(http.ListenAndServe(":5000", nil))
 }
