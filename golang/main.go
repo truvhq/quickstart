@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -121,12 +124,29 @@ func checkEnv() {
 	}
 }
 
+func generate_webhook_sign(body string, key string) string {
+
+	mac := hmac.New(sha256.New, []byte(key))
+	mac.Write([]byte(body))
+	return hex.EncodeToString(mac.Sum(nil))
+}
+
+func webhook(w http.ResponseWriter, r *http.Request) {
+	b, _ := ioutil.ReadAll(r.Body)
+	convertedBody := string(b)
+	signature := generate_webhook_sign(convertedBody, os.Getenv("API_SECRET"))
+	fullSignature := fmt.Sprintf("v1=%s", signature)
+
+	fmt.Fprintf(w, fullSignature)
+}
+
 // handleRequests sets up all endpoint handlers
 func handleRequests() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/getBridgeToken", bridgeToken)
 	http.HandleFunc("/getVerifications/", verifications)
 	http.HandleFunc("/getAdminData/", adminData)
+	http.HandleFunc("/webhook", webhook)
 
 	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")
 
