@@ -307,6 +307,7 @@
           <div id="fasComplete" class="hidden">
             <p>The FAS process is now complete. Here's what happened.</p>
 
+            <h3>Initializing the Citadel Bridge</h3>
             <ol>
               <li>The quickstart front end requested a bridge token from the quickstart back end.</li>
               <li>
@@ -315,9 +316,15 @@
               </li>
               <li>Citadel provided the quickstart backend with a bridge token, which the quickstart back end returned to the quickstart front end</li>
               <li>The quickstart front end initialized the Citadel Bridge with the provided bridge_token</li>
+            </ol>
+            <h3>Starting the FAS process</h3>
+            <ol>
               <li>The user logged into their payroll provider through the Citadel Bridge</li>
               <li>The Citadel Bridge provided a public_token to the quickstart front end, who passed that public_token to the quickstart back end</li>
               <li>The quickstart back end exchanged that public_token with Citadel for an access_token and stored that access_token for later use.</li>
+            </ol>
+            <h3>Completing the FAS process</h3>
+            <ol>
               <li>The user provided the quickstart front end with the values of the two micro deposits the payroll provider sent to the new bank account</li>
               <li>The quickstart front end provided these micro deposit values to the quickstart back end </li>
               <li>The quickstart sent Citadel a Task refresh request providing the previously stored access_token and the two micro deposit values</li>
