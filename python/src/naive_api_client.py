@@ -49,16 +49,13 @@ class NaiveApiClient:
 
         request_data: BridgeTokenRequest = {
             'product_type': self.PRODUCT_TYPE,
-            'client_name': 'Citadel Quickstarts',
+            'client_name': 'Citadel Quickstart',
             'tracking_info': '1337'
         }
 
         if self.PRODUCT_TYPE == 'fas':
-            logging.info("FAS")
-            request_data['account'] = account
-            
+            request_data['account'] = account            
 
-        logging.info(request_data)
         tokens: Any = requests.post(
             self.API_URL + 'bridge-tokens/',
             json=request_data,
@@ -201,11 +198,14 @@ class NaiveApiClient:
         """
         logging.info("CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
         logging.info("CITADEL: Access Token - %s", access_token)
+
+        class SettingsRequest(TypedDict):
+            micro_deposits: List[float]
         class RefreshRequest(TypedDict):
             access_token: str
-            settings: List[float]
+            settings: SettingsRequest
 
-        request_data = {'access_token': access_token, 'settings': { 'micro_deposits': [first_micro, second_micro]} }
+        request_data: RefreshRequest = {'access_token': access_token, 'settings': { 'micro_deposits': [first_micro, second_micro]} }
 
         return requests.post(
             self.API_URL + 'refresh/tasks/',
