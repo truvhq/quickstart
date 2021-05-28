@@ -26,7 +26,7 @@ class NaiveApiClient:
                  client_id: str,
                  product_type: str,
                  ):
-        self.API_URL = 'https://prod.citadelid.com/v1/'
+        self.API_URL = 'https://stage.citadelid.com/v1/'
         self.PRODUCT_TYPE = product_type
         self.API_HEADERS = {
             'X-Access-Secret': secret,
@@ -34,7 +34,7 @@ class NaiveApiClient:
             'Content-Type': 'application/json;charset=UTF-8',
         }
 
-    def get_bridge_token(self) -> Any:
+    def get_bridge_token(self, account: TypedDict) -> Any:
         """
         https://docs.citadelid.com/?python#bridge-tokens_create
         :param public_token:
@@ -45,13 +45,20 @@ class NaiveApiClient:
             product_type: str
             client_name: str
             tracking_info: str
+            account: TypedDict
 
         request_data: BridgeTokenRequest = {
             'product_type': self.PRODUCT_TYPE,
-            'client_name': 'Citadel Quickstart',
+            'client_name': 'Citadel Quickstarts',
             'tracking_info': '1337'
         }
 
+        if self.PRODUCT_TYPE == 'fas':
+            logging.info("FAS")
+            request_data['account'] = account
+            
+
+        logging.info(request_data)
         tokens: Any = requests.post(
             self.API_URL + 'bridge-tokens/',
             json=request_data,
@@ -83,7 +90,7 @@ class NaiveApiClient:
             json=request_data,
             headers=self.API_HEADERS,
         ).json()
-        return tokens['access_token']
+        return tokens
 
     def get_employment_info_by_token(self, access_token: str) -> Any:
         """
@@ -183,5 +190,25 @@ class NaiveApiClient:
         logging.info("CITADEL: Report ID - %s", report_id)
         return requests.get(
             self.API_URL + f'administrators/payrolls/{report_id}',
+            headers=self.API_HEADERS,
+        ).json()
+    
+    def complete_fas_flow_by_token(self, access_token: str, first_micro: float, second_micro: float) -> Any:
+        """
+        https://docs.citadelid.com/#funding-account
+        :param access_token:
+        :return:
+        """
+        logging.info("CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+        logging.info("CITADEL: Access Token - %s", access_token)
+        class RefreshRequest(TypedDict):
+            access_token: str
+            settings: List[float]
+
+        request_data = {'access_token': access_token, 'settings': { 'micro_deposits': [first_micro, second_micro]} }
+
+        return requests.post(
+            self.API_URL + 'refresh/tasks/',
+            json=request_data,
             headers=self.API_HEADERS,
         ).json()

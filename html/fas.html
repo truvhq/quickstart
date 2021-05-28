@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="theme-color" content="#000000" />
+
+    <title>Funding account switch portal</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <!-- Step 1 - add the bridge library to your app with a script tag -->
+    <script src="https://cdn-stage.citadelid.com/bridge.js"></script>
+    <style>
+      header {
+        position: fixed;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        background: white;
+        padding: 1rem;
+      }
+
+      header img {
+        height: 3rem;
+      }
+      body {
+        padding: 40px;
+        margin: 0;
+        margin-top: 4rem;
+        background: #f1f4f9;
+      }
+      button {
+        border: 0;
+        background: #15aa63;
+        border-radius: 6px;
+        color: #ffffff;
+        cursor: pointer;
+        font-family: Open Sans;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 32px;
+        padding: 12px 60px;
+        outline: 0;
+        transition: all 0.15s ease-out;
+        display: block;
+      }
+
+      button:hover {
+        background: #179463;
+      }
+
+      .spinnerContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .row {
+        justify-content: space-between;
+      }
+
+      .titleContainer {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 2rem;
+      }
+
+      .titleContainer .img {
+        border-radius: 50%;
+        background: #365bf0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        color: white;
+        margin-right: 1rem;
+      }
+
+      .titleContainer svg {
+        width: 50%;
+        heigt: 50%;
+      }
+
+      form {
+        background: white;
+        padding: 2rem 5rem;
+      }
+
+      .formSection {
+        margin-bottom: 2rem;
+      }
+
+      #homeAdrressInput {
+        margin-bottom: 1rem;
+      }
+
+      .historyText {
+        display: block;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        margin-bottom: 1rem;
+      }
+
+      .container {
+        padding-bottom: 30px;
+        border-bottom: 1px solid #e2e2e2;
+        margin-bottom: 30px;
+      }
+      .container:last-child {
+        padding-bottom: 0px;
+        border-bottom: 0px solid #e2e2e2;
+        margin-bottom: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <script>
+      function getApiRequests(apiEnpoint) {
+        const headers = {
+          "Content-Type": "application/json;charset=UTF-8",
+        }
+
+        const getBridgeToken = async () => {
+          const response = await fetch(apiEnpoint + `getBridgeToken`, {
+            method: "get",
+            headers,
+          }).then((r) => r.json())
+          return response
+        }
+
+        const startFasFlow = async (public_token) => {
+          const response = await fetch(
+            apiEnpoint + `startFasFlow/${public_token}`,
+            {
+              method: "get",
+              headers,
+            }
+          ).then((r) => r.json())
+          return response
+        }
+
+        const completeFasFlow = async (first_micro, second_micro) => {
+          const response = await fetch(
+            apiEnpoint + `completeFasFlow/${first_micro}/${second_micro}`,
+            {
+              method: "get",
+              headers,
+            }
+          ).then((r) => r.json())
+          return response
+        }
+
+        return {
+          completeFasFlow,
+          getBridgeToken,
+          startFasFlow,
+        }
+      }
+
+      const apiRequests = getApiRequests("{{ server_url }}")
+
+      ;(async function () {
+
+        let successClosing
+
+        // Step 2 - Call your back end to retrieve a bridge token from citadel
+        const bridgeToken = await apiRequests.getBridgeToken()
+
+        // Step 3 - Initialize the Citadel Bridge
+        const bridge = CitadelBridge.init({
+          bridgeToken: bridgeToken.bridge_token,
+          onLoad: function () {
+            console.log("onLoad callback called")
+            successClosing = null
+          },
+          onEvent: function (eventType, payload) {
+            console.log(`onEvent callback called. Event Type: ${eventType}`)
+            if (payload) console.log("onEvent payload:", payload)
+          },
+          onSuccess: async function (public_token, meta) {
+            console.log(
+              `onSuccess callback called. public_token: ${public_token}`
+            )
+            console.log("onSuccess meta: ", meta)
+
+            successClosing = true
+
+            const content = document.querySelector(".spinnerContainer")
+
+            content.classList.remove("hidden")
+            let fasFlow
+            try {
+              console.log(
+                "Completing Funding account switch from the back end with public_token"
+              )
+              fasFlow = await apiRequests.startFasFlow(public_token)
+            } catch (e) {
+              console.error(e)
+              content.classList.add("hidden")
+              return
+            }
+            content.classList.add("hidden")
+
+            renderPayrollData(fasFlow)
+          },
+          onClose: function () {
+            console.log("onClose callback called.")
+            if (successClosing !== true) {
+              renderPayrollData({})
+            }
+          },
+        })
+        window.bridge = bridge
+      })()
+
+      async function submitMicroDeposits() {
+        const first_micro = document.getElementById("firstMicroInput")
+        const second_micro = document.getElementById("secondMicroInput")
+        const fasResult = await apiRequests.completeFasFlow(first_micro.value, second_micro.value)
+        renderPayrollData(fasResult)
+        document.getElementById("microContainer").classList.add("hidden")
+        document.getElementById("fasComplete").classList.remove("hidden")
+      }
+
+      function renderPayrollData(data) {
+        const historyContainer = document.querySelector("#history")
+        historyContainer.innerHTML = JSON.stringify(data, null, 2)
+        document.getElementById("connectButton").hidden = true
+        document.getElementById("dataView").classList.remove("hidden")
+        document.getElementById("microContainer").classList.remove("hidden")
+      }
+    </script>
+
+    <div class="spinnerContainer hidden">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+
+    <div id="content" class="container">
+      <div class="titleContainer">
+        <div class="img">
+          <svg
+            viewBox="0 0 16 16"
+            class="bi bi-person-check"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm4.854-7.85a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h2>Funding account switching</h2>
+          <span
+            >Funding account switch (FAS) allows payroll administrators to change the financial account their payroll provider uses to fund their payroll. Citadel makes FAS easy to integrate into your system with a simple process.
+            Click "Connect" below to start the FAS process.
+          </span>
+        </div>
+      </div>
+      <form>
+        <div class="formSection historyContainer">
+          <!-- Step 4 - Create a button or action that calls bridge.open() to open the Citadel Bridge -->
+          <button type="button" id="connectButton" onclick="bridge.open()">
+            Connect
+          </button>
+          <div id="microContainer" class="hidden">
+            <p>FAS Task created. Please enter two decimal values below $0.20 in the fields below</p>
+            <p>
+              <input id="firstMicroInput" type="number" step=".01" placeholder="0.01" min="0.01" max="0.2" />
+              <input id="secondMicroInput" type="number" step=".01" placeholder="0.02" min="0.01" max="0.2" />
+            </p>
+            <p>
+              <button type="button" id="microButton" onclick="submitMicroDeposits()">
+                Submit
+              </button>
+            </p>
+          </div>
+          <div id="fasComplete" class="hidden">
+            <p>The FAS process is now complete. Here's what happened.</p>
+
+            <ol>
+              <li>The quickstart front end requested a bridge token from the quickstart back end.</li>
+              <li>
+                The quickstart back end requested a bridge token from Citadel, providing <code>fas</code> as the value for <code>product_type</code>
+                and all the account information for the new bank account to fund the administrator payroll.
+              </li>
+              <li>Citadel provided the quickstart backend with a bridge token, which the quickstart back end returned to the quickstart front end</li>
+              <li>The quickstart front end initialized the Citadel Bridge with the provided bridge_token</li>
+              <li>The user logged into their payroll provider through the Citadel Bridge</li>
+              <li>The Citadel Bridge provided a public_token to the quickstart front end, who passed that public_token to the quickstart back end</li>
+              <li>The quickstart back end exchanged that public_token with Citadel for an access_token and stored that access_token for later use.</li>
+              <li>The user provided the quickstart front end with the values of the two micro deposits the payroll provider sent to the new bank account</li>
+              <li>The quickstart front end provided these micro deposit values to the quickstart back end </li>
+              <li>The quickstart sent Citadel a Task refresh request providing the previously stored access_token and the two micro deposit values</li>
+              <li>Citadel provided these two micro deposit values to the payroll provider, completing the Funding account switch process.</li>
+            </ol>
+          </div>
+          <div>
+            <pre id="dataView" class="hidden">Returned by Citadel:
+<code id="history"></code></pre>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
