@@ -26,7 +26,7 @@ class NaiveApiClient:
                  client_id: str,
                  product_type: str,
                  ):
-        self.API_URL = 'https://stage.citadelid.com/v1/'
+        self.API_URL = 'https://prod.citadelid.com/v1/'
         self.PRODUCT_TYPE = product_type
         self.API_HEADERS = {
             'X-Access-Secret': secret,
@@ -34,7 +34,7 @@ class NaiveApiClient:
             'Content-Type': 'application/json;charset=UTF-8',
         }
 
-    def get_bridge_token(self, account: TypedDict) -> Any:
+    def get_bridge_token(self) -> Any:
         """
         https://docs.citadelid.com/?python#bridge-tokens_create
         :param public_token:
@@ -54,7 +54,12 @@ class NaiveApiClient:
         }
 
         if self.PRODUCT_TYPE == 'fas':
-            request_data['account'] = account            
+            request_data['account'] = {
+                'account_number': '16002600',
+                'account_type': 'checking',
+                'routing_number': '123456789',
+                'bank_name': 'TD Bank'
+            }
 
         tokens: Any = requests.post(
             self.API_URL + 'bridge-tokens/',
@@ -190,6 +195,25 @@ class NaiveApiClient:
             headers=self.API_HEADERS,
         ).json()
     
+    def get_fas_status_by_token(self, access_token: str) -> Any:
+        """
+        https://docs.citadelid.com/#fas-report
+        :param access_token:
+        :return:
+        """
+        logging.info("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/account-switches")
+        logging.info("CITADEL: Access Token - %s", access_token)
+        class FasRequest(TypedDict):
+            access_token: str
+
+        request_data: FasRequest = {'access_token': access_token}
+
+        return requests.post(
+            self.API_URL + 'account-switches/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+
     def complete_fas_flow_by_token(self, access_token: str, first_micro: float, second_micro: float) -> Any:
         """
         https://docs.citadelid.com/#funding-account

@@ -58,16 +58,8 @@ def index():
 
 @app.route('/getBridgeToken', methods=['GET'])
 def create_bridge_token():
-    account = None
-    if product_type == 'fas':
-        account = {
-            'account_number': '16002600',
-            'account_type': 'checking',
-            'routing_number': '123456789',
-            'bank_name': 'TD Bank'
-        }
     """Back end API endpoint to request a bridge token"""
-    return api_client.get_bridge_token(account)
+    return api_client.get_bridge_token()
 
 
 @app.route('/getVerifications/<public_token>', methods=['GET'])
@@ -97,10 +89,12 @@ def start_fas_flow_by_token(public_token: str):
     tokenResult = api_client.get_access_token(public_token)
     access_token = tokenResult["access_token"]
 
-    return tokenResult
+    fasResult = api_client.get_fas_status_by_token(access_token)
+
+    return fasResult
 
 @app.route('/completeFasFlow/<first_micro>/<second_micro>', methods=['GET'])
-def complete_fas_flow_by_token(first_micro: float, second_micro: float):
+def complete_fas_flow_by_micro_deposits(first_micro: float, second_micro: float):
     """ Back end API endpoint to create a refresh task for fas flow using a front
         end public_token """
     global access_token
