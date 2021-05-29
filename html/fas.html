@@ -216,9 +216,7 @@
             content.classList.remove("hidden")
             let fasFlow
             try {
-              console.log(
-                "Completing Funding account switch from the back end with public_token"
-              )
+              console.log("Funding account switch has begun with user login. Exchanging public_token for access_token")
               fasFlow = await apiRequests.startFasFlow(public_token)
             } catch (e) {
               console.error(e)
@@ -228,11 +226,13 @@
             content.classList.add("hidden")
 
             renderPayrollData(fasFlow)
+            document.getElementById("connectButton").hidden = true
+            document.getElementById("microContainer").classList.remove("hidden")
           },
           onClose: function () {
             console.log("onClose callback called.")
             if (successClosing !== true) {
-              renderPayrollData({})
+              
             }
           },
         })
@@ -240,6 +240,7 @@
       })()
 
       async function submitMicroDeposits() {
+        console.log("Completing Funding account switch from the back end with access_token and micro deposit values")
         const first_micro = document.getElementById("firstMicroInput")
         const second_micro = document.getElementById("secondMicroInput")
         const fasResult = await apiRequests.completeFasFlow(first_micro.value, second_micro.value)
@@ -249,11 +250,8 @@
       }
 
       function renderPayrollData(data) {
-        const historyContainer = document.querySelector("#history")
-        historyContainer.innerHTML = JSON.stringify(data, null, 2)
-        document.getElementById("connectButton").hidden = true
-        document.getElementById("dataView").classList.remove("hidden")
-        document.getElementById("microContainer").classList.remove("hidden")
+        console.log("Returned from Citadel:")
+        console.table(data)
       }
     </script>
 
@@ -282,7 +280,7 @@
           <h2>Funding account switching</h2>
           <span
             >Funding account switch (FAS) allows payroll administrators to change the financial account their payroll provider uses to fund their payroll. Citadel makes FAS easy to integrate into your system with a simple process.
-            Click "Connect" below to start the FAS process.
+            Click "Connect" below to start the FAS process. Monitor console logs to learn what's happening behind the scenes.
           </span>
         </div>
       </div>
@@ -332,8 +330,6 @@
             </ol>
           </div>
           <div>
-            <pre id="dataView" class="hidden">Returned by Citadel:
-<code id="history"></code></pre>
           </div>
         </div>
       </form>
