@@ -146,6 +146,7 @@
           "Content-Type": "application/json;charset=UTF-8",
         }
 
+        // requests a bridge_token from the quickstart back end
         const getBridgeToken = async () => {
           const response = await fetch(apiEnpoint + `getBridgeToken`, {
             method: "get",
@@ -154,6 +155,8 @@
           return response
         }
 
+        // sends a public_token to quickstart back end so the quickstart
+        // back end can exchange it with Citadel for an access_token
         const startFasFlow = async (public_token) => {
           const response = await fetch(
             apiEnpoint + `startFasFlow/${public_token}`,
@@ -165,6 +168,8 @@
           return response
         }
 
+        // sends two micro deposit values to the quickstart back end
+        // so the quickstart backend can complete the FAS process.
         const completeFasFlow = async (first_micro, second_micro) => {
           const response = await fetch(
             apiEnpoint + `completeFasFlow/${first_micro}/${second_micro}`,
@@ -196,14 +201,19 @@
         const bridge = CitadelBridge.init({
           bridgeToken: bridgeToken.bridge_token,
           onLoad: function () {
+            // onLoad function is called by the Citadel Bridge when the Citadel Bridge is opened via bridge.open()
             console.log("onLoad callback called")
             successClosing = null
           },
           onEvent: function (eventType, payload) {
+            // onEvent function is called by the Citadel Bridge when various events occur, including errors, successful
+            // connection to a payroll provider, Citadel Bridge loading and Citadel Bridge closing.
             console.log(`onEvent callback called. Event Type: ${eventType}`)
             if (payload) console.log("onEvent payload:", payload)
           },
           onSuccess: async function (public_token, meta) {
+            // onSuccess function is called by the Citadel Bridge when the user successfully connects to their payroll
+            // provider and closes the Citadel Bridge.
             console.log(
               `onSuccess callback called. public_token: ${public_token}`
             )
@@ -230,6 +240,8 @@
             document.getElementById("microContainer").classList.remove("hidden")
           },
           onClose: function () {
+            // onClose function is called by the Citadel Bridge when the user closes the Citadel Bridge without
+            // successfully connecting to their payroll provider.
             console.log("onClose callback called.")
             if (successClosing !== true) {
               
