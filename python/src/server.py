@@ -13,12 +13,15 @@ logging.basicConfig(level=logging.INFO)
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
-app = Flask(__name__)
+template_dir = os.path.abspath('./html')
+app = Flask(__name__, template_folder=template_dir)
 CORS(app)
 
 secret = os.environ.get('API_SECRET')
 client_id = os.environ.get('API_CLIENT_ID')
 product_type = os.environ.get('API_PRODUCT_TYPE', 'employment')
+
+access_token = None
 
 api_client = NaiveApiClient(
     secret=secret,
@@ -48,6 +51,8 @@ def index():
         return render_template('income.html')
     elif product_type == 'admin':
         return render_template('admin.html')
+    elif product_type == 'fas':
+        return render_template('fas.html')
     else:
         return render_template('employment.html')
 
@@ -63,7 +68,8 @@ def get_verification_info_by_token(public_token: str):
         data using a front end public_token """
 
     # First exchange public_token to access_token
-    access_token = api_client.get_access_token(public_token)
+    tokenResult = api_client.get_access_token(public_token)
+    access_token = tokenResult["access_token"]
 
     # Use access_token to retrieve the data
     if product_type == 'employment':
@@ -74,6 +80,28 @@ def get_verification_info_by_token(public_token: str):
         raise Exception('Unsupported product type!')
     return verifications
 
+@app.route('/startFasFlow/<public_token>', methods=['GET'])
+def start_fas_flow_by_token(public_token: str):
+    """ Back end API endpoint to create a refresh task for fas flow using a front
+        end public_token """
+    global access_token
+    # First exchange public_token to access_token
+    tokenResult = api_client.get_access_token(public_token)
+    access_token = tokenResult["access_token"]
+
+    fasResult = api_client.get_fas_status_by_token(access_token)
+
+    return fasResult
+
+@app.route('/completeFasFlow/<first_micro>/<second_micro>', methods=['GET'])
+def complete_fas_flow_by_micro_deposits(first_micro: float, second_micro: float):
+    """ Back end API endpoint to create a refresh task for fas flow using a front
+        end public_token """
+    global access_token
+    # Use access_token to retrieve the data
+    refreshResult = api_client.complete_fas_flow_by_token(access_token, float(first_micro), float(second_micro))
+
+    return refreshResult
 
 @app.route('/getAdminData/<public_token>', methods=['GET'])
 def get_admin_data_by_token(public_token: str):
@@ -81,7 +109,8 @@ def get_admin_data_by_token(public_token: str):
         using a front end public_token """
 
     # First, exchange public_token to access_token
-    access_token = api_client.get_access_token(public_token)
+    tokenResult = api_client.get_access_token(public_token)
+    access_token = tokenResult["access_token"]
 
     # Second, request employee directory
     directory = api_client.get_employee_directory_by_token(access_token)
