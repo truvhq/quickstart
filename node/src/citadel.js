@@ -22,11 +22,21 @@ const getHeaders = () => {
  */
 const getBridgeToken = async () => {
   console.log("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
-  const body = JSON.stringify({
+  const bodyObj = {
     product_type: API_PRODUCT_TYPE,
     client_name: "Citadel Quickstart",
     tracking_info: "1337"
-  })
+  }
+  if(API_PRODUCT_TYPE === "fas") {
+    bodyObj.account = {
+      account_number: "16002600",
+      account_type: "checking",
+      routing_number: "123456789",
+      bank_name: "TD Bank"
+    }
+  }
+  const body = JSON.stringify(bodyObj)
+
   const responseBody = await sendRequest("bridge-tokens/", {body})
   return responseBody
 }
@@ -45,7 +55,7 @@ const getAccessToken = async (public_token) => {
     public_token: public_token,
   })
   const responseBody = await sendRequest("link-access-tokens/", {body})
-  return responseBody.access_token
+  return responseBody
 }
 
 /**
@@ -126,6 +136,39 @@ const getPayrollById = async (report_id) => {
   })
 }
 
+/**
+ * Retrieves FAS status from Citadel
+ * https://docs.citadelid.com/?javascript--nodejs#funding-account
+ * @param {String} access_token
+ * @return The response from Citadel - https://docs.citadelid.com/?javascript--nodejs#schemafas
+ **/
+ const getFasStatusByToken = async (access_token) => {
+  console.log("CITADEL: Requesting FAS update data using an access_token from https://prod.citadelid.com/v1/account-switches")
+  console.log(`CITADEL: Access Token - ${access_token}`)
+  const body = JSON.stringify({
+    access_token,
+  })
+  return await sendRequest("account-switches/", {body})
+}
+
+/**
+ * Requests a task refresh from Citadel to complete the Funding account switch flow
+ * https://docs.citadelid.com/?javascript#funding-account
+ * @param {String} access_token
+ * @param {Number} first_micro
+ * @param {Number} second_micro
+ * @return The response from Citadel - https://docs.citadelid.com/javascript#schemaincomecheck
+ */
+ const completeFasFlowByToken = async (access_token, first_micro, second_micro) => {
+  console.log("CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+  console.log(`CITADEL: Access Token - ${access_token}`)
+  const body = JSON.stringify({
+    access_token,
+    settings: { micro_deposits: [ parseFloat(first_micro), parseFloat(second_micro) ] }
+  })
+  return await sendRequest("refresh/tasks/", { body })
+}
+
 const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
   const headers = getHeaders()
   try {
@@ -144,6 +187,8 @@ const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
 }
 
 export {
+  getFasStatusByToken,
+  completeFasFlowByToken,
   getEmploymentInfoByToken,
   getAccessToken,
   getBridgeToken,

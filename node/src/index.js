@@ -3,13 +3,15 @@ import cors from "cors"
 import bodyParser from "body-parser"
 import htmlFile from "./serve.js"
 import {
+  completeFasFlowByToken,
   getAccessToken,
   getBridgeToken,
   getEmploymentInfoByToken,
   getIncomeInfoByToken,
   getEmployeeDirectoryByToken,
   getPayrollById,
-  requestPayrollReport
+  requestPayrollReport,
+  getFasStatusByToken
 } from "./citadel.js"
 
 const {
@@ -44,7 +46,8 @@ app.get("/getBridgeToken", async (req, res) => {
 app.get("/getVerifications/:token", async (req, res) => {
   // retrieve income verification information
   try {
-    const accessToken = await getAccessToken(req.params.token)
+    const accessTokenResponse = await getAccessToken(req.params.token)
+    const accessToken = accessTokenResponse.access_token
     let verifications
     if(API_PRODUCT_TYPE === "employment") {
       verifications = await getEmploymentInfoByToken(accessToken)
@@ -62,7 +65,8 @@ app.get("/getVerifications/:token", async (req, res) => {
 app.get("/getAdminData/:token", async (req, res) => {
   // retrieve income verification information
   try {
-    const accessToken = await getAccessToken(req.params.token)
+    const accessTokenResponse = await getAccessToken(req.params.token)
+    const accessToken = accessTokenResponse.access_token
 
     const directory = await getEmployeeDirectoryByToken(accessToken)
 
@@ -73,7 +77,38 @@ app.get("/getAdminData/:token", async (req, res) => {
     const data = { directory, payroll }
     res.json(data)
   } catch (e) {
-    console.error("error with getVerifications")
+    console.error("error with getAdminData")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
+let accessToken = null
+
+app.get("/startFasFlow/:token", async (req, res) => {
+  // retrieve income verification information
+  try {
+    const accessTokenResponse = await getAccessToken(req.params.token)
+    accessToken = accessTokenResponse.access_token
+
+    const fasResult = await getFasStatusByToken(accessToken)
+
+    res.json(fasResult)
+  } catch (e) {
+    console.error("error with completeFasFlow")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
+app.get("/completeFasFlow/:first_micro/:second_micro", async (req, res) => {
+  // retrieve income verification information
+  try {
+    const fasResult = await completeFasFlowByToken(accessToken, req.params.first_micro, req.params.second_micro)
+
+    res.json(fasResult)
+  } catch (e) {
+    console.error("error with completeFasFlow")
     console.error(e)
     res.status(500).json({ success: false })
   }
