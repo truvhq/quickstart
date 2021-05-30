@@ -201,7 +201,7 @@ class NaiveApiClient:
         :param access_token:
         :return:
         """
-        logging.info("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/account-switches")
+        logging.info("CITADEL: Requesting FAS update data using an access_token from https://prod.citadelid.com/v1/account-switches")
         logging.info("CITADEL: Access Token - %s", access_token)
         class FasRequest(TypedDict):
             access_token: str
