@@ -60,6 +60,11 @@
         background: #179463;
       }
 
+      button:disabled {
+        background-color: #c2c2c2;
+        cursor: default;
+      }
+
       .spinnerContainer {
         position: fixed;
         top: 0;
@@ -101,7 +106,7 @@
 
       .titleContainer svg {
         width: 50%;
-        heigt: 50%;
+        height: 50%;
       }
 
       form {
@@ -261,6 +266,15 @@
         document.getElementById("fasComplete").classList.remove("hidden")
       }
 
+      function checkMicroValues() {
+        const first_micro = parseFloat(document.getElementById("firstMicroInput").value)
+        const second_micro = parseFloat(document.getElementById("secondMicroInput").value)
+
+        const button = document.getElementById("microButton")
+        console.log(!(first_micro > 0 && first_micro <= .2 && second_micro > 0 && second_micro <= .2))
+        button.disabled = !(first_micro > 0 && first_micro <= .2 && second_micro > 0 && second_micro <= .2)
+      }
+
       function renderPayrollData(data) {
         console.log("Returned from Citadel:")
         console.table(data)
@@ -292,8 +306,8 @@
           <div id="microContainer" class="hidden">
             <p>FAS Task created. Please enter two decimal values below $0.20 in the fields below</p>
             <p>
-              <input id="firstMicroInput" type="number" step=".01" placeholder="0.01" min="0.01" max="0.2" value="0.1" />
-              <input id="secondMicroInput" type="number" step=".01" placeholder="0.02" min="0.01" max="0.2" value="0.2" />
+              <input id="firstMicroInput" type="number" step=".01" placeholder="0.01" min="0.01" max="0.2" value="0.1" onchange="checkMicroValues()" />
+              <input id="secondMicroInput" type="number" step=".01" placeholder="0.02" min="0.01" max="0.2" value="0.2" onchange="checkMicroValues()" />
             </p>
             <p>
               <button type="button" id="microButton" onclick="submitMicroDeposits()">
