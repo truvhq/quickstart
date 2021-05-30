@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,10 @@ namespace c_sharp.Controllers
     [HttpGet]
     public async Task<string> Get(string token)
     {
-      var accessToken = await _citadel.GetAccessToken(token);
+      var accessTokenResponse = await _citadel.GetAccessToken(token);
+      var parsedResponse = JsonDocument.Parse(accessTokenResponse);
+      var accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
+
       if (_productType == "employment")
       {
         return await _citadel.GetEmploymentInfoByToken(accessToken);
