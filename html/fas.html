@@ -279,7 +279,7 @@
           <h2>Funding account switching</h2>
           <span
             >Funding account switch (FAS) allows payroll administrators to change the financial account their payroll provider uses to fund their payroll. Citadel makes FAS easy to integrate into your system with a simple process.
-            Click "Connect" below to start the FAS process. Monitor console logs to learn what's happening behind the scenes.
+            Click "Connect" below to start the FAS process. <strong>Monitor console logs to learn what's happening behind the scenes</strong>.
           </span>
         </div>
       </div>
@@ -292,8 +292,8 @@
           <div id="microContainer" class="hidden">
             <p>FAS Task created. Please enter two decimal values below $0.20 in the fields below</p>
             <p>
-              <input id="firstMicroInput" type="number" step=".01" placeholder="0.01" min="0.01" max="0.2" value="0.01" />
-              <input id="secondMicroInput" type="number" step=".01" placeholder="0.02" min="0.01" max="0.2" value="0.02" />
+              <input id="firstMicroInput" type="number" step=".01" placeholder="0.01" min="0.01" max="0.2" value="0.1" />
+              <input id="secondMicroInput" type="number" step=".01" placeholder="0.02" min="0.01" max="0.2" value="0.2" />
             </p>
             <p>
               <button type="button" id="microButton" onclick="submitMicroDeposits()">
