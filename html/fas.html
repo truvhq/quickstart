@@ -153,10 +153,12 @@
 
         // requests a bridge_token from the quickstart back end
         const getBridgeToken = async () => {
+          console.log("Requesting a bridge_token from the quickstart back end.")
           const response = await fetch(apiEnpoint + `getBridgeToken`, {
             method: "get",
             headers,
           }).then((r) => r.json())
+          console.table(response)
           return response
         }
 
@@ -248,9 +250,6 @@
             // onClose function is called by the Citadel Bridge when the user closes the Citadel Bridge without
             // successfully connecting to their payroll provider.
             console.log("onClose callback called.")
-            if (successClosing !== true) {
-              
-            }
           },
         })
         window.bridge = bridge
@@ -262,6 +261,7 @@
         const second_micro = document.getElementById("secondMicroInput")
         const fasResult = await apiRequests.completeFasFlow(first_micro.value, second_micro.value)
         renderPayrollData(fasResult)
+        document.getElementById("history").innerHTML = JSON.stringify(fasResult, null, 2)
         document.getElementById("microContainer").classList.add("hidden")
         document.getElementById("fasComplete").classList.remove("hidden")
       }
@@ -316,7 +316,7 @@
             </p>
           </div>
           <div id="fasComplete" class="hidden">
-            <p>The FAS process is now complete. Here's what happened.</p>
+            <p>The FAS process is now complete. Here's what happened. <a href="#dataView">What data was returned?</a></p>
 
             <h3>Initializing the Citadel Bridge</h3>
             <ol>
@@ -341,6 +341,12 @@
               <li>The quickstart sent Citadel a Task refresh request providing the previously stored access_token and the two micro deposit values</li>
               <li>Citadel provided these two micro deposit values to the payroll provider, completing the Funding account switch process.</li>
             </ol>
+            <div id="dataView">
+              <h3>What data was returned?</h3>
+              <div>
+                <pre><code id="history"></code></pre>
+              </div>
+            </div>
           </div>
           <div>
           </div>

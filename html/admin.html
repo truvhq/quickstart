@@ -74,7 +74,7 @@
       }
 
       .hidden {
-        visibility: hidden;
+        display: none;
       }
 
       .row {
@@ -101,7 +101,7 @@
 
       .titleContainer svg {
         width: 50%;
-        heigt: 50%;
+        height: 50%;
       }
 
       form {
@@ -147,14 +147,17 @@
         }
 
         const getBridgeToken = async () => {
+          console.log("Requesting a bridge_token from the quickstart back end.")
           const response = await fetch(apiEnpoint + `getBridgeToken`, {
             method: "get",
             headers,
           }).then((r) => r.json())
+          console.table(response)
           return response
         }
 
         const getAdminInfoByToken = async (public_token) => {
+          console.log("Requesting payroll admin data from the quickstart back end with public_token.")
           const response = await fetch(
             apiEnpoint + `getAdminData/${public_token}`,
             {
@@ -162,6 +165,11 @@
               headers,
             }
           ).then((r) => r.json())
+          console.table(response)
+          console.log("response.directory.directory")
+          console.table(response.directory.directory)
+          console.log("response.payroll.payroll_report")
+          console.table(response.payroll.payroll_report)
           return response
         }
 
@@ -203,9 +211,6 @@
             content.classList.remove("hidden")
             let adminInfo
             try {
-              console.log(
-                "Requesting Admin payroll information from the back end with public_token"
-              )
               adminInfo = await apiRequests.getAdminInfoByToken(public_token)
             } catch (e) {
               console.error(e)
@@ -218,9 +223,6 @@
           },
           onClose: function () {
             console.log("onClose callback called.")
-            if (successClosing !== true) {
-              renderPayrollData({})
-            }
           },
         })
         window.bridge = bridge
@@ -230,6 +232,7 @@
         const historyContainer = document.querySelector("#history")
         historyContainer.innerHTML = JSON.stringify(data, null, 2)
         document.getElementById("connectButton").hidden = true
+        document.getElementById("adminComplete").classList.remove("hidden")
       }
     </script>
 
@@ -239,49 +242,53 @@
       </div>
     </div>
 
-    <header>
-      <div class="container">
-        <img
-          src="https://citadelid-resources.s3-us-west-2.amazonaws.com/Citadel.svg"
-          alt="Citadel"
-          style="width: 100px; height: 50px"
-        />
-      </div>
-    </header>
-
     <div id="content" class="container">
       <div class="titleContainer">
-        <div class="img">
-          <svg
-            viewBox="0 0 16 16"
-            class="bi bi-person-check"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10zm4.854-7.85a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"
-            />
-          </svg>
-        </div>
         <div>
           <h2>Request payroll admin data</h2>
-          <span
-            >Click the Connect button below and follow the instructions at the
-            top of the window and in the widget to see what payroll admin data
-            you'll get back.
+          <span>
+            Citadel enables companies to share their payroll data including a directory of employees and payroll history.
+            Payroll admin can help companies to better run FP&A analyses, calculate taxes or onboard employees via a directory.
+            Click "Connect" below to start the payroll admin process. <strong>Monitor console logs to learn what's happening behind the scenes</strong>.
           </span>
         </div>
       </div>
       <form>
         <div class="formSection historyContainer">
-          <div>
-            <pre><code id="history"></code></pre>
-          </div>
           <!-- Step 4 - Create a button or action that calls bridge.open() to open the Citadel Bridge -->
           <button type="button" id="connectButton" onclick="bridge.open()">
             Connect
           </button>
+          <div id="adminComplete" class="hidden">
+            <p>The admin process is now complete. Here's what happened. <a href="#dataView">What data was returned?</a></p>
+
+            <h3>Initializing the Citadel Bridge</h3>
+            <ol>
+              <li>The quickstart front end requested a <code>bridge_token</code> from the quickstart back end.</li>
+              <li>
+                The quickstart back end requested a <code>bridge_token</code> from Citadel, providing <code>admin</code> as the value for <code>product_type</code>.
+              </li>
+              <li>Citadel provided the quickstart backend with a <code>bridge_token</code>, which the quickstart back end returned to the quickstart front end.</li>
+              <li>The quickstart front end initialized the Citadel Bridge with the provided <code>bridge_token</code></li>
+            </ol>
+            <h3>Connecting the administrator to their payroll administration account</h3>
+            <ol>
+              <li>The administrator logged into their payroll administration account through the Citadel Bridge.</li>
+              <li>The Citadel Bridge provided a <code>public_token</code> to the quickstart front end, who passed that <code>public_token</code> to the quickstart back end.</li>
+              <li>The quickstart back end exchanged that <code>public_token</code> with Citadel for an <code>access_token</code> and stored that <code>access_token</code> for later use.</li>
+            </ol>
+            <h3>Accessing admin data from Citadel</h3>
+            <ol>
+              <li>The quickstart back end uses the stored <code>access_token</code> to request employee directory data and a payroll report from Citadel.</li>
+              <li>Citadel provides that admin information to the quickstart back end who sends it to the quickstart front end.</li>
+            </ol>
+            <div id="dataView">
+              <h3>What data was returned?</h3>
+              <div>
+                <pre><code id="history"></code></pre>
+              </div>
+            </div>
+          </div>
         </div>
       </form>
     </div>
