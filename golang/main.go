@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -98,6 +99,44 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, data)
 }
 
+var accessToken string
+var err error
+
+// startFasFlow retrieves FAS data
+func startFasFlow(w http.ResponseWriter, r *http.Request) {
+	splitPath := strings.Split(r.URL.Path, "/")
+	token := splitPath[2]
+	accessToken, err = getAccessToken(token)
+	fmt.Println(accessToken)
+	if err != nil {
+		fmt.Println("Error getting access token", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+	fasResponse, err := getFasStatusByToken(accessToken)
+	if err != nil {
+		fmt.Println("Error getting FAS Status", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+	} else {
+		fmt.Fprintf(w, fasResponse)
+	}
+}
+
+// completeFasFlow finishes the FAS flow with two micro deposit values
+func completeFasFlow(w http.ResponseWriter, r *http.Request) {
+	splitPath := strings.Split(r.URL.Path, "/")
+	first_micro, _ := strconv.ParseFloat(splitPath[2], 32)
+	second_micro, _ := strconv.ParseFloat(splitPath[3], 32)
+
+	fasResponse, err := completeFasFlowByToken(accessToken, float32(first_micro), float32(second_micro))
+	if err != nil {
+		fmt.Println("Error getting FAS Status", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+	} else {
+		fmt.Fprintf(w, fasResponse)
+	}
+}
+
 // checkEnv ensures all required environment variables have been set
 func checkEnv() {
 	clientId := os.Getenv("API_CLIENT_ID")
@@ -115,8 +154,8 @@ func checkEnv() {
 		fmt.Println("No API_PRODUCT_TYPE provided")
 		os.Exit(1)
 	}
-	if productType != "employment" && productType != "income" && productType != "admin" {
-		fmt.Println("API_PRODUCT_TYPE must be one of employment, income or admin")
+	if productType != "employment" && productType != "income" && productType != "admin" && productType != "fas" {
+		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin or fas")
 		os.Exit(1)
 	}
 }
@@ -127,6 +166,8 @@ func handleRequests() {
 	http.HandleFunc("/getBridgeToken", bridgeToken)
 	http.HandleFunc("/getVerifications/", verifications)
 	http.HandleFunc("/getAdminData/", adminData)
+	http.HandleFunc("/startFasFlow/", startFasFlow)
+	http.HandleFunc("/completeFasFlow/", completeFasFlow)
 
 	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")
 

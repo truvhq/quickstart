@@ -19,7 +19,7 @@ Once you have your API keys, it's time to run the Citadel C# Quickstart app loca
     ```bash
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-    API_PRODUCT_TYPE=<employment, income or admin>
+    API_PRODUCT_TYPE=<employment, income, admin or fas>
     ```
 
 5. `make csharp_local`
