@@ -53,6 +53,8 @@ def index():
         return render_template('admin.html')
     elif product_type == 'fas':
         return render_template('fas.html')
+    elif product_type == 'deposit_switch':
+        return render_template('dds.html')
     else:
         return render_template('employment.html')
 
@@ -79,6 +81,20 @@ def get_verification_info_by_token(public_token: str):
     else:
         raise Exception('Unsupported product type!')
     return verifications
+
+@app.route('/getDdsData/<public_token>', methods=['GET'])
+def get_dds_data_by_token(public_token: str):
+    """ Back end API endpoint to retrieve direct deposit switch
+        data using a front end public_token """
+
+    # First exchange public_token to access_token
+    tokenResult = api_client.get_access_token(public_token)
+    access_token = tokenResult["access_token"]
+
+    # Use access_token to retrieve the data
+    dds = api_client.get_dds_by_token(access_token)
+
+    return dds
 
 @app.route('/startFasFlow/<public_token>', methods=['GET'])
 def start_fas_flow_by_token(public_token: str):
