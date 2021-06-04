@@ -230,6 +230,7 @@
 
             renderPayrollData(ddsData)
             document.getElementById("connectButton").hidden = true
+            document.getElementById("ddsComplete").classList.remove("hidden")
           },
           onClose: function () {
             // onClose function is called by the Citadel Bridge when the user closes the Citadel Bridge without
@@ -276,24 +277,22 @@
             <ol>
               <li>The quickstart front end requested a bridge token from the quickstart back end.</li>
               <li>
-                The quickstart back end requested a bridge token from Citadel, providing <code>dds</code> as the value for <code>product_type</code>
+                The quickstart back end requested a bridge token from Citadel, providing <code>deposit_switch</code> as the value for <code>product_type</code>
                 and all the account information for the new bank account to fund the administrator payroll.
               </li>
-              <li>Citadel provided the quickstart backend with a bridge token, which the quickstart back end returned to the quickstart front end</li>
-              <li>The quickstart front end initialized the Citadel Bridge with the provided bridge_token</li>
+              <li>Citadel provided the quickstart backend with a bridge token, which the quickstart back end returned to the quickstart front end.</li>
+              <li>The quickstart front end initialized the Citadel Bridge with the provided bridge_token.</li>
             </ol>
             <h3>Starting the DDS process</h3>
             <ol>
-              <li>The user logged into their payroll provider through the Citadel Bridge</li>
-              <li>The Citadel Bridge provided a public_token to the quickstart front end, who passed that public_token to the quickstart back end</li>
+              <li>The user logged into their payroll provider through the Citadel Bridge.</li>
+              <li>The Citadel Bridge provided a public_token to the quickstart front end, who passed that public_token to the quickstart back end.</li>
               <li>The quickstart back end exchanged that public_token with Citadel for an access_token and stored that access_token for later use.</li>
             </ol>
-            <h3>Completing the DDS process</h3>
+            <h3>Retrieving the DDS data</h3>
             <ol>
-              <li>The user provided the quickstart front end with the values of the two micro deposits the payroll provider sent to the new bank account</li>
-              <li>The quickstart front end provided these micro deposit values to the quickstart back end </li>
-              <li>The quickstart sent Citadel a Task refresh request providing the previously stored access_token and the two micro deposit values</li>
-              <li>Citadel provided these two micro deposit values to the payroll provider, completing the Funding account switch process.</li>
+              <li>The quickstart back end sent Citadel a request for DDS data providing the previously stored access_token.</li>
+              <li>Citadel provided the data to the quickstart back end who sent it to the quickstart front end.</li>
             </ol>
             <div id="dataView">
               <h3>What data was returned?</h3>

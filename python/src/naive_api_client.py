@@ -168,7 +168,7 @@ class NaiveApiClient:
         request_data: DDSRequest = {'access_token': access_token}
 
         return requests.post(
-            self.API_URL + '/deposit-switches/',
+            self.API_URL + 'deposit-switches/',
             json=request_data,
             headers=self.API_HEADERS,
         ).json()
