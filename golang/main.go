@@ -21,6 +21,9 @@ func check(e error) {
 // given in the API_PRODUCT_TYPE environment variable
 func homePage(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
+	if productType == "deposit_switch" {
+		productType = "dds"
+	}
 	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s.html", productType))
 	check(err)
 	html := string(dat)
@@ -137,6 +140,26 @@ func completeFasFlow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// dds accepts requests for a dds status and sends the response
+func dds(w http.ResponseWriter, r *http.Request) {
+	splitPath := strings.Split(r.URL.Path, "/")
+	token := splitPath[2]
+	accessToken, err := getAccessToken(token)
+	if err != nil {
+		fmt.Println("Error getting access token", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+	ddsResponse, err := getDdsByToken(accessToken)
+	
+	if err != nil {
+		fmt.Println("Error getting dds", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+	} else {
+		fmt.Fprintf(w, ddsResponse)
+	}
+}
+
 // checkEnv ensures all required environment variables have been set
 func checkEnv() {
 	clientId := os.Getenv("API_CLIENT_ID")
@@ -154,8 +177,8 @@ func checkEnv() {
 		fmt.Println("No API_PRODUCT_TYPE provided")
 		os.Exit(1)
 	}
-	if productType != "employment" && productType != "income" && productType != "admin" && productType != "fas" {
-		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin or fas")
+	if productType != "employment" && productType != "income" && productType != "admin" && productType != "fas" && productType != "deposit_switch" {
+		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin, dds or fas")
 		os.Exit(1)
 	}
 }
@@ -168,6 +191,7 @@ func handleRequests() {
 	http.HandleFunc("/getAdminData/", adminData)
 	http.HandleFunc("/startFasFlow/", startFasFlow)
 	http.HandleFunc("/completeFasFlow/", completeFasFlow)
+	http.HandleFunc("/getDdsData/", dds)
 
 	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")
 

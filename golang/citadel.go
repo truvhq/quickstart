@@ -72,7 +72,7 @@ func getBridgeToken() (string, error) {
 	fmt.Println("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	bridgeTokenRequest := BridgeTokenRequest{ProductType: productType, ClientName: "Citadel Quickstart", TrackingInfo: "1337"}
-	if productType == "fas" {
+	if productType == "fas" || productType == "deposit_switch" {
 		bridgeTokenRequest.Account = AccountRequest{AccountNumber: "16002600", AccountType: "checking", RoutingNumber: "123456789", BankName: "TD Bank"}
 	}
 	bridgeJson, _ := json.Marshal(bridgeTokenRequest)
@@ -271,6 +271,28 @@ func completeFasFlowByToken(access_token string, first_micro float32, second_mic
 	accessToken := RefreshRequest{AccessToken: access_token, Settings: SettingsRequest{ MicroDeposits: []float32{first_micro, second_micro} }}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
+	if err != nil {
+		return "", err
+	}
+	client := &http.Client{}
+	res, err := client.Do(request)
+	defer res.Body.Close()
+
+	if err != nil {
+		return "", err
+	}
+	data, _ := ioutil.ReadAll(res.Body)
+	return string(data), nil
+}
+
+// getDdsByToken uses the given access token to request
+// the associated dds info
+func getDdsByToken(access_token string) (string, error) {
+	fmt.Println("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
+	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	accessToken := AccessTokenRequest{AccessToken: access_token}
+	jsonAccessToken, _ := json.Marshal(accessToken)
+	request, err := getRequest("deposit-switches", "POST", jsonAccessToken)
 	if err != nil {
 		return "", err
 	}
