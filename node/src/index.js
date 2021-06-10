@@ -3,6 +3,7 @@ import cors from "cors"
 import bodyParser from "body-parser"
 import htmlFile from "./serve.js"
 import {
+  getDdsByToken,
   completeFasFlowByToken,
   getAccessToken,
   getBridgeToken,
@@ -86,7 +87,7 @@ app.get("/getAdminData/:token", async (req, res) => {
 let accessToken = null
 
 app.get("/startFasFlow/:token", async (req, res) => {
-  // retrieve income verification information
+  // retrieve fas status information
   try {
     const accessTokenResponse = await getAccessToken(req.params.token)
     accessToken = accessTokenResponse.access_token
@@ -95,7 +96,23 @@ app.get("/startFasFlow/:token", async (req, res) => {
 
     res.json(fasResult)
   } catch (e) {
-    console.error("error with completeFasFlow")
+    console.error("error with startFasFlow")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
+app.get("/getDdsData/:token", async (req, res) => {
+  // retrieve dds status information
+  try {
+    const accessTokenResponse = await getAccessToken(req.params.token)
+    accessToken = accessTokenResponse.access_token
+
+    const ddsResult = await getDdsByToken(accessToken)
+
+    res.json(ddsResult)
+  } catch (e) {
+    console.error("error with getDdsData")
     console.error(e)
     res.status(500).json({ success: false })
   }

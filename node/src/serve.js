@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 dotenv.config()
 
 const { API_PRODUCT_TYPE } = process.env
-const validProductTypes = ["employment", "income", "admin", "fas"]
+const validProductTypes = ["employment", "income", "admin", "fas", "deposit_switch"]
 
 if (validProductTypes.indexOf(API_PRODUCT_TYPE) < 0) {
   console.error(
@@ -13,7 +13,7 @@ if (validProductTypes.indexOf(API_PRODUCT_TYPE) < 0) {
   process.exit(-1)
 }
 
-const html = readFileSync(`../html/${API_PRODUCT_TYPE}.html`)
+const html = readFileSync(`../html/${API_PRODUCT_TYPE === 'deposit_switch' ? 'dds' : API_PRODUCT_TYPE}.html`)
   .toString()
   .replace("{{ product_type }}", API_PRODUCT_TYPE)
 
