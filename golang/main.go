@@ -21,9 +21,6 @@ func check(e error) {
 // given in the API_PRODUCT_TYPE environment variable
 func homePage(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
-	if productType == "deposit_switch" {
-		productType = "dds"
-	}
 	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s.html", productType))
 	check(err)
 	html := string(dat)

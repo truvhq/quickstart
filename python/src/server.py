@@ -54,7 +54,7 @@ def index():
     elif product_type == 'fas':
         return render_template('fas.html')
     elif product_type == 'deposit_switch':
-        return render_template('dds.html')
+        return render_template('deposit_switch.html')
     else:
         return render_template('employment.html')
 
