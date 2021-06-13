@@ -102,8 +102,8 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 var accessToken string
 var err error
 
-// startFasFlow retrieves FAS data
-func startFasFlow(w http.ResponseWriter, r *http.Request) {
+// startFundingSwitchFlow retrieves funding switch data
+func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err = getAccessToken(token)
@@ -113,27 +113,27 @@ func startFasFlow(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
-	fasResponse, err := getFasStatusByToken(accessToken)
+	fundingSwitchResponse, err := getFundingSwitchStatusByToken(accessToken)
 	if err != nil {
-		fmt.Println("Error getting FAS Status", err)
+		fmt.Println("Error getting funding switch Status", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
-		fmt.Fprintf(w, fasResponse)
+		fmt.Fprintf(w, fundingSwitchResponse)
 	}
 }
 
-// completeFasFlow finishes the FAS flow with two micro deposit values
-func completeFasFlow(w http.ResponseWriter, r *http.Request) {
+// completeFundingSwitchFlow finishes the funding switch flow with two micro deposit values
+func completeFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
 	first_micro, _ := strconv.ParseFloat(splitPath[2], 32)
 	second_micro, _ := strconv.ParseFloat(splitPath[3], 32)
 
-	fasResponse, err := completeFasFlowByToken(accessToken, float32(first_micro), float32(second_micro))
+	fundingSwitchResponse, err := completeFundingSwitchFlowByToken(accessToken, float32(first_micro), float32(second_micro))
 	if err != nil {
-		fmt.Println("Error getting FAS Status", err)
+		fmt.Println("Error getting funding switch Status", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
-		fmt.Fprintf(w, fasResponse)
+		fmt.Fprintf(w, fundingSwitchResponse)
 	}
 }
 
@@ -186,8 +186,8 @@ func handleRequests() {
 	http.HandleFunc("/getBridgeToken", bridgeToken)
 	http.HandleFunc("/getVerifications/", verifications)
 	http.HandleFunc("/getAdminData/", adminData)
-	http.HandleFunc("/startFasFlow/", startFasFlow)
-	http.HandleFunc("/completeFasFlow/", completeFasFlow)
+	http.HandleFunc("/startFundingSwitchFlow/", startFundingSwitchFlow)
+	http.HandleFunc("/completeFundingSwitchFlow/", completeFundingSwitchFlow)
 	http.HandleFunc("/getDepositSwitchData/", depositSwitch)
 
 	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")

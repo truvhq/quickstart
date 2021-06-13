@@ -4,7 +4,7 @@ import bodyParser from "body-parser"
 import htmlFile from "./serve.js"
 import {
   getDepositSwitchByToken,
-  completeFasFlowByToken,
+  completeFundingSwitchFlowByToken,
   getAccessToken,
   getBridgeToken,
   getEmploymentInfoByToken,
@@ -12,7 +12,7 @@ import {
   getEmployeeDirectoryByToken,
   getPayrollById,
   requestPayrollReport,
-  getFasStatusByToken
+  getFundingSwitchStatusByToken
 } from "./citadel.js"
 
 const {
@@ -86,17 +86,17 @@ app.get("/getAdminData/:token", async (req, res) => {
 
 let accessToken = null
 
-app.get("/startFasFlow/:token", async (req, res) => {
-  // retrieve fas status information
+app.get("/startFundingSwitchFlow/:token", async (req, res) => {
+  // retrieve funding switch status information
   try {
     const accessTokenResponse = await getAccessToken(req.params.token)
     accessToken = accessTokenResponse.access_token
 
-    const fasResult = await getFasStatusByToken(accessToken)
+    const fundingSwitchResult = await getFundingSwitchStatusByToken(accessToken)
 
-    res.json(fasResult)
+    res.json(fundingSwitchResult)
   } catch (e) {
-    console.error("error with startFasFlow")
+    console.error("error with startFundingSwitchFlow")
     console.error(e)
     res.status(500).json({ success: false })
   }
@@ -118,14 +118,14 @@ app.get("/getDepositSwitchData/:token", async (req, res) => {
   }
 })
 
-app.get("/completeFasFlow/:first_micro/:second_micro", async (req, res) => {
+app.get("/completeFundingSwitchFlow/:first_micro/:second_micro", async (req, res) => {
   // retrieve income verification information
   try {
-    const fasResult = await completeFasFlowByToken(accessToken, req.params.first_micro, req.params.second_micro)
+    const fundingSwitchResult = await completeFundingSwitchFlowByToken(accessToken, req.params.first_micro, req.params.second_micro)
 
-    res.json(fasResult)
+    res.json(fundingSwitchResult)
   } catch (e) {
-    console.error("error with completeFasFlow")
+    console.error("error with completeFundingSwitchFlow")
     console.error(e)
     res.status(500).json({ success: false })
   }

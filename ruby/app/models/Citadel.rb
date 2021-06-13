@@ -64,17 +64,17 @@ class Citadel
     sendRequest("administrators/payrolls/#{report_id}", nil, "GET")
   end
 
-  def self.getFasStatusByToken(access_token)
+  def self.getFundingSwitchStatusByToken(access_token)
     # https://docs.citadelid.com/?ruby#funding-account
-    puts "CITADEL: Requesting FAS update data using an access_token from https://prod.citadelid.com/v1/account-switches"
+    puts "CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches"
     puts "CITADEL: Access Token - #{access_token}"
     body = { "access_token" => access_token }.to_json
     sendRequest('account-switches/', body, "POST")
   end
 
-  def self.completeFasFlowByToken(access_token, first_micro, second_micro)
+  def self.completeFundingSwitchFlowByToken(access_token, first_micro, second_micro)
     # https://docs.citadelid.com/?ruby#funding-account
-    puts "CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks"
+    puts "CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks"
     puts "CITADEL: Access Token - #{access_token}"
     body = { "access_token" => access_token, "settings" => { "micro_deposits" => [first_micro.to_f, second_micro.to_f] } }.to_json
     sendRequest('refresh/tasks/', body, "POST")

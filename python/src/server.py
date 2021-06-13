@@ -96,26 +96,26 @@ def get_deposit_switch_data_by_token(public_token: str):
 
     return depositSwitch
 
-@app.route('/startFasFlow/<public_token>', methods=['GET'])
-def start_fas_flow_by_token(public_token: str):
-    """ Back end API endpoint to create a refresh task for fas flow using a front
+@app.route('/startFundingSwitchFlow/<public_token>', methods=['GET'])
+def start_funding_switch_flow_by_token(public_token: str):
+    """ Back end API endpoint to create a refresh task for funding switch flow using a front
         end public_token """
     global access_token
     # First exchange public_token to access_token
     tokenResult = api_client.get_access_token(public_token)
     access_token = tokenResult["access_token"]
 
-    fasResult = api_client.get_fas_status_by_token(access_token)
+    fundingSwitchResult = api_client.get_funding_switch_status_by_token(access_token)
 
-    return fasResult
+    return fundingSwitchResult
 
-@app.route('/completeFasFlow/<first_micro>/<second_micro>', methods=['GET'])
-def complete_fas_flow_by_micro_deposits(first_micro: float, second_micro: float):
-    """ Back end API endpoint to create a refresh task for fas flow using a front
+@app.route('/completeFundingSwitchFlow/<first_micro>/<second_micro>', methods=['GET'])
+def complete_funding_switch_flow_by_micro_deposits(first_micro: float, second_micro: float):
+    """ Back end API endpoint to create a refresh task for funding switch flow using a front
         end public_token """
     global access_token
     # Use access_token to retrieve the data
-    refreshResult = api_client.complete_fas_flow_by_token(access_token, float(first_micro), float(second_micro))
+    refreshResult = api_client.complete_funding_switch_flow_by_token(access_token, float(first_micro), float(second_micro))
 
     return refreshResult
 

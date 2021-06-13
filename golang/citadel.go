@@ -241,10 +241,10 @@ func getPayrollById(reportId string) (string, error) {
 	return string(data), nil
 }
 
-// getFasStatusByToken uses the given access token to request
-// the associated fas requests
-func getFasStatusByToken(access_token string) (string, error) {
-	fmt.Println("CITADEL: Requesting FAS update data using an access_token from https://prod.citadelid.com/v1/account-switches")
+// getFundingSwitchStatusByToken uses the given access token to request
+// the associated funding switch requests
+func getFundingSwitchStatusByToken(access_token string) (string, error) {
+	fmt.Println("CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches")
 	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
@@ -263,10 +263,10 @@ func getFasStatusByToken(access_token string) (string, error) {
 	return string(data), nil
 }
 
-// completeFasFlowByToken uses the given access token to request
+// completeFundingSwitchFlowByToken uses the given access token to request
 // a task refresh to complete the Funding account switch flow
-func completeFasFlowByToken(access_token string, first_micro float32, second_micro float32) (string, error) {
-	fmt.Println("CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+func completeFundingSwitchFlowByToken(access_token string, first_micro float32, second_micro float32) (string, error) {
+	fmt.Println("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
 	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
 	accessToken := RefreshRequest{AccessToken: access_token, Settings: SettingsRequest{ MicroDeposits: []float32{first_micro, second_micro} }}
 	jsonAccessToken, _ := json.Marshal(accessToken)

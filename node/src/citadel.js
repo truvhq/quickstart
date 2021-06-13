@@ -137,13 +137,13 @@ const getPayrollById = async (report_id) => {
 }
 
 /**
- * Retrieves FAS status from Citadel
+ * Retrieves funding switch status from Citadel
  * https://docs.citadelid.com/?javascript--nodejs#funding-account
  * @param {String} access_token
  * @return The response from Citadel - https://docs.citadelid.com/?javascript--nodejs#schemafas
  **/
- const getFasStatusByToken = async (access_token) => {
-  console.log("CITADEL: Requesting FAS update data using an access_token from https://prod.citadelid.com/v1/account-switches")
+ const getFundingSwitchStatusByToken = async (access_token) => {
+  console.log("CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches")
   console.log(`CITADEL: Access Token - ${access_token}`)
   const body = JSON.stringify({
     access_token,
@@ -159,8 +159,8 @@ const getPayrollById = async (report_id) => {
  * @param {Number} second_micro
  * @return The response from Citadel - https://docs.citadelid.com/?javascript--nodejs#schemarefreshtaskcreateresponse
  */
- const completeFasFlowByToken = async (access_token, first_micro, second_micro) => {
-  console.log("CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+ const completeFundingSwitchFlowByToken = async (access_token, first_micro, second_micro) => {
+  console.log("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
   console.log(`CITADEL: Access Token - ${access_token}`)
   const body = JSON.stringify({
     access_token,
@@ -203,8 +203,8 @@ const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
 
 export {
   getDepositSwitchByToken,
-  getFasStatusByToken,
-  completeFasFlowByToken,
+  getFundingSwitchStatusByToken,
+  completeFundingSwitchFlowByToken,
   getEmploymentInfoByToken,
   getAccessToken,
   getBridgeToken,
