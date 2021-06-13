@@ -53,7 +53,7 @@ class NaiveApiClient:
             'tracking_info': '1337'
         }
 
-        if self.PRODUCT_TYPE == 'fas':
+        if self.PRODUCT_TYPE == 'fas' or self.PRODUCT_TYPE == 'deposit_switch':
             request_data['account'] = {
                 'account_number': '16002600',
                 'account_type': 'checking',
@@ -149,6 +149,26 @@ class NaiveApiClient:
 
         return requests.post(
             self.API_URL + 'administrators/directories/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+
+    def get_dds_by_token(self, access_token: str) -> Any:
+        """
+        https://docs.citadelid.com/#direct-deposit
+        :param access_token:
+        :return:
+        """
+
+        logging.info("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
+        logging.info("CITADEL: Access Token - %s", access_token)
+        class DDSRequest(TypedDict):
+            access_token: str
+
+        request_data: DDSRequest = {'access_token': access_token}
+
+        return requests.post(
+            self.API_URL + 'deposit-switches/',
             json=request_data,
             headers=self.API_HEADERS,
         ).json()

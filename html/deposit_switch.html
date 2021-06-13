@@ -8,7 +8,7 @@
     />
     <meta name="theme-color" content="#000000" />
 
-    <title>Funding account switch portal</title>
+    <title>Direct deposit switch portal</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap"
       rel="stylesheet"
@@ -164,22 +164,9 @@
 
         // sends a public_token to quickstart back end so the quickstart
         // back end can exchange it with Citadel for an access_token
-        const startFasFlow = async (public_token) => {
+        const getDdsData = async (public_token) => {
           const response = await fetch(
-            apiEnpoint + `startFasFlow/${public_token}`,
-            {
-              method: "get",
-              headers,
-            }
-          ).then((r) => r.json())
-          return response
-        }
-
-        // sends two micro deposit values to the quickstart back end
-        // so the quickstart backend can complete the FAS process.
-        const completeFasFlow = async (first_micro, second_micro) => {
-          const response = await fetch(
-            apiEnpoint + `completeFasFlow/${first_micro}/${second_micro}`,
+            apiEnpoint + `getDdsData/${public_token}`,
             {
               method: "get",
               headers,
@@ -189,9 +176,8 @@
         }
 
         return {
-          completeFasFlow,
           getBridgeToken,
-          startFasFlow,
+          getDdsData,
         }
       }
 
@@ -231,10 +217,10 @@
             const content = document.querySelector(".spinnerContainer")
 
             content.classList.remove("hidden")
-            let fasFlow
+            let ddsData
             try {
-              console.log("Funding account switch has begun with user login. Exchanging public_token for access_token")
-              fasFlow = await apiRequests.startFasFlow(public_token)
+              console.log("Direct deposit switch has begun with user login. Exchanging public_token for access_token")
+              ddsData = await apiRequests.getDdsData(public_token)
             } catch (e) {
               console.error(e)
               content.classList.add("hidden")
@@ -242,9 +228,9 @@
             }
             content.classList.add("hidden")
 
-            renderPayrollData(fasFlow)
+            renderPayrollData(ddsData)
             document.getElementById("connectButton").hidden = true
-            document.getElementById("microContainer").classList.remove("hidden")
+            document.getElementById("ddsComplete").classList.remove("hidden")
           },
           onClose: function () {
             // onClose function is called by the Citadel Bridge when the user closes the Citadel Bridge without
@@ -255,28 +241,10 @@
         window.bridge = bridge
       })()
 
-      async function submitMicroDeposits() {
-        console.log("Completing Funding account switch from the back end with access_token and micro deposit values")
-        const first_micro = document.getElementById("firstMicroInput")
-        const second_micro = document.getElementById("secondMicroInput")
-        const fasResult = await apiRequests.completeFasFlow(first_micro.value, second_micro.value)
-        renderPayrollData(fasResult)
-        document.getElementById("history").innerHTML = JSON.stringify(fasResult, null, 2)
-        document.getElementById("microContainer").classList.add("hidden")
-        document.getElementById("fasComplete").classList.remove("hidden")
-      }
-
-      function checkMicroValues() {
-        const first_micro = parseFloat(document.getElementById("firstMicroInput").value)
-        const second_micro = parseFloat(document.getElementById("secondMicroInput").value)
-
-        const button = document.getElementById("microButton")
-        button.disabled = !(first_micro > 0 && first_micro <= .2 && second_micro > 0 && second_micro <= .2)
-      }
-
       function renderPayrollData(data) {
         console.log("Returned from Citadel:")
         console.table(data)
+        document.getElementById("history").innerHTML = JSON.stringify(data, null, 2)
       }
     </script>
 
@@ -289,10 +257,10 @@
     <div id="content" class="container">
       <div class="titleContainer">
         <div>
-          <h2>Funding account switching</h2>
+          <h2>Direct deposit switching</h2>
           <span
-            >Funding account switch (FAS) allows payroll administrators to change the financial account their payroll provider uses to fund their payroll. Citadel makes FAS easy to integrate into your system with a simple process.
-            Click "Connect" below to start the FAS process. <strong>Monitor console logs to learn what's happening behind the scenes</strong>.
+            >Direct deposit switch (DDS) allows individuals to change the financial account their payroll provider uses to deposit their pay into. Citadel makes DDS easy to integrate into your system with a simple process.
+            Click "Connect" below to start the DDS process. <strong>Monitor console logs to learn what's happening behind the scenes</strong>.
           </span>
         </div>
       </div>
@@ -302,43 +270,29 @@
           <button type="button" id="connectButton" onclick="bridge.open()">
             Connect
           </button>
-          <div id="microContainer" class="hidden">
-            <p>FAS Task created. Please enter two decimal values below $0.20 in the fields below</p>
-            <p>
-              <input id="firstMicroInput" type="number" step=".01" placeholder="0.01" min="0.01" max="0.2" value="0.1" onchange="checkMicroValues()" />
-              <input id="secondMicroInput" type="number" step=".01" placeholder="0.02" min="0.01" max="0.2" value="0.2" onchange="checkMicroValues()" />
-            </p>
-            <p>
-              <button type="button" id="microButton" onclick="submitMicroDeposits()">
-                Submit
-              </button>
-            </p>
-          </div>
-          <div id="fasComplete" class="hidden">
-            <p>The FAS process is now complete. Here's what happened. <a href="#dataView">What data was returned?</a></p>
+          <div id="ddsComplete" class="hidden">
+            <p>The DDS process is now complete. Here's what happened. <a href="#dataView">What data was returned?</a></p>
 
             <h3>Initializing the Citadel Bridge</h3>
             <ol>
               <li>The quickstart front end requested a bridge token from the quickstart back end.</li>
               <li>
-                The quickstart back end requested a bridge token from Citadel, providing <code>fas</code> as the value for <code>product_type</code>
+                The quickstart back end requested a bridge token from Citadel, providing <code>deposit_switch</code> as the value for <code>product_type</code>
                 and all the account information for the new bank account to fund the administrator payroll.
               </li>
               <li>Citadel provided the quickstart backend with a bridge token, which the quickstart back end returned to the quickstart front end.</li>
               <li>The quickstart front end initialized the Citadel Bridge with the provided bridge_token.</li>
             </ol>
-            <h3>Starting the FAS process</h3>
+            <h3>Starting the DDS process</h3>
             <ol>
               <li>The user logged into their payroll provider through the Citadel Bridge.</li>
               <li>The Citadel Bridge provided a public_token to the quickstart front end, who passed that public_token to the quickstart back end.</li>
               <li>The quickstart back end exchanged that public_token with Citadel for an access_token and stored that access_token for later use.</li>
             </ol>
-            <h3>Completing the FAS process</h3>
+            <h3>Retrieving the DDS data</h3>
             <ol>
-              <li>The user provided the quickstart front end with the values of the two micro deposits the payroll provider sent to the new bank account.</li>
-              <li>The quickstart front end provided these micro deposit values to the quickstart back end.</li>
-              <li>The quickstart back end sent Citadel a Task refresh request providing the previously stored access_token and the two micro deposit values.</li>
-              <li>Citadel provided these two micro deposit values to the payroll provider, completing the Funding account switch process.</li>
+              <li>The quickstart back end sent Citadel a request for DDS data providing the previously stored access_token.</li>
+              <li>Citadel provided the data to the quickstart back end who sent it to the quickstart front end.</li>
             </ol>
             <div id="dataView">
               <h3>What data was returned?</h3>

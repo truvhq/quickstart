@@ -10,7 +10,7 @@ class Citadel
     # https://docs.citadelid.com/ruby#bridge-tokens_create
     puts "CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens"
     bodyObj = { "product_type" => Citadel.product_type, "client_name" => "Citadel Quickstart", "tracking_info" => "1337" }
-    if product_type == "fas"
+    if product_type == "fas" or product_type == "deposit_switch"
       bodyObj["account"] = { "account_number" => "10062800", "account_type" => "checking", "routing_number" => "123456789", "bank_name" => "TD Bank" }
     end
     body = bodyObj.to_json
@@ -78,6 +78,14 @@ class Citadel
     puts "CITADEL: Access Token - #{access_token}"
     body = { "access_token" => access_token, "settings" => { "micro_deposits" => [first_micro.to_f, second_micro.to_f] } }.to_json
     sendRequest('refresh/tasks/', body, "POST")
+  end
+
+  def self.getDdsByToken(access_token)
+    # https://docs.citadelid.com/?ruby#direct-deposit
+    puts "CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches"
+    puts "CITADEL: Access Token - #{access_token}"
+    body = { "access_token" => access_token }.to_json
+    sendRequest('deposit-switches/', body, "POST")
   end
 
   def self.sendRequest(endpoint, body, method)

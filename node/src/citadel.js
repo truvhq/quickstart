@@ -17,8 +17,8 @@ const getHeaders = () => {
 
 /**
  * Retrieves a bridge token from Citadel
- * https://docs.citadelid.com/javascript#bridge-tokens_create
- * @return The response from Citadel - https://docs.citadelid.com/javascript#schemabridgetoken
+ * https://docs.citadelid.com/javascript--nodejs#bridge-tokens_create
+ * @return The response from Citadel - https://docs.citadelid.com/javascript--nodejs#schemabridgetoken
  */
 const getBridgeToken = async () => {
   console.log("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
@@ -27,7 +27,7 @@ const getBridgeToken = async () => {
     client_name: "Citadel Quickstart",
     tracking_info: "1337"
   }
-  if(API_PRODUCT_TYPE === "fas") {
+  if(API_PRODUCT_TYPE === "fas" || API_PRODUCT_TYPE === "deposit_switch") {
     bodyObj.account = {
       account_number: "16002600",
       account_type: "checking",
@@ -44,7 +44,7 @@ const getBridgeToken = async () => {
 /**
  * Calls out to Citadel exchanging the public token given by the API request
  * for an access token to make subsequent requests
- * https://docs.citadelid.com/?javascript#exchange-token-flow
+ * https://docs.citadelid.com/?javascript--nodejs#exchange-token-flow
  * @param {String} public_token The token provided by the API request to exchange
  * @return The access token provided by citadel
  **/
@@ -60,9 +60,9 @@ const getAccessToken = async (public_token) => {
 
 /**
  * Retrieves employment verifications from Citadel
- * https://docs.citadelid.com/?javascript#employment-verification
+ * https://docs.citadelid.com/?javascript--nodejs#employment-verification
  * @param {String} access_token The access token provided by Citadel
- * @return The response from Citadel - https://docs.citadelid.com/javascript#schemaemploymentcheck
+ * @return The response from Citadel - https://docs.citadelid.com/javascript--nodejs#schemaemploymentcheck
  */
 const getEmploymentInfoByToken = async (access_token) => {
   console.log("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments")
@@ -75,9 +75,9 @@ const getEmploymentInfoByToken = async (access_token) => {
 
 /**
  * Retrieves income verifications from Citadel
- * https://docs.citadelid.com/?javascript#income-verification
+ * https://docs.citadelid.com/?javascript--nodejs#income-verification
  * @param {String} access_token
- * @return The response from Citadel - https://docs.citadelid.com/javascript#schemaincomecheck
+ * @return The response from Citadel - https://docs.citadelid.com/javascript--nodejs#schemaincomecheck
  */
 const getIncomeInfoByToken = async (access_token) => {
   console.log("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes")
@@ -90,9 +90,9 @@ const getIncomeInfoByToken = async (access_token) => {
 
 /**
  * Retrieves employee directories from Citadel
- * https://docs.citadelid.com/?javascript#employee-directory
+ * https://docs.citadelid.com/?javascript--nodejs#employee-directory
  * @param {String} access_token
- * @return The response from Citadel - https://docs.citadelid.com/?javascript#schemadirectoryresponse
+ * @return The response from Citadel - https://docs.citadelid.com/?javascript--nodejs#schemadirectoryresponse
  */
 const getEmployeeDirectoryByToken = async (access_token) => {
   console.log("CITADEL: Requesting employee directory data using an access_token from https://prod.citadelid.com/v1/administrators/directories")
@@ -105,11 +105,11 @@ const getEmployeeDirectoryByToken = async (access_token) => {
 
 /**
  * Creates a payroll report in Citadel
- * https://docs.citadelid.com/?javascript#create-payroll-report
+ * https://docs.citadelid.com/?javascript--nodejs#create-payroll-report
  * @param {String} access_token
  * @param {String} start_date
  * @param {String} end_date
- * @return The payroll report ID from Citadel - https://docs.citadelid.com/?javascript#create-payroll-admin-report-request-responseschema
+ * @return The payroll report ID from Citadel - https://docs.citadelid.com/?javascript--nodejs#create-payroll-admin-report-request-responseschema
  */
 const requestPayrollReport = async (access_token, start_date, end_date) => {
   console.log("CITADEL: Requesting a payroll report be created using an access_token from https://prod.citadelid.com/v1/administrators/payrolls")
@@ -124,9 +124,9 @@ const requestPayrollReport = async (access_token, start_date, end_date) => {
 
 /**
  * Retrieves a payroll report from Citadel
- * https://docs.citadelid.com/?javascript#retrieve-payroll-report
+ * https://docs.citadelid.com/?javascript--nodejs#retrieve-payroll-report
  * @param {String} report_id
- * @return The payroll report ID from Citadel - https://docs.citadelid.com/?javascript#create-payroll-admin-report-request-responseschema
+ * @return The payroll report ID from Citadel - https://docs.citadelid.com/?javascript--nodejs#create-payroll-admin-report-request-responseschema
  */
 const getPayrollById = async (report_id) => {
   console.log("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}")
@@ -153,11 +153,11 @@ const getPayrollById = async (report_id) => {
 
 /**
  * Requests a task refresh from Citadel to complete the Funding account switch flow
- * https://docs.citadelid.com/?javascript#funding-account
+ * https://docs.citadelid.com/?javascript--nodejs#data-refresh
  * @param {String} access_token
  * @param {Number} first_micro
  * @param {Number} second_micro
- * @return The response from Citadel - https://docs.citadelid.com/javascript#schemaincomecheck
+ * @return The response from Citadel - https://docs.citadelid.com/?javascript--nodejs#schemarefreshtaskcreateresponse
  */
  const completeFasFlowByToken = async (access_token, first_micro, second_micro) => {
   console.log("CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
@@ -167,6 +167,21 @@ const getPayrollById = async (report_id) => {
     settings: { micro_deposits: [ parseFloat(first_micro), parseFloat(second_micro) ] }
   })
   return await sendRequest("refresh/tasks/", { body })
+}
+
+/**
+ * Retrieves DDS status from Citadel
+ * https://docs.citadelid.com/?javascript--nodejs#direct-deposit
+ * @param {String} access_token The access token provided by Citadel
+ * @return The response from Citadel - https://docs.citadelid.com/?javascript--nodejs#schemadds
+ */
+ const getDdsByToken = async (access_token) => {
+  console.log("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit_switches")
+  console.log(`CITADEL: Access Token - ${access_token}`)
+  const body = JSON.stringify({
+    access_token,
+  })
+  return await sendRequest("deposit-switches/", {body})
 }
 
 const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
@@ -187,6 +202,7 @@ const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
 }
 
 export {
+  getDdsByToken,
   getFasStatusByToken,
   completeFasFlowByToken,
   getEmploymentInfoByToken,

@@ -37,7 +37,7 @@ namespace c_sharp
 
     public async Task<string> GetBridgeToken()
     {
-      var account = productType == "fas" ? "\"account\": { \"account_number\": \"16002600\", \"account_type\": \"checking\", \"routing_number\": \"123456789\", \"bank_name\": \"TD Bank\" }," : "";
+      var account = productType == "fas" || productType == "deposit_switch" ? "\"account\": { \"account_number\": \"16002600\", \"account_type\": \"checking\", \"routing_number\": \"123456789\", \"bank_name\": \"TD Bank\" }," : "";
       Console.WriteLine("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens");
       var body = "{ \"product_type\": \"" + productType + "\"," +
                  account +
@@ -107,6 +107,13 @@ namespace c_sharp
       Console.WriteLine("CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks");
       Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       return await SendRequest("refresh/tasks/", "{\"access_token\": \"" + accessToken + "\", \"settings\": { \"micro_deposits\": [" + first_micro.ToString() + ", " + second_micro.ToString() + "] } }");
+    }
+
+    public async Task<string> GetDdsByToken(string accessToken)
+    {
+      Console.WriteLine("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
+      return await SendRequest("deposit-switches/", "{\"access_token\": \"" + accessToken + "\" }");
     }
   }
 
