@@ -285,9 +285,9 @@ func completeFasFlowByToken(access_token string, first_micro float32, second_mic
 	return string(data), nil
 }
 
-// getDdsByToken uses the given access token to request
-// the associated dds info
-func getDdsByToken(access_token string) (string, error) {
+// getDepositSwitchByToken uses the given access token to request
+// the associated deposit switch info
+func getDepositSwitchByToken(access_token string) (string, error) {
 	fmt.Println("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
 	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}

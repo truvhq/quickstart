@@ -80,7 +80,7 @@ class Citadel
     sendRequest('refresh/tasks/', body, "POST")
   end
 
-  def self.getDdsByToken(access_token)
+  def self.getDepositSwitchByToken(access_token)
     # https://docs.citadelid.com/?ruby#direct-deposit
     puts "CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches"
     puts "CITADEL: Access Token - #{access_token}"

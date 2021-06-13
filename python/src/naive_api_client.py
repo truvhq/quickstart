@@ -153,7 +153,7 @@ class NaiveApiClient:
             headers=self.API_HEADERS,
         ).json()
 
-    def get_dds_by_token(self, access_token: str) -> Any:
+    def get_deposit_switch_by_token(self, access_token: str) -> Any:
         """
         https://docs.citadelid.com/#direct-deposit
         :param access_token:
@@ -162,10 +162,10 @@ class NaiveApiClient:
 
         logging.info("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
         logging.info("CITADEL: Access Token - %s", access_token)
-        class DDSRequest(TypedDict):
+        class DepositSwitchRequest(TypedDict):
             access_token: str
 
-        request_data: DDSRequest = {'access_token': access_token}
+        request_data: DepositSwitchRequest = {'access_token': access_token}
 
         return requests.post(
             self.API_URL + 'deposit-switches/',

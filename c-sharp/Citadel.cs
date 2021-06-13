@@ -109,7 +109,7 @@ namespace c_sharp
       return await SendRequest("refresh/tasks/", "{\"access_token\": \"" + accessToken + "\", \"settings\": { \"micro_deposits\": [" + first_micro.ToString() + ", " + second_micro.ToString() + "] } }");
     }
 
-    public async Task<string> GetDdsByToken(string accessToken)
+    public async Task<string> GetDepositSwitchByToken(string accessToken)
     {
       Console.WriteLine("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches");
       Console.WriteLine("CITADEL: Access Token - {0}", accessToken);

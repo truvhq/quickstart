@@ -82,8 +82,8 @@ def get_verification_info_by_token(public_token: str):
         raise Exception('Unsupported product type!')
     return verifications
 
-@app.route('/getDdsData/<public_token>', methods=['GET'])
-def get_dds_data_by_token(public_token: str):
+@app.route('/getDepositSwitchData/<public_token>', methods=['GET'])
+def get_deposit_switch_data_by_token(public_token: str):
     """ Back end API endpoint to retrieve direct deposit switch
         data using a front end public_token """
 
@@ -92,9 +92,9 @@ def get_dds_data_by_token(public_token: str):
     access_token = tokenResult["access_token"]
 
     # Use access_token to retrieve the data
-    dds = api_client.get_dds_by_token(access_token)
+    depositSwitch = api_client.get_deposit_switch_by_token(access_token)
 
-    return dds
+    return depositSwitch
 
 @app.route('/startFasFlow/<public_token>', methods=['GET'])
 def start_fas_flow_by_token(public_token: str):

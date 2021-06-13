@@ -137,8 +137,8 @@ func completeFasFlow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// dds accepts requests for a dds status and sends the response
-func dds(w http.ResponseWriter, r *http.Request) {
+// depositSwitch accepts requests for a deposit switch status and sends the response
+func depositSwitch(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err := getAccessToken(token)
@@ -147,13 +147,13 @@ func dds(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
-	ddsResponse, err := getDdsByToken(accessToken)
+	depositSwitchResponse, err := getDepositSwitchByToken(accessToken)
 	
 	if err != nil {
-		fmt.Println("Error getting dds", err)
+		fmt.Println("Error getting deposit switch", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
-		fmt.Fprintf(w, ddsResponse)
+		fmt.Fprintf(w, depositSwitchResponse)
 	}
 }
 
@@ -175,7 +175,7 @@ func checkEnv() {
 		os.Exit(1)
 	}
 	if productType != "employment" && productType != "income" && productType != "admin" && productType != "fas" && productType != "deposit_switch" {
-		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin, dds or fas")
+		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or fas")
 		os.Exit(1)
 	}
 }
@@ -188,7 +188,7 @@ func handleRequests() {
 	http.HandleFunc("/getAdminData/", adminData)
 	http.HandleFunc("/startFasFlow/", startFasFlow)
 	http.HandleFunc("/completeFasFlow/", completeFasFlow)
-	http.HandleFunc("/getDdsData/", dds)
+	http.HandleFunc("/getDepositSwitchData/", depositSwitch)
 
 	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")
 

@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace c_sharp.Controllers
 {
   [ApiController]
-  [Route("getDdsData")]
-  public class DdsController : ControllerBase
+  [Route("getDepositSwitchData")]
+  public class DepositSwitchController : ControllerBase
   {
 
     private Citadel _citadel = new Citadel();
@@ -19,7 +19,7 @@ namespace c_sharp.Controllers
       var parsedResponse = JsonDocument.Parse(accessTokenResponse);
       var accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
 
-      return await _citadel.GetDdsByToken(accessToken);
+      return await _citadel.GetDepositSwitchByToken(accessToken);
     }
   }
 }

@@ -3,7 +3,7 @@ import cors from "cors"
 import bodyParser from "body-parser"
 import htmlFile from "./serve.js"
 import {
-  getDdsByToken,
+  getDepositSwitchByToken,
   completeFasFlowByToken,
   getAccessToken,
   getBridgeToken,
@@ -102,17 +102,17 @@ app.get("/startFasFlow/:token", async (req, res) => {
   }
 })
 
-app.get("/getDdsData/:token", async (req, res) => {
-  // retrieve dds status information
+app.get("/getDepositSwitchData/:token", async (req, res) => {
+  // retrieve deposit switch status information
   try {
     const accessTokenResponse = await getAccessToken(req.params.token)
     accessToken = accessTokenResponse.access_token
 
-    const ddsResult = await getDdsByToken(accessToken)
+    const depositSwitchResult = await getDepositSwitchByToken(accessToken)
 
-    res.json(ddsResult)
+    res.json(depositSwitchResult)
   } catch (e) {
-    console.error("error with getDdsData")
+    console.error("error with getDepositSwitchData")
     console.error(e)
     res.status(500).json({ success: false })
   }

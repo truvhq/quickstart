@@ -170,12 +170,12 @@ const getPayrollById = async (report_id) => {
 }
 
 /**
- * Retrieves DDS status from Citadel
+ * Retrieves deposit switch status from Citadel
  * https://docs.citadelid.com/?javascript--nodejs#direct-deposit
  * @param {String} access_token The access token provided by Citadel
  * @return The response from Citadel - https://docs.citadelid.com/?javascript--nodejs#schemadds
  */
- const getDdsByToken = async (access_token) => {
+ const getDepositSwitchByToken = async (access_token) => {
   console.log("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit_switches")
   console.log(`CITADEL: Access Token - ${access_token}`)
   const body = JSON.stringify({
@@ -202,7 +202,7 @@ const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
 }
 
 export {
-  getDdsByToken,
+  getDepositSwitchByToken,
   getFasStatusByToken,
   completeFasFlowByToken,
   getEmploymentInfoByToken,
