@@ -164,9 +164,9 @@
 
         // sends a public_token to quickstart back end so the quickstart
         // back end can exchange it with Citadel for an access_token
-        const getDdsData = async (public_token) => {
+        const getDepositSwitchData = async (public_token) => {
           const response = await fetch(
-            apiEnpoint + `getDdsData/${public_token}`,
+            apiEnpoint + `getDepositSwitchData/${public_token}`,
             {
               method: "get",
               headers,
@@ -177,7 +177,7 @@
 
         return {
           getBridgeToken,
-          getDdsData,
+          getDepositSwitchData,
         }
       }
 
@@ -217,10 +217,10 @@
             const content = document.querySelector(".spinnerContainer")
 
             content.classList.remove("hidden")
-            let ddsData
+            let depositSwitchData
             try {
               console.log("Direct deposit switch has begun with user login. Exchanging public_token for access_token")
-              ddsData = await apiRequests.getDdsData(public_token)
+              depositSwitchData = await apiRequests.getDepositSwitchData(public_token)
             } catch (e) {
               console.error(e)
               content.classList.add("hidden")
@@ -228,9 +228,9 @@
             }
             content.classList.add("hidden")
 
-            renderPayrollData(ddsData)
+            renderPayrollData(depositSwitchData)
             document.getElementById("connectButton").hidden = true
-            document.getElementById("ddsComplete").classList.remove("hidden")
+            document.getElementById("depositSwitchComplete").classList.remove("hidden")
           },
           onClose: function () {
             // onClose function is called by the Citadel Bridge when the user closes the Citadel Bridge without
@@ -270,7 +270,7 @@
           <button type="button" id="connectButton" onclick="bridge.open()">
             Connect
           </button>
-          <div id="ddsComplete" class="hidden">
+          <div id="depositSwitchComplete" class="hidden">
             <p>The DDS process is now complete. Here's what happened. <a href="#dataView">What data was returned?</a></p>
 
             <h3>Initializing the Citadel Bridge</h3>

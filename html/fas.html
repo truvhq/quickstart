@@ -164,9 +164,9 @@
 
         // sends a public_token to quickstart back end so the quickstart
         // back end can exchange it with Citadel for an access_token
-        const startFasFlow = async (public_token) => {
+        const startFundingSwitchFlow = async (public_token) => {
           const response = await fetch(
-            apiEnpoint + `startFasFlow/${public_token}`,
+            apiEnpoint + `startFundingSwitchFlow/${public_token}`,
             {
               method: "get",
               headers,
@@ -176,10 +176,10 @@
         }
 
         // sends two micro deposit values to the quickstart back end
-        // so the quickstart backend can complete the FAS process.
-        const completeFasFlow = async (first_micro, second_micro) => {
+        // so the quickstart backend can complete the funding switch process.
+        const completeFundingSwitchFlow = async (first_micro, second_micro) => {
           const response = await fetch(
-            apiEnpoint + `completeFasFlow/${first_micro}/${second_micro}`,
+            apiEnpoint + `completeFundingSwitchFlow/${first_micro}/${second_micro}`,
             {
               method: "get",
               headers,
@@ -189,9 +189,9 @@
         }
 
         return {
-          completeFasFlow,
+          completeFundingSwitchFlow,
           getBridgeToken,
-          startFasFlow,
+          startFundingSwitchFlow,
         }
       }
 
@@ -231,10 +231,10 @@
             const content = document.querySelector(".spinnerContainer")
 
             content.classList.remove("hidden")
-            let fasFlow
+            let fundingSwitchFlow
             try {
               console.log("Funding account switch has begun with user login. Exchanging public_token for access_token")
-              fasFlow = await apiRequests.startFasFlow(public_token)
+              fundingSwitchFlow = await apiRequests.startFundingSwitchFlow(public_token)
             } catch (e) {
               console.error(e)
               content.classList.add("hidden")
@@ -242,7 +242,7 @@
             }
             content.classList.add("hidden")
 
-            renderPayrollData(fasFlow)
+            renderPayrollData(fundingSwitchFlow)
             document.getElementById("connectButton").hidden = true
             document.getElementById("microContainer").classList.remove("hidden")
           },
@@ -259,11 +259,11 @@
         console.log("Completing Funding account switch from the back end with access_token and micro deposit values")
         const first_micro = document.getElementById("firstMicroInput")
         const second_micro = document.getElementById("secondMicroInput")
-        const fasResult = await apiRequests.completeFasFlow(first_micro.value, second_micro.value)
-        renderPayrollData(fasResult)
-        document.getElementById("history").innerHTML = JSON.stringify(fasResult, null, 2)
+        const fundingSwitchResult = await apiRequests.completeFundingSwitchFlow(first_micro.value, second_micro.value)
+        renderPayrollData(fundingSwitchResult)
+        document.getElementById("history").innerHTML = JSON.stringify(fundingSwitchResult, null, 2)
         document.getElementById("microContainer").classList.add("hidden")
-        document.getElementById("fasComplete").classList.remove("hidden")
+        document.getElementById("fundingSwitchComplete").classList.remove("hidden")
       }
 
       function checkMicroValues() {
@@ -314,7 +314,7 @@
               </button>
             </p>
           </div>
-          <div id="fasComplete" class="hidden">
+          <div id="fundingSwitchComplete" class="hidden">
             <p>The FAS process is now complete. Here's what happened. <a href="#dataView">What data was returned?</a></p>
 
             <h3>Initializing the Citadel Bridge</h3>

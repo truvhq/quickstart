@@ -153,7 +153,7 @@ class NaiveApiClient:
             headers=self.API_HEADERS,
         ).json()
 
-    def get_dds_by_token(self, access_token: str) -> Any:
+    def get_deposit_switch_by_token(self, access_token: str) -> Any:
         """
         https://docs.citadelid.com/#direct-deposit
         :param access_token:
@@ -162,10 +162,10 @@ class NaiveApiClient:
 
         logging.info("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
         logging.info("CITADEL: Access Token - %s", access_token)
-        class DDSRequest(TypedDict):
+        class DepositSwitchRequest(TypedDict):
             access_token: str
 
-        request_data: DDSRequest = {'access_token': access_token}
+        request_data: DepositSwitchRequest = {'access_token': access_token}
 
         return requests.post(
             self.API_URL + 'deposit-switches/',
@@ -215,18 +215,18 @@ class NaiveApiClient:
             headers=self.API_HEADERS,
         ).json()
     
-    def get_fas_status_by_token(self, access_token: str) -> Any:
+    def get_funding_switch_status_by_token(self, access_token: str) -> Any:
         """
         https://docs.citadelid.com/#fas-report
         :param access_token:
         :return:
         """
-        logging.info("CITADEL: Requesting FAS update data using an access_token from https://prod.citadelid.com/v1/account-switches")
+        logging.info("CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches")
         logging.info("CITADEL: Access Token - %s", access_token)
-        class FasRequest(TypedDict):
+        class FundingSwitchRequest(TypedDict):
             access_token: str
 
-        request_data: FasRequest = {'access_token': access_token}
+        request_data: FundingSwitchRequest = {'access_token': access_token}
 
         return requests.post(
             self.API_URL + 'account-switches/',
@@ -234,13 +234,13 @@ class NaiveApiClient:
             headers=self.API_HEADERS,
         ).json()
 
-    def complete_fas_flow_by_token(self, access_token: str, first_micro: float, second_micro: float) -> Any:
+    def complete_funding_switch_flow_by_token(self, access_token: str, first_micro: float, second_micro: float) -> Any:
         """
         https://docs.citadelid.com/#funding-account
         :param access_token:
         :return:
         """
-        logging.info("CITADEL: Completing FAS flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+        logging.info("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
         logging.info("CITADEL: Access Token - %s", access_token)
 
         class SettingsRequest(TypedDict):

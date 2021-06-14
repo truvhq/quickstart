@@ -1,9 +1,9 @@
 class FundingAccountSwitch
-  def self.startFasFlow(public_token)
+  def self.startFundingSwitchFlow(public_token)
     @accessToken = Citadel.getAccessToken(public_token)
-    return Citadel.getFasStatusByToken(@accessToken)
+    return Citadel.getFundingSwitchStatusByToken(@accessToken)
   end
-  def self.completeFasFlow(first_micro, second_micro)
-    return Citadel.completeFasFlowByToken(@accessToken, first_micro, second_micro)
+  def self.completeFundingSwitchFlow(first_micro, second_micro)
+    return Citadel.completeFundingSwitchFlowByToken(@accessToken, first_micro, second_micro)
   end
 end
