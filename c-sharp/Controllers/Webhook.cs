@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Security.Cryptography;
 using System;
+using System.Text.Json;
 
 namespace c_sharp.Controllers
 {
@@ -18,7 +19,13 @@ namespace c_sharp.Controllers
       using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
       {
         string body = await reader.ReadToEndAsync();
-        return generateWebhookSign(body, Environment.GetEnvironmentVariable("API_SECRET"));
+        var signature = generateWebhookSign(body, Environment.GetEnvironmentVariable("API_SECRET"));
+        var document = JsonDocument.Parse(body);
+        Console.WriteLine("CITADEL: Webhook Received");
+        Console.WriteLine("CITADEL: Event type:      {0}", document.RootElement.GetProperty("event_type").GetString());
+        Console.WriteLine("CITADEL: Status:          {0}", document.RootElement.GetProperty("status").GetString());
+        Console.WriteLine("CITADEL: Signature match: {0}\n", Request.Headers["x-webhook-sign"].ToString() == signature);
+        return String.Empty;
       }
     }
 

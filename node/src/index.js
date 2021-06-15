@@ -21,7 +21,7 @@ const {
 } = process.env
 
 const generate_webhook_sign = (body, key) => {
-  return crypto.createHmac("sha256", key)
+  return "v1=" + crypto.createHmac("sha256", key)
   .update(body)
   .digest("hex")
 }
@@ -93,10 +93,15 @@ app.get("/getAdminData/:token", async (req, res) => {
 
 app.post("/webhook", async (req, res) => {
 
+  console.log("CITADEL: Webhook Received")
   const body = req.rawBody.toString()
-  const webhook_sign = generate_webhook_sign(body, API_SECRET)
   
-  res.send(`v1=${webhook_sign}`).end()
+  const webhook_sign = generate_webhook_sign(body, API_SECRET)
+  console.log(`CITADEL: Event type:      ${req.body.event_type}`)
+  console.log(`CITADEL: Status:          ${req.body.status}`)
+  console.log(`CITADEL: Signature match: ${webhook_sign === req.headers['x-webhook-sign']}\n`)
+  
+  res.status(200).end()
 })
 
 app.listen(5000, () => {

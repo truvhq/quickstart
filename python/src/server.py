@@ -68,7 +68,12 @@ def generate_webhook_sign(payload: str, key: str) -> str:
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    return generate_webhook_sign(request.data.decode('UTF-8'), secret)
+    signature = generate_webhook_sign(request.data.decode('UTF-8'), secret)
+    logging.info("CITADEL: Webhook received")
+    logging.info("CITADEL: Event type:      %s", request.json["event_type"])
+    logging.info("CITADEL: Status:          %s", request.json["status"])
+    logging.info("CITADEL: Signature match: %s\n", request.headers["X-WEBHOOK-SIGN"] == signature)
+    return ""
 
 
 @app.route('/getVerifications/<public_token>', methods=['GET'])

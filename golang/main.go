@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -128,16 +129,27 @@ func generate_webhook_sign(body string, key string) string {
 
 	mac := hmac.New(sha256.New, []byte(key))
 	mac.Write([]byte(body))
-	return hex.EncodeToString(mac.Sum(nil))
+	return fmt.Sprintf("v1=%s", hex.EncodeToString(mac.Sum(nil)))
+}
+
+type WebhookRequest struct {
+	EventType string `json:"event_type"`
+	Status    string `json:"status"`
 }
 
 func webhook(w http.ResponseWriter, r *http.Request) {
 	b, _ := ioutil.ReadAll(r.Body)
 	convertedBody := string(b)
+	var parsedJson WebhookRequest
+	json.Unmarshal(b, &parsedJson)
 	signature := generate_webhook_sign(convertedBody, os.Getenv("API_SECRET"))
-	fullSignature := fmt.Sprintf("v1=%s", signature)
 
-	fmt.Fprintf(w, fullSignature)
+	fmt.Println("CITADEL: Webhook received")
+	fmt.Printf("CITADEL: Event type:      %v\n", parsedJson.EventType)
+	fmt.Printf("CITADEL: Status:          %v\n", parsedJson.Status)
+	fmt.Printf("CITADEL: Signature match: %v\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
+
+	fmt.Fprintf(w, "")
 }
 
 // handleRequests sets up all endpoint handlers
