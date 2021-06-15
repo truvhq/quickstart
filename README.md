@@ -16,6 +16,37 @@ Follow the `README.md` file for the language you would like to implement in. If 
 - [Node](https://github.com/citadelid/quickstart/blob/master/node/README.md)
 - [Ruby on Rails](https://github.com/citadelid/quickstart/blob/master/ruby/README.md)
 
+## Viewing webhooks in Quickstart
+
+Endpoints exist in Quickstart to be able to test [Citadel Webhooks](https://docs.citadelid.com/#webhooks), but in order to allow Citadel to be able to route
+those webhooks to your local machine you need to run an application called [ngrok](https://ngrok.com/). In order to have this work, follow these steps:
+
+1) Go to the [ngrok download page](https://ngrok.com/download) and follow instructions to run ngrok locally. Make sure to specify port 5000. Once it's up and running you should see an output like this:
+
+   ```shell
+   Session Status                online
+   Session Expires               1 hour, 59 minutes
+   Version                       2.3.40
+   Region                        United States (us)
+   Web Interface                 http://127.0.0.1:4040
+   Forwarding                    http://89cb0c536e81.ngrok.io -> http://localhost:5000
+   Forwarding                    https://89cb0c536e81.ngrok.io -> http://localhost:5000                                    
+   ```
+
+2) Visit the [Webhooks](https://dashboard.citadelid.com/app/development/webhooks) section of the Citadel Dashboard and enter the `https` url specified by ngrok, followed by `/webhook`. For the example above
+   it would be `https://89cb0c536e81.ngrok.io/webhook` but for your ngrok service the beginning should be different. Don't forget to click "Save".
+
+    **NOTE:** When running the free version of ngrok your URL changes every time you run ngrok and your session only lasts 2 hours. If you need to rerun ngrok you will have to return to the Citadel Dashboard and
+    update the URL.
+
+3) If you're running the ruby version of Quickstart you will need to add the following line to your `ruby/config/environments/development.rb` file:
+
+    `config.hosts << "XXXXXXXXXXXX.ngrok.io"`
+
+   make sure to replace `XXXXXXXXXXXX` with the unique string for your ngrok service.
+
+4) Run Quickstart as you normally would and pay attention to the console logs for the Quickstart back end. When you click "Submit" on the Bridge to log into the payroll provider you should see logs for webhook calls.
+
 ## What happens under the hood
 
 Here is the flow that a successful payroll connection process takes in our example. The below code will be shown in Python but each language has it's own
