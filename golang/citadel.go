@@ -21,11 +21,29 @@ type AccessTokenRequest struct {
 	AccessToken string `json:"access_token"`
 }
 
+type SettingsRequest struct {
+	MicroDeposits []float32 `json:"micro_deposits"`
+}
+
+// RefreshRequest is used to define the body for the task refresh
+// endpoint
+type RefreshRequest struct {
+	AccessToken string `json:"access_token"`
+	Settings SettingsRequest `json:"settings"`
+}
+
 // AccessTokenResponse is used to define the body for the
 // response of requesting an access token
 type AccessTokenResponse struct {
 	AccessToken string `json:"access_token"`
 	LinkId string `json:"link_id"`
+}
+
+type AccountRequest struct {
+	AccountNumber  string `json:"account_number"`
+	AccountType  string `json:"account_type"`
+	RoutingNumber  string `json:"routing_number"`
+	BankName  string `json:"bank_name"`
 }
 
 // PayrollReportRequest defines the body of the request when requesting
@@ -34,6 +52,7 @@ type BridgeTokenRequest struct {
 	ProductType  string `json:"product_type"`
 	ClientName   string `json:"client_name"`
 	TrackingInfo string `json:"tracking_info"`
+	Account      AccountRequest `json:"account"`
 }
 
 // getRequest creates an http request with the required HTTP headers
@@ -53,6 +72,9 @@ func getBridgeToken() (string, error) {
 	fmt.Println("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	bridgeTokenRequest := BridgeTokenRequest{ProductType: productType, ClientName: "Citadel Quickstart", TrackingInfo: "1337"}
+	if productType == "fas" || productType == "deposit_switch" {
+		bridgeTokenRequest.Account = AccountRequest{AccountNumber: "16002600", AccountType: "checking", RoutingNumber: "123456789", BankName: "TD Bank"}
+	}
 	bridgeJson, _ := json.Marshal(bridgeTokenRequest)
 	request, err := getRequest("bridge-tokens/", "POST", bridgeJson)
 	if err != nil {
@@ -205,6 +227,72 @@ func getPayrollById(reportId string) (string, error) {
 	fmt.Println("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}")
 	fmt.Printf("CITADEL: Report ID - %v\n", reportId)
 	request, err := getRequest(fmt.Sprintf("administrators/payrolls/%s", reportId), "GET", nil)
+	if err != nil {
+		return "", err
+	}
+	client := &http.Client{}
+	res, err := client.Do(request)
+	defer res.Body.Close()
+
+	if err != nil {
+		return "", err
+	}
+	data, _ := ioutil.ReadAll(res.Body)
+	return string(data), nil
+}
+
+// getFundingSwitchStatusByToken uses the given access token to request
+// the associated funding switch requests
+func getFundingSwitchStatusByToken(access_token string) (string, error) {
+	fmt.Println("CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches")
+	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	accessToken := AccessTokenRequest{AccessToken: access_token}
+	jsonAccessToken, _ := json.Marshal(accessToken)
+	request, err := getRequest("account-switches", "POST", jsonAccessToken)
+	if err != nil {
+		return "", err
+	}
+	client := &http.Client{}
+	res, err := client.Do(request)
+	defer res.Body.Close()
+
+	if err != nil {
+		return "", err
+	}
+	data, _ := ioutil.ReadAll(res.Body)
+	return string(data), nil
+}
+
+// completeFundingSwitchFlowByToken uses the given access token to request
+// a task refresh to complete the Funding account switch flow
+func completeFundingSwitchFlowByToken(access_token string, first_micro float32, second_micro float32) (string, error) {
+	fmt.Println("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	accessToken := RefreshRequest{AccessToken: access_token, Settings: SettingsRequest{ MicroDeposits: []float32{first_micro, second_micro} }}
+	jsonAccessToken, _ := json.Marshal(accessToken)
+	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
+	if err != nil {
+		return "", err
+	}
+	client := &http.Client{}
+	res, err := client.Do(request)
+	defer res.Body.Close()
+
+	if err != nil {
+		return "", err
+	}
+	data, _ := ioutil.ReadAll(res.Body)
+	return string(data), nil
+}
+
+// getDepositSwitchByToken uses the given access token to request
+// the associated deposit switch info
+func getDepositSwitchByToken(access_token string) (string, error) {
+	fmt.Println("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
+	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	accessToken := AccessTokenRequest{AccessToken: access_token}
+	jsonAccessToken, _ := json.Marshal(accessToken)
+	request, err := getRequest("deposit-switches", "POST", jsonAccessToken)
 	if err != nil {
 		return "", err
 	}

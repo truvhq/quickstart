@@ -6,7 +6,9 @@ WORKDIR /app/python
 
 RUN pip3 install -r requirements.txt
 
-ENV FLASK_APP=src.server.py
+WORKDIR /app
+
+ENV FLASK_APP=python.src.server.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_ENV='development'
 ENV FLASK_DEBUG=true

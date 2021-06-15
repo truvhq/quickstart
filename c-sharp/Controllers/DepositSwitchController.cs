@@ -1,20 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace c_sharp.Controllers
 {
   [ApiController]
-  [Route("getVerifications")]
-  public class VerificationController : ControllerBase
+  [Route("getDepositSwitchData")]
+  public class DepositSwitchController : ControllerBase
   {
 
     private Citadel _citadel = new Citadel();
-    private string _productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
 
     [Route("{token}")]
     [HttpGet]
@@ -24,14 +19,7 @@ namespace c_sharp.Controllers
       var parsedResponse = JsonDocument.Parse(accessTokenResponse);
       var accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
 
-      if (_productType == "employment")
-      {
-        return await _citadel.GetEmploymentInfoByToken(accessToken);
-      }
-      else
-      {
-        return await _citadel.GetIncomeInfoByToken(accessToken);
-      }
+      return await _citadel.GetDepositSwitchByToken(accessToken);
     }
   }
 }

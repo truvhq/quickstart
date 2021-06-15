@@ -5,13 +5,16 @@ import htmlFile from "./serve.js"
 import crypto from "crypto"
 
 import {
+  getDepositSwitchByToken,
+  completeFundingSwitchFlowByToken,
   getAccessToken,
   getBridgeToken,
   getEmploymentInfoByToken,
   getIncomeInfoByToken,
   getEmployeeDirectoryByToken,
   getPayrollById,
-  requestPayrollReport
+  requestPayrollReport,
+  getFundingSwitchStatusByToken
 } from "./citadel.js"
 
 const {
@@ -56,7 +59,8 @@ app.get("/getBridgeToken", async (req, res) => {
 app.get("/getVerifications/:token", async (req, res) => {
   // retrieve income verification information
   try {
-    const accessToken = await getAccessToken(req.params.token)
+    const accessTokenResponse = await getAccessToken(req.params.token)
+    const accessToken = accessTokenResponse.access_token
     let verifications
     if(API_PRODUCT_TYPE === "employment") {
       verifications = await getEmploymentInfoByToken(accessToken)
@@ -74,7 +78,8 @@ app.get("/getVerifications/:token", async (req, res) => {
 app.get("/getAdminData/:token", async (req, res) => {
   // retrieve income verification information
   try {
-    const accessToken = await getAccessToken(req.params.token)
+    const accessTokenResponse = await getAccessToken(req.params.token)
+    const accessToken = accessTokenResponse.access_token
 
     const directory = await getEmployeeDirectoryByToken(accessToken)
 
@@ -85,7 +90,54 @@ app.get("/getAdminData/:token", async (req, res) => {
     const data = { directory, payroll }
     res.json(data)
   } catch (e) {
-    console.error("error with getVerifications")
+    console.error("error with getAdminData")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
+let accessToken = null
+
+app.get("/startFundingSwitchFlow/:token", async (req, res) => {
+  // retrieve funding switch status information
+  try {
+    const accessTokenResponse = await getAccessToken(req.params.token)
+    accessToken = accessTokenResponse.access_token
+
+    const fundingSwitchResult = await getFundingSwitchStatusByToken(accessToken)
+
+    res.json(fundingSwitchResult)
+  } catch (e) {
+    console.error("error with startFundingSwitchFlow")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
+app.get("/getDepositSwitchData/:token", async (req, res) => {
+  // retrieve deposit switch status information
+  try {
+    const accessTokenResponse = await getAccessToken(req.params.token)
+    accessToken = accessTokenResponse.access_token
+
+    const depositSwitchResult = await getDepositSwitchByToken(accessToken)
+
+    res.json(depositSwitchResult)
+  } catch (e) {
+    console.error("error with getDepositSwitchData")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
+app.get("/completeFundingSwitchFlow/:first_micro/:second_micro", async (req, res) => {
+  // retrieve income verification information
+  try {
+    const fundingSwitchResult = await completeFundingSwitchFlowByToken(accessToken, req.params.first_micro, req.params.second_micro)
+
+    res.json(fundingSwitchResult)
+  } catch (e) {
+    console.error("error with completeFundingSwitchFlow")
     console.error(e)
     res.status(500).json({ success: false })
   }

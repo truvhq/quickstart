@@ -45,12 +45,21 @@ class NaiveApiClient:
             product_type: str
             client_name: str
             tracking_info: str
+            account: TypedDict
 
         request_data: BridgeTokenRequest = {
             'product_type': self.PRODUCT_TYPE,
             'client_name': 'Citadel Quickstart',
             'tracking_info': '1337'
         }
+
+        if self.PRODUCT_TYPE == 'fas' or self.PRODUCT_TYPE == 'deposit_switch':
+            request_data['account'] = {
+                'account_number': '16002600',
+                'account_type': 'checking',
+                'routing_number': '123456789',
+                'bank_name': 'TD Bank'
+            }
 
         tokens: Any = requests.post(
             self.API_URL + 'bridge-tokens/',
@@ -83,7 +92,7 @@ class NaiveApiClient:
             json=request_data,
             headers=self.API_HEADERS,
         ).json()
-        return tokens['access_token']
+        return tokens
 
     def get_employment_info_by_token(self, access_token: str) -> Any:
         """
@@ -144,6 +153,26 @@ class NaiveApiClient:
             headers=self.API_HEADERS,
         ).json()
 
+    def get_deposit_switch_by_token(self, access_token: str) -> Any:
+        """
+        https://docs.citadelid.com/#direct-deposit
+        :param access_token:
+        :return:
+        """
+
+        logging.info("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
+        logging.info("CITADEL: Access Token - %s", access_token)
+        class DepositSwitchRequest(TypedDict):
+            access_token: str
+
+        request_data: DepositSwitchRequest = {'access_token': access_token}
+
+        return requests.post(
+            self.API_URL + 'deposit-switches/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+
     def request_payroll_report(self, access_token: str, start_date: str , end_date: str) -> Any:
         """
         https://docs.citadelid.com/#payroll-admin
@@ -183,5 +212,47 @@ class NaiveApiClient:
         logging.info("CITADEL: Report ID - %s", report_id)
         return requests.get(
             self.API_URL + f'administrators/payrolls/{report_id}',
+            headers=self.API_HEADERS,
+        ).json()
+    
+    def get_funding_switch_status_by_token(self, access_token: str) -> Any:
+        """
+        https://docs.citadelid.com/#fas-report
+        :param access_token:
+        :return:
+        """
+        logging.info("CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches")
+        logging.info("CITADEL: Access Token - %s", access_token)
+        class FundingSwitchRequest(TypedDict):
+            access_token: str
+
+        request_data: FundingSwitchRequest = {'access_token': access_token}
+
+        return requests.post(
+            self.API_URL + 'account-switches/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+
+    def complete_funding_switch_flow_by_token(self, access_token: str, first_micro: float, second_micro: float) -> Any:
+        """
+        https://docs.citadelid.com/#funding-account
+        :param access_token:
+        :return:
+        """
+        logging.info("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+        logging.info("CITADEL: Access Token - %s", access_token)
+
+        class SettingsRequest(TypedDict):
+            micro_deposits: List[float]
+        class RefreshRequest(TypedDict):
+            access_token: str
+            settings: SettingsRequest
+
+        request_data: RefreshRequest = {'access_token': access_token, 'settings': { 'micro_deposits': [first_micro, second_micro]} }
+
+        return requests.post(
+            self.API_URL + 'refresh/tasks/',
+            json=request_data,
             headers=self.API_HEADERS,
         ).json()

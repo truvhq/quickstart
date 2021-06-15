@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -102,6 +103,64 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, data)
 }
 
+var accessToken string
+var err error
+
+// startFundingSwitchFlow retrieves funding switch data
+func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
+	splitPath := strings.Split(r.URL.Path, "/")
+	token := splitPath[2]
+	accessToken, err = getAccessToken(token)
+	fmt.Println(accessToken)
+	if err != nil {
+		fmt.Println("Error getting access token", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+	fundingSwitchResponse, err := getFundingSwitchStatusByToken(accessToken)
+	if err != nil {
+		fmt.Println("Error getting funding switch Status", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+	} else {
+		fmt.Fprintf(w, fundingSwitchResponse)
+	}
+}
+
+// completeFundingSwitchFlow finishes the funding switch flow with two micro deposit values
+func completeFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
+	splitPath := strings.Split(r.URL.Path, "/")
+	first_micro, _ := strconv.ParseFloat(splitPath[2], 32)
+	second_micro, _ := strconv.ParseFloat(splitPath[3], 32)
+
+	fundingSwitchResponse, err := completeFundingSwitchFlowByToken(accessToken, float32(first_micro), float32(second_micro))
+	if err != nil {
+		fmt.Println("Error getting funding switch Status", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+	} else {
+		fmt.Fprintf(w, fundingSwitchResponse)
+	}
+}
+
+// depositSwitch accepts requests for a deposit switch status and sends the response
+func depositSwitch(w http.ResponseWriter, r *http.Request) {
+	splitPath := strings.Split(r.URL.Path, "/")
+	token := splitPath[2]
+	accessToken, err := getAccessToken(token)
+	if err != nil {
+		fmt.Println("Error getting access token", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+	depositSwitchResponse, err := getDepositSwitchByToken(accessToken)
+	
+	if err != nil {
+		fmt.Println("Error getting deposit switch", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+	} else {
+		fmt.Fprintf(w, depositSwitchResponse)
+	}
+}
+
 // checkEnv ensures all required environment variables have been set
 func checkEnv() {
 	clientId := os.Getenv("API_CLIENT_ID")
@@ -119,8 +178,8 @@ func checkEnv() {
 		fmt.Println("No API_PRODUCT_TYPE provided")
 		os.Exit(1)
 	}
-	if productType != "employment" && productType != "income" && productType != "admin" {
-		fmt.Println("API_PRODUCT_TYPE must be one of employment, income or admin")
+	if productType != "employment" && productType != "income" && productType != "admin" && productType != "fas" && productType != "deposit_switch" {
+		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or fas")
 		os.Exit(1)
 	}
 }
@@ -158,6 +217,9 @@ func handleRequests() {
 	http.HandleFunc("/getBridgeToken", bridgeToken)
 	http.HandleFunc("/getVerifications/", verifications)
 	http.HandleFunc("/getAdminData/", adminData)
+	http.HandleFunc("/startFundingSwitchFlow/", startFundingSwitchFlow)
+	http.HandleFunc("/completeFundingSwitchFlow/", completeFundingSwitchFlow)
+	http.HandleFunc("/getDepositSwitchData/", depositSwitch)
 	http.HandleFunc("/webhook", webhook)
 
 	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")

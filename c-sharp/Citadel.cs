@@ -37,8 +37,10 @@ namespace c_sharp
 
     public async Task<string> GetBridgeToken()
     {
+      var account = productType == "fas" || productType == "deposit_switch" ? "\"account\": { \"account_number\": \"16002600\", \"account_type\": \"checking\", \"routing_number\": \"123456789\", \"bank_name\": \"TD Bank\" }," : "";
       Console.WriteLine("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens");
       var body = "{ \"product_type\": \"" + productType + "\"," +
+                 account +
                  " \"tracking_info\": \"1337\"," +
                  " \"client_name\": \"Citadel Quickstart\"" +
                  "}";
@@ -49,9 +51,7 @@ namespace c_sharp
     {
       Console.WriteLine("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens");
       Console.WriteLine("CITADEL: Public Token - {0}", publicToken);
-      var response = await SendRequest("link-access-tokens/", "{\"public_token\": \"" + publicToken + "\" }");
-      var parsedResponse = JsonDocument.Parse(response);
-      return parsedResponse.RootElement.GetProperty("access_token").GetString();
+      return await SendRequest("link-access-tokens/", "{\"public_token\": \"" + publicToken + "\" }");
     }
 
     public async Task<string> GetEmploymentInfoByToken(string accessToken)
@@ -93,6 +93,27 @@ namespace c_sharp
       Console.WriteLine("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}");
       Console.WriteLine("CITADEL: Report ID - {0}", reportId);
       return await SendRequest($"administrators/payrolls/{reportId}", "", "GET");
+    }
+
+    public async Task<string> GetFundingSwitchStatusByToken(string accessToken)
+    {
+      Console.WriteLine("CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
+      return await SendRequest($"account-switches", "{\"access_token\": \"" + accessToken + "\" }", "POST");
+    }
+
+    public async Task<string> CompleteFundingSwitchFlowByToken(string accessToken, float first_micro, float second_micro)
+    {
+      Console.WriteLine("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
+      return await SendRequest("refresh/tasks/", "{\"access_token\": \"" + accessToken + "\", \"settings\": { \"micro_deposits\": [" + first_micro.ToString() + ", " + second_micro.ToString() + "] } }");
+    }
+
+    public async Task<string> GetDepositSwitchByToken(string accessToken)
+    {
+      Console.WriteLine("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
+      return await SendRequest("deposit-switches/", "{\"access_token\": \"" + accessToken + "\" }");
     }
   }
 
