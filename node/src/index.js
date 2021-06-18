@@ -2,6 +2,8 @@ import express from "express"
 import cors from "cors"
 import bodyParser from "body-parser"
 import htmlFile from "./serve.js"
+import crypto from "crypto"
+
 import {
   getDepositSwitchByToken,
   completeFundingSwitchFlowByToken,
@@ -21,10 +23,20 @@ const {
   API_PRODUCT_TYPE,
 } = process.env
 
+const generate_webhook_sign = (body, key) => {
+  return "v1=" + crypto.createHmac("sha256", key)
+  .update(body)
+  .digest("hex")
+}
+
 const app = express()
 
 // ensure all request bodies are parsed to JSON
-app.use(bodyParser.json())
+app.use(bodyParser.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf
+  }
+}))
 
 // ensure CORS requests
 app.use(cors())
@@ -129,6 +141,19 @@ app.get("/completeFundingSwitchFlow/:first_micro/:second_micro", async (req, res
     console.error(e)
     res.status(500).json({ success: false })
   }
+})
+
+app.post("/webhook", async (req, res) => {
+
+  console.log("CITADEL: Webhook Received")
+  const body = req.rawBody.toString()
+  
+  const webhook_sign = generate_webhook_sign(body, API_SECRET)
+  console.log(`CITADEL: Event type:      ${req.body.event_type}`)
+  console.log(`CITADEL: Status:          ${req.body.status}`)
+  console.log(`CITADEL: Signature match: ${webhook_sign === req.headers['x-webhook-sign']}\n`)
+  
+  res.status(200).end()
 })
 
 app.listen(5000, () => {

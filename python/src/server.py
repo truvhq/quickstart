@@ -2,9 +2,11 @@ import json
 import os
 import time
 import logging
+import hashlib
+import hmac
 
 import flask
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_cors import CORS
 
 from .naive_api_client import NaiveApiClient
@@ -62,6 +64,23 @@ def index():
 def create_bridge_token():
     """Back end API endpoint to request a bridge token"""
     return api_client.get_bridge_token()
+
+def generate_webhook_sign(payload: str, key: str) -> str:
+    generated_hash = hmac.new(
+        key=key.encode('utf-8'),
+        msg=payload.encode('utf-8'),
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+    return f'v1={generated_hash}'
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    signature = generate_webhook_sign(request.data.decode('UTF-8'), secret)
+    logging.info("CITADEL: Webhook received")
+    logging.info("CITADEL: Event type:      %s", request.json["event_type"])
+    logging.info("CITADEL: Status:          %s", request.json["status"])
+    logging.info("CITADEL: Signature match: %s\n", request.headers["X-WEBHOOK-SIGN"] == signature)
+    return ""
 
 
 @app.route('/getVerifications/<public_token>', methods=['GET'])

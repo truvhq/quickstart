@@ -6,4 +6,5 @@ Rails.application.routes.draw do
   get 'startFundingSwitchFlow/:public_token', to: 'funding_switch#startFundingSwitchFlow'
   get 'completeFundingSwitchFlow/:first_micro/:second_micro', to: 'funding_switch#completeFundingSwitchFlow', constraints: { first_micro: /[^\/]+/, second_micro: /[^\/]+/ }
   get 'getDepositSwitchData/:public_token', to: 'deposit_switch#get'
+  post 'webhook', to: 'webhook#post'
 end
