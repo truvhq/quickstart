@@ -1,9 +1,12 @@
 class Admin
+  class_attribute :product_type
+
   def self.get(public_token)
     access_token = Citadel.getAccessToken(public_token)
-    directory = Citadel.getEmployeeDirectoryByToken(access_token)
+    if Admin.product_type == "admin-directory"
+      return Citadel.getEmployeeDirectoryByToken(access_token)
+    end
     report_id = Citadel.requestPayrollReport(access_token, '2020-01-01', '2020-02-01')['payroll_report_id']
-    payroll = Citadel.getPayrollById(report_id)
-    return { "directory" => directory, "payroll" => payroll } 
+    return Citadel.getPayrollById(report_id)
   end
 end

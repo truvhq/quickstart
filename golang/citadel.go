@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
 
 // PublicTokenRequest is used to define the body for requesting an
@@ -52,7 +53,7 @@ type BridgeTokenRequest struct {
 	ProductType  string `json:"product_type"`
 	ClientName   string `json:"client_name"`
 	TrackingInfo string `json:"tracking_info"`
-	Account      AccountRequest `json:"account"`
+	Account      *AccountRequest `json:"account,omitempty"`
 }
 
 // getRequest creates an http request with the required HTTP headers
@@ -71,9 +72,13 @@ func getRequest(endpoint string, method string, body []byte) (*http.Request, err
 func getBridgeToken() (string, error) {
 	fmt.Println("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
 	productType := os.Getenv("API_PRODUCT_TYPE")
+	if strings.HasPrefix(productType, "admin") {
+		productType = "admin"
+	}
 	bridgeTokenRequest := BridgeTokenRequest{ProductType: productType, ClientName: "Citadel Quickstart", TrackingInfo: "1337"}
 	if productType == "fas" || productType == "deposit_switch" {
-		bridgeTokenRequest.Account = AccountRequest{AccountNumber: "16002600", AccountType: "checking", RoutingNumber: "123456789", BankName: "TD Bank"}
+		var account = AccountRequest{AccountNumber: "16002600", AccountType: "checking", RoutingNumber: "123456789", BankName: "TD Bank"}
+		bridgeTokenRequest.Account = &account
 	}
 	bridgeJson, _ := json.Marshal(bridgeTokenRequest)
 	request, err := getRequest("bridge-tokens/", "POST", bridgeJson)

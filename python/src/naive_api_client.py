@@ -53,6 +53,9 @@ class NaiveApiClient:
             'tracking_info': '1337'
         }
 
+        if self.PRODUCT_TYPE.startswith('admin'):
+            request_data['product_type'] = 'admin'
+
         if self.PRODUCT_TYPE == 'fas' or self.PRODUCT_TYPE == 'deposit_switch':
             request_data['account'] = {
                 'account_number': '16002600',

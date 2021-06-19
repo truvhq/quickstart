@@ -21,6 +21,9 @@ namespace c_sharp
       client = new HttpClient();
       client.DefaultRequestHeaders.Add("X-Access-Client-Id", clientId);
       client.DefaultRequestHeaders.Add("X-Access-Secret", clientSecret);
+      if (productType.StartsWith("admin")) {
+        productType = "admin";
+      }
     }
 
     public async Task<string> SendRequest(string endpoint, string content = "", string method = "POST")

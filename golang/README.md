@@ -19,7 +19,7 @@ Once you have your API keys, it's time to run the Citadel Go Quickstart app loca
     ```bash
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-    API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or fas>
+    API_PRODUCT_TYPE=<employment, income, admin-directory, admin-report, deposit_switch or fas>
     ```
 
 5. `make go_local`

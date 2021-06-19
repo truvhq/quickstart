@@ -70,6 +70,7 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 
 // adminData accepts requests for admin data and sends the response
 func adminData(w http.ResponseWriter, r *http.Request) {
+	productType := os.Getenv("API_PRODUCT_TYPE")
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err := getAccessToken(token)
@@ -78,12 +79,20 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
-	directory, err := getEmployeeDirectoryByToken(accessToken)
-	if err != nil {
-		fmt.Println("Error getting Employee Directory", err)
-		fmt.Fprintf(w, `{ "success": false }`)
+
+	// admin-directory means return directory data
+	if productType == "admin-directory" {
+		directory, err := getEmployeeDirectoryByToken(accessToken)
+		if err != nil {
+			fmt.Println("Error getting Employee Directory", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+		fmt.Fprintf(w, directory)
 		return
 	}
+	
+
 	report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
 	if err != nil {
 		fmt.Println("Error requesting payroll report", err)
@@ -98,9 +107,8 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := fmt.Sprintf(`{ "directory": %s, "payroll": %s }`, directory, payroll)
-
-	fmt.Fprintf(w, data)
+	fmt.Fprintf(w, payroll)
+	return
 }
 
 var accessToken string
@@ -178,8 +186,8 @@ func checkEnv() {
 		fmt.Println("No API_PRODUCT_TYPE provided")
 		os.Exit(1)
 	}
-	if productType != "employment" && productType != "income" && productType != "admin" && productType != "fas" && productType != "deposit_switch" {
-		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or fas")
+	if productType != "employment" && productType != "income" && productType != "admin-directory" && productType != "admin-report" && productType != "fas" && productType != "deposit_switch" {
+		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin-directory, admin-report, deposit_switch or fas")
 		os.Exit(1)
 	}
 }

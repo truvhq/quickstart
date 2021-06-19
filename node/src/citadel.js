@@ -22,8 +22,9 @@ const getHeaders = () => {
  */
 const getBridgeToken = async () => {
   console.log("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
+  const productType = API_PRODUCT_TYPE.startsWith("admin") ? "admin" : API_PRODUCT_TYPE
   const bodyObj = {
-    product_type: API_PRODUCT_TYPE,
+    product_type: productType,
     client_name: "Citadel Quickstart",
     tracking_info: "1337"
   }

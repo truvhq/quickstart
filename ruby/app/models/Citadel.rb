@@ -9,7 +9,11 @@ class Citadel
   def self.getBridgeToken()
     # https://docs.citadelid.com/ruby#bridge-tokens_create
     puts "CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens"
-    bodyObj = { "product_type" => Citadel.product_type, "client_name" => "Citadel Quickstart", "tracking_info" => "1337" }
+    productType = Citadel.product_type
+    if productType.start_with?("admin")
+      productType = "admin"
+    end
+    bodyObj = { "product_type" => productType, "client_name" => "Citadel Quickstart", "tracking_info" => "1337" }
     if product_type == "fas" or product_type == "deposit_switch"
       bodyObj["account"] = { "account_number" => "10062800", "account_type" => "checking", "routing_number" => "123456789", "bank_name" => "TD Bank" }
     end

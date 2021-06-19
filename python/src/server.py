@@ -51,8 +51,10 @@ def index():
     """Just render example with bridge.js"""
     if product_type == 'income':
         return render_template('income.html')
-    elif product_type == 'admin':
-        return render_template('admin.html')
+    elif product_type == 'admin-directory':
+        return render_template('admin-directory.html')
+    elif product_type == 'admin-report':
+        return render_template('admin-report.html')
     elif product_type == 'fas':
         return render_template('fas.html')
     elif product_type == 'deposit_switch':
@@ -147,10 +149,11 @@ def get_admin_data_by_token(public_token: str):
     tokenResult = api_client.get_access_token(public_token)
     access_token = tokenResult["access_token"]
 
-    # Second, request employee directory
-    directory = api_client.get_employee_directory_by_token(access_token)
+    # admin-directory means request employee directory
+    if product_type == 'admin-directory':
+        return api_client.get_employee_directory_by_token(access_token)
 
-    # Third, create request for payroll report
+    # admin-report means request payroll report
     report_id = api_client.request_payroll_report(access_token, '2020-01-01', '2020-02-01')['payroll_report_id']
 
     # Last, collect prepared payroll report
@@ -159,11 +162,8 @@ def get_admin_data_by_token(public_token: str):
         logging.info("CITADEL: Report not complete. Waiting and trying again")
         time.sleep(5)
         payroll = api_client.get_payroll_report_by_id(report_id)
-
-    return {
-        'directory': directory,
-        'payroll': payroll
-    }
+    
+    return payroll
 
 print("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.", )
 

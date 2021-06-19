@@ -166,10 +166,7 @@
             }
           ).then((r) => r.json())
           console.table(response)
-          console.log("response.directory.directory")
-          console.table(response.directory.directory)
-          console.log("response.payroll.payroll_report")
-          console.table(response.payroll.payroll_report)
+          console.table(response.payroll_report)
           return response
         }
 
@@ -245,9 +242,9 @@
     <div id="content" class="container">
       <div class="titleContainer">
         <div>
-          <h2>Request payroll admin data</h2>
+          <h2>Request payroll report data</h2>
           <span>
-            Citadel enables companies to share their payroll data including a directory of employees and payroll history.
+            Citadel enables companies to share their payroll data generating a payroll report.
             Payroll admin can help companies to better run FP&A analyses, calculate taxes or onboard employees via a directory.
             Click "Connect" below to start the payroll admin process. <strong>Monitor console logs to learn what's happening behind the scenes</strong>.
           </span>
@@ -279,7 +276,7 @@
             </ol>
             <h3>Accessing admin data from Citadel</h3>
             <ol>
-              <li>The quickstart back end uses the stored <code>access_token</code> to request employee directory data and a payroll report from Citadel.</li>
+              <li>The quickstart back end uses the stored <code>access_token</code> to request a payroll report from Citadel.</li>
               <li>Citadel provides that admin information to the quickstart back end who sends it to the quickstart front end.</li>
             </ol>
             <div id="dataView">
