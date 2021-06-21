@@ -136,6 +136,13 @@
         border-bottom: 0px solid #e2e2e2;
         margin-bottom: 0px;
       }
+
+      .codeContainer {
+        border-width: 0 1px 1px;
+        border-color: #dee2e6;
+        border-style: solid;
+        padding: 15px;
+      }
     </style>
   </head>
   <body>
@@ -229,10 +236,28 @@
       })()
 
       function renderPayrollData(data) {
-        const historyContainer = document.querySelector("#history")
-        historyContainer.innerHTML = JSON.stringify(data, null, 2)
+        const directoryContainer = document.querySelector("#historyDirectory")
+        directoryContainer.innerHTML = JSON.stringify(data.directory, null, 2)
+        const reportContainer = document.querySelector("#historyReport")
+        reportContainer.innerHTML = JSON.stringify(data.payroll, null, 2)
         document.getElementById("connectButton").hidden = true
         document.getElementById("adminComplete").classList.remove("hidden")
+      }
+
+      function changeTab(active) {
+        switch(active) {
+          case "directory":
+            document.getElementById("reportContainer").classList.add("hidden")
+            document.getElementById("reportTab").classList.remove("active")
+            document.getElementById("directoryContainer").classList.remove("hidden")
+            document.getElementById("directoryTab").classList.add("active")
+            break;
+          default:
+            document.getElementById("directoryContainer").classList.add("hidden")
+            document.getElementById("directoryTab").classList.remove("active")
+            document.getElementById("reportContainer").classList.remove("hidden")
+            document.getElementById("reportTab").classList.add("active")
+        }
       }
     </script>
 
@@ -284,8 +309,21 @@
             </ol>
             <div id="dataView">
               <h3>What data was returned?</h3>
-              <div>
-                <pre><code id="history"></code></pre>
+              <ul class="nav nav-tabs">
+                <li class="nav-item" onclick="changeTab('directory')">
+                  <span id="directoryTab" class="nav-link active">Employee Directory</span>
+                </li>
+                <li class="nav-item">
+                  <span id="reportTab" class="nav-link" onclick="changeTab('report')">Payroll Report</span>
+                </li>
+              </ul>
+              <div class="codeContainer">
+                <div id="directoryContainer">
+                  <pre><code id="historyDirectory"></code></pre>
+                </div>
+                <div id="reportContainer">
+                  <pre><code id="historyReport"></code></pre>
+                </div>
               </div>
             </div>
           </div>
