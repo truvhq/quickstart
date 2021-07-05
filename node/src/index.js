@@ -100,7 +100,7 @@ app.get("/createRefreshTask", async (req, res) => {
         break;
     }
   } catch (e) {
-    console.error("error with getAdminData")
+    console.error("error with createRefreshTask")
     console.error(e)
     res.status(500).json({ success: false })
   }
