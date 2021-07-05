@@ -11,6 +11,7 @@ namespace c_sharp
   public class Citadel
   {
 
+    private static string accessToken = null;
     private string clientId = Environment.GetEnvironmentVariable("API_CLIENT_ID");
     private string clientSecret = Environment.GetEnvironmentVariable("API_SECRET");
     private string productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
@@ -51,11 +52,16 @@ namespace c_sharp
     {
       Console.WriteLine("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens");
       Console.WriteLine("CITADEL: Public Token - {0}", publicToken);
-      return await SendRequest("link-access-tokens/", "{\"public_token\": \"" + publicToken + "\" }");
+      var response = await SendRequest("link-access-tokens/", "{\"public_token\": \"" + publicToken + "\" }");
+      var parsedResponse = JsonDocument.Parse(response);
+      Citadel.accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
+      return response;
     }
 
     public async Task<string> GetEmploymentInfoByToken(string accessToken)
     {
+      if(accessToken == null)
+        accessToken = Citadel.accessToken;
       Console.WriteLine("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments");
       Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       return await SendRequest("verifications/employments/", "{\"access_token\": \"" + accessToken + "\" }");
@@ -66,6 +72,20 @@ namespace c_sharp
       Console.WriteLine("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes");
       Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       return await SendRequest("verifications/incomes/", "{\"access_token\": \"" + accessToken + "\" }");
+    }
+
+    public async Task<string> CreateRefreshTask()
+    {
+      Console.WriteLine("CITADEL: Requesting a data refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks");
+      Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
+      return await SendRequest("refresh/tasks/", "{\"access_token\": \"" + accessToken + "\" }");
+    }
+
+    public async Task<string> GetRefreshTask(string taskId)
+    {
+      Console.WriteLine("CITADEL: Requesting a refresh task using a task_id from https://prod.citadelid.com/v1/refresh/tasks/{task_id}");
+      Console.WriteLine("CITADEL: Task ID - {0}", taskId);
+      return await SendRequest($"refresh/tasks/{taskId}", "", "GET");
     }
 
     public async Task<string> GetEmployeeDirectoryByToken(string accessToken)
