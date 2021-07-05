@@ -132,6 +132,39 @@ class NaiveApiClient:
             json=request_data,
             headers=self.API_HEADERS,
         ).json()
+    
+    def create_refresh_task(self, access_token: str) -> Any:
+        """
+        https://docs.citadelid.com/#data-refresh
+        :param access_token:
+        :return:
+        """
+        logging.info("CITADEL: Requesting a data refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+        logging.info("CITADEL: Access Token - %s", access_token)
+        class CreateRefreshTaskRequest(TypedDict):
+            access_token: str
+
+        request_data: CreateRefreshTaskRequest = {'access_token': access_token}
+
+        return requests.post(
+            self.API_URL + 'refresh/tasks/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+    
+    def get_refresh_task(self, task_id: str) -> Any:
+        """
+        https://docs.citadelid.com/#data-refresh
+        :param task_id:
+        :return:
+        """
+        logging.info("CITADEL: Requesting a refresh task using a task_id from https://prod.citadelid.com/v1/refresh/tasks/{task_id}")
+        logging.info("CITADEL: Task ID - %s", task_id)
+
+        return requests.get(
+            self.API_URL + f'refresh/tasks/{task_id}',
+            headers=self.API_HEADERS,
+        ).json()
 
     def get_employee_directory_by_token(self, access_token: str) -> Any:
         """

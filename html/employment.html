@@ -163,7 +163,8 @@
             headers,
           }).then((r) => r.json())
           console.table(response)
-          return response
+          console.table(response.employments)
+          return response.employments
         }
 
         /**
