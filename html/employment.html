@@ -136,6 +136,14 @@
         border-bottom: 0px solid #e2e2e2;
         margin-bottom: 0px;
       }
+
+      #refreshMessage {
+        margin-bottom: 20px;
+      }
+
+      #refreshTime {
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
@@ -254,6 +262,8 @@
             let refreshedInfo
             try {
               refreshedInfo = await apiRequests.createRefreshTask()
+              document.getElementById("refreshMessage").classList.remove("hidden")
+              document.getElementById("refreshTime").innerHTML = new Date()
             } catch (e) {
               console.error(e)
               content.classList.add("hidden")
@@ -328,6 +338,7 @@
               </div>
               <p>Did you know that you can use the same <code>access_token</code> from this payroll provider connection to refresh the users data at a later point in time? Click the button below and follow along
               in the console logs to see what happens.</p>
+              <div id="refreshMessage" class="hidden">The above data was last refreshed <span id="refreshTime"></span></div>
               <button type="button" id="refreshButton" onclick="refresh()">
                 Refresh
               </button>
