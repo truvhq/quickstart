@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // check will cause a panic if there an error given
@@ -20,6 +21,9 @@ func check(e error) {
 		panic(e)
 	}
 }
+
+var accessToken string
+var err error
 
 // homePage writes the html page for the product type
 // given in the API_PRODUCT_TYPE environment variable
@@ -48,7 +52,7 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
-	accessToken, err := getAccessToken(token)
+	accessToken, err = getAccessToken(token)
 	if err != nil {
 		fmt.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
@@ -66,6 +70,57 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprintf(w, verificationResponse)
 	}
+}
+
+type RefreshStatusResponse struct {
+	Status    string `json:"status"`
+}
+// verifications accepts requests for a verification and sends the response
+func refresh(w http.ResponseWriter, r *http.Request) {
+	productType := os.Getenv("API_PRODUCT_TYPE")
+	
+	taskId, err := createRefreshTask(accessToken)
+
+	if err != nil {
+		fmt.Println("Error creating refresh task", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+
+	finishedStatuses := []string{"done", "login_error", "mfa_error", "config_error", "account_locked", "no_data", "unavailable", "error"}
+	refreshStatus, err := getRefreshTask(taskId)
+	var refreshStatusResponse RefreshStatusResponse
+	json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
+	_, found := find(finishedStatuses, refreshStatusResponse.Status)
+	for found {
+		fmt.Println("CITADEL: Refresh task is not finished. Waiting 2 seconds, then checking again.")
+		time.Sleep(2 * time.Second)
+		refreshStatus, err = getRefreshTask(taskId)
+		json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
+		_, found = find(finishedStatuses, refreshStatusResponse.Status)
+	}
+
+	fmt.Println("CITADEL: Refresh task is finished. Pulling the latest data.")
+
+	refreshResponse := ""
+	if productType == "employment" {
+		refreshResponse, err = getEmploymentInfoByToken(accessToken)
+	}
+	if err != nil {
+		fmt.Println("Error getting refresh data", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+	} else {
+		fmt.Fprintf(w, refreshResponse)
+	}
+}
+
+func find(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+			if item == val {
+					return i, true
+			}
+	}
+	return -1, false
 }
 
 // adminData accepts requests for admin data and sends the response
@@ -102,9 +157,6 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, data)
 }
-
-var accessToken string
-var err error
 
 // startFundingSwitchFlow retrieves funding switch data
 func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
@@ -220,6 +272,7 @@ func handleRequests() {
 	http.HandleFunc("/startFundingSwitchFlow/", startFundingSwitchFlow)
 	http.HandleFunc("/completeFundingSwitchFlow/", completeFundingSwitchFlow)
 	http.HandleFunc("/getDepositSwitchData/", depositSwitch)
+	http.HandleFunc("/createRefreshTask/", refresh)
 	http.HandleFunc("/webhook", webhook)
 
 	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")

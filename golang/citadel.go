@@ -39,6 +39,12 @@ type AccessTokenResponse struct {
 	LinkId string `json:"link_id"`
 }
 
+// CreateRefreshTaskResponse is used to define the body for the
+// response of requesting a task refresh
+type CreateRefreshTaskResponse struct {
+	TaskId string `json:"task_id"`
+}
+
 type AccountRequest struct {
 	AccountNumber  string `json:"account_number"`
 	AccountType  string `json:"account_type"`
@@ -52,7 +58,7 @@ type BridgeTokenRequest struct {
 	ProductType  string `json:"product_type"`
 	ClientName   string `json:"client_name"`
 	TrackingInfo string `json:"tracking_info"`
-	Account      AccountRequest `json:"account"`
+	Account      *AccountRequest `json:"account,omitempty"`
 }
 
 // getRequest creates an http request with the required HTTP headers
@@ -73,7 +79,8 @@ func getBridgeToken() (string, error) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	bridgeTokenRequest := BridgeTokenRequest{ProductType: productType, ClientName: "Citadel Quickstart", TrackingInfo: "1337"}
 	if productType == "fas" || productType == "deposit_switch" {
-		bridgeTokenRequest.Account = AccountRequest{AccountNumber: "16002600", AccountType: "checking", RoutingNumber: "123456789", BankName: "TD Bank"}
+		account := AccountRequest{AccountNumber: "16002600", AccountType: "checking", RoutingNumber: "123456789", BankName: "TD Bank"}
+		bridgeTokenRequest.Account = &account
 	}
 	bridgeJson, _ := json.Marshal(bridgeTokenRequest)
 	request, err := getRequest("bridge-tokens/", "POST", bridgeJson)
@@ -160,6 +167,54 @@ func getIncomeInfoByToken(access_token string) (string, error) {
 	return string(data), nil
 }
 
+// createRefreshTask uses the given access token to request
+// a task refresh
+func createRefreshTask(access_token string) (string, error) {
+	fmt.Println("CITADEL: Requesting a data refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	accessToken := AccessTokenRequest{AccessToken: access_token}
+	jsonAccessToken, _ := json.Marshal(accessToken)
+	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
+	if err != nil {
+		return "", err
+	}
+	client := &http.Client{}
+	res, err := client.Do(request)
+	defer res.Body.Close()
+
+	if err != nil {
+		return "", err
+	}
+	
+	refreshTask := CreateRefreshTaskResponse{}
+	err = json.NewDecoder(res.Body).Decode(&refreshTask)
+
+	if err != nil {
+		return "", err
+	}
+
+	return refreshTask.TaskId, nil
+}
+
+// getRefreshTask requests a task refresh update
+func getRefreshTask(taskId string) (string, error) {
+	fmt.Println("CITADEL: Requesting a refresh task using a task_id from https://prod.citadelid.com/v1/refresh/tasks/{task_id}")
+	fmt.Printf("CITADEL: Task ID - %v\n", taskId)
+	request, err := getRequest(fmt.Sprintf("refresh/tasks/%s", taskId), "GET", nil)
+	if err != nil {
+		return "", err
+	}
+	client := &http.Client{}
+	res, err := client.Do(request)
+	defer res.Body.Close()
+
+	if err != nil {
+		return "", err
+	}
+	data, _ := ioutil.ReadAll(res.Body)
+	return string(data), nil
+}
+
 // getEmployeeDirectoryByToken uses the given access token to request
 // the associated employee directory info
 func getEmployeeDirectoryByToken(access_token string) (string, error) {
@@ -221,7 +276,7 @@ func requestPayrollReport(access_token, start_date, end_date string) (*PayrollRe
 	}
 	return &payrollReport, nil
 }
-
+	
 // getPayrollById requests the payroll report associated to the given id
 func getPayrollById(reportId string) (string, error) {
 	fmt.Println("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}")
