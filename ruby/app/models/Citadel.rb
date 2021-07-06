@@ -5,6 +5,7 @@ class Citadel
   class_attribute :client_id
   class_attribute :client_secret
   class_attribute :product_type
+  class_attribute :access_token
 
   def self.getBridgeToken()
     # https://docs.citadelid.com/ruby#bridge-tokens_create
@@ -22,11 +23,15 @@ class Citadel
     puts "CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens"
     puts "CITADEL: Public Token - #{public_token}"
     body = { "public_token" => public_token }.to_json
-    return sendRequest('link-access-tokens/', body, "POST")["access_token"]
+    Citadel.access_token = sendRequest('link-access-tokens/', body, "POST")["access_token"]
+    return Citadel.access_token
   end
 
   def self.getEmploymentInfoByToken(access_token)
     # https://docs.citadelid.com/?ruby#employment-verification
+    if access_token == nil 
+      access_token = Citadel.access_token
+    end
     puts "CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments"
     puts "CITADEL: Access Token - #{access_token}"
     body = { "access_token" => access_token }.to_json
@@ -39,6 +44,21 @@ class Citadel
     puts "CITADEL: Access Token - #{access_token}"
     body = { "access_token" => access_token }.to_json
     sendRequest('verifications/incomes/', body, "POST")
+  end
+
+  def self.createRefreshTask()
+    # https://docs.citadelid.com/?ruby#data-refresh
+    puts "CITADEL: Requesting a data refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks"
+    puts "CITADEL: Access Token - #{Citadel.access_token}"
+    body = { "access_token" => Citadel.access_token }.to_json
+    sendRequest('refresh/tasks/', body, "POST")["task_id"]
+  end
+
+  def self.getRefreshTask(task_id)
+    # https://docs.citadelid.com/?ruby#data-refresh
+    puts "CITADEL: Requesting a refresh task using a task_id from https://prod.citadelid.com/v1/refresh/tasks/{task_id}"
+    puts "CITADEL: Task ID - #{task_id}"
+    sendRequest("refresh/tasks/#{task_id}", nil, "GET")
   end
 
   def self.getEmployeeDirectoryByToken(access_token)
