@@ -66,6 +66,9 @@ class Citadel
 
   def self.getEmployeeDirectoryByToken(access_token)
     # * https://docs.citadelid.com/?ruby#employee-directory
+    if access_token == nil 
+      access_token = Citadel.access_token
+    end
     puts "CITADEL: Requesting employee directory data using an access_token from https://prod.citadelid.com/v1/administrators/directories"
     puts "CITADEL: Access Token - #{access_token}"
     body = { "access_token" => access_token }.to_json
@@ -74,6 +77,9 @@ class Citadel
 
   def self.requestPayrollReport(access_token, start_date, end_date)
     # https://docs.citadelid.com/?ruby#create-payroll-report
+    if access_token == nil 
+      access_token = Citadel.access_token
+    end
     puts "CITADEL: Requesting a payroll report be created using an access_token from https://prod.citadelid.com/v1/administrators/payrolls"
     puts "CITADEL: Access Token - #{access_token}"
     body = { "access_token" => access_token, "start_date" => start_date, "end_date" => end_date }.to_json

@@ -107,6 +107,28 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		refreshResponse, err = getEmploymentInfoByToken(accessToken)
 	} else if productType == "income" {
 		refreshResponse, err = getIncomeInfoByToken(accessToken)
+	} else if productType == "admin" {
+		directory, err := getEmployeeDirectoryByToken(accessToken)
+		if err != nil {
+			fmt.Println("Error getting Employee Directory", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+		report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
+		if err != nil {
+			fmt.Println("Error requesting payroll report", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+		reportId := report.PayrollReportId
+		payroll, err := getPayrollById(reportId)
+		if err != nil {
+			fmt.Println("Error getting payroll by id", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+
+		refreshResponse = fmt.Sprintf(`{ "directory": %s, "payroll": %s }`, directory, payroll)
 	}
 	if err != nil {
 		fmt.Println("Error getting refresh data", err)
@@ -129,7 +151,7 @@ func find(slice []string, val string) (int, bool) {
 func adminData(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
-	accessToken, err := getAccessToken(token)
+	accessToken, err = getAccessToken(token)
 	if err != nil {
 		fmt.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)

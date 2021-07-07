@@ -129,6 +129,8 @@ def create_refresh_task_by_token():
         data = api_client.get_employment_info_by_token(access_token)
     elif product_type == 'income':
         data = api_client.get_income_info_by_token(access_token)
+    elif product_type == 'admin':
+        data = get_admin_data()
 
     return data
 
@@ -174,21 +176,29 @@ def get_admin_data_by_token(public_token: str):
     """ Back end API endpoint to retrieve payroll admin data
         using a front end public_token """
 
+    global access_token
+
     # First, exchange public_token to access_token
     tokenResult = api_client.get_access_token(public_token)
     access_token = tokenResult["access_token"]
 
-    # Second, request employee directory
+    # Second, request admin data
+    return get_admin_data()
+
+def get_admin_data():
+
+    global access_token
+    # request employee directory
     directory = api_client.get_employee_directory_by_token(access_token)
 
-    # Third, create request for payroll report
+    # create request for payroll report
     report_id = api_client.request_payroll_report(access_token, '2020-01-01', '2020-02-01')['payroll_report_id']
 
-    # Last, collect prepared payroll report
+    # collect prepared payroll report
     payroll = api_client.get_payroll_report_by_id(report_id)
     if payroll['status'] != 'done':
         logging.info("CITADEL: Report not complete. Waiting and trying again")
-        time.sleep(5)
+        time.sleep(2)
         payroll = api_client.get_payroll_report_by_id(report_id)
 
     return {

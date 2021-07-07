@@ -42,6 +42,12 @@ namespace c_sharp.Controllers
           return await _citadel.GetEmploymentInfoByToken(null);
         case "income":
           return await _citadel.GetIncomeInfoByToken(null);
+        case "admin":
+          var directory = await _citadel.GetEmployeeDirectoryByToken(null);
+          var reportId = await _citadel.RequestPayrollReport(null, "2020-01-01", "2020-02-01");
+          var payroll = await _citadel.GetPayrollById(reportId);
+          var finalResponse = "{ \"directory\": " + directory + ", \"payroll\": " + payroll + "}";
+          return finalResponse;
         default:
           return "{ \"success\": false }";
       }

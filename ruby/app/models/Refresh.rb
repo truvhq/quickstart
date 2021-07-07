@@ -20,6 +20,11 @@ class Refresh
       return Citadel.getEmploymentInfoByToken(nil)
     elsif Refresh.product_type == "income"
       return Citadel.getIncomeInfoByToken(nil)
+    elsif Refresh.product_type == "admin"
+      directory = Citadel.getEmployeeDirectoryByToken(nil)
+      report_id = Citadel.requestPayrollReport(nil, '2020-01-01', '2020-02-01')['payroll_report_id']
+      payroll = Citadel.getPayrollById(report_id)
+      return { "directory" => directory, "payroll" => payroll } 
     end
   end
 end

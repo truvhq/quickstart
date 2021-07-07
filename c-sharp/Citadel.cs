@@ -92,6 +92,8 @@ namespace c_sharp
 
     public async Task<string> GetEmployeeDirectoryByToken(string accessToken)
     {
+      if(accessToken == null)
+        accessToken = Citadel.accessToken;
       Console.WriteLine("CITADEL: Requesting employee directory data using an access_token from https://prod.citadelid.com/v1/administrators/directories");
       Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       return await SendRequest("administrators/directories/", "{\"access_token\": \"" + accessToken + "\" }");
@@ -99,6 +101,8 @@ namespace c_sharp
 
     public async Task<string> RequestPayrollReport(string accessToken, string startDate, string endDate)
     {
+      if(accessToken == null)
+        accessToken = Citadel.accessToken;
       Console.WriteLine("CITADEL: Requesting a payroll report be created using an access_token from https://prod.citadelid.com/v1/administrators/payrolls");
       Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       var body = "{ \"access_token\": \"" + accessToken + "\"," +

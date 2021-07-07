@@ -143,6 +143,14 @@
         border-style: solid;
         padding: 15px;
       }
+
+      #refreshMessage {
+        margin-bottom: 20px;
+      }
+
+      #refreshTime {
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
@@ -180,14 +188,30 @@
           return response
         }
 
+        const createRefreshTask = async () => {
+          console.log("Requesting a data refresh from the quickstart back end.")
+          const response = await fetch(apiEnpoint + `createRefreshTask`, {
+            method: "get",
+            headers,
+          }).then((r) => r.json())
+          console.table(response)
+          console.log("response.directory.directory")
+          console.table(response.directory.directory)
+          console.log("response.payroll.payroll_report")
+          console.table(response.payroll.payroll_report)
+          return response
+        }
+
         return {
           getAdminInfoByToken,
           getBridgeToken,
+          createRefreshTask
         }
       }
 
+      const apiRequests = getApiRequests("{{ server_url }}")
+
       ;(async function () {
-        const apiRequests = getApiRequests("{{ server_url }}")
 
         let successClosing
 
@@ -234,6 +258,25 @@
         })
         window.bridge = bridge
       })()
+
+      async function refresh() {
+        const content = document.querySelector(".spinnerContainer")
+
+        content.classList.remove("hidden")
+        let refreshedInfo
+        try {
+          refreshedInfo = await apiRequests.createRefreshTask()
+          document.getElementById("refreshMessage").classList.remove("hidden")
+          document.getElementById("refreshTime").innerHTML = new Date()
+        } catch (e) {
+          console.error(e)
+          content.classList.add("hidden")
+          return
+        }
+        content.classList.add("hidden")
+
+        renderPayrollData(refreshedInfo)
+      }
 
       function renderPayrollData(data) {
         const directoryContainer = document.querySelector("#historyDirectory")
@@ -325,6 +368,12 @@
                   <pre><code id="historyReport"></code></pre>
                 </div>
               </div>
+              <p>Did you know that you can use the same <code>access_token</code> from this payroll provider connection to refresh the users data at a later point in time? Click the button below and follow along
+                in the console logs to see what happens.</p>
+              <div id="refreshMessage" class="hidden">The above data was last refreshed <span id="refreshTime"></span></div>
+              <button type="button" id="refreshButton" onclick="refresh()">
+                Refresh
+              </button>
             </div>
           </div>
         </div>

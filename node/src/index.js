@@ -101,6 +101,13 @@ app.get("/createRefreshTask", async (req, res) => {
         case "income":
           res.json(await getIncomeInfoByToken(accessToken))
           break;
+        case "admin":
+          const directory = await getEmployeeDirectoryByToken(accessToken)
+          const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id
+          const payroll = await getPayrollById(reportId)
+          const data = { directory, payroll }
+          res.json(data)
+          break;
     }
   } catch (e) {
     console.error("error with createRefreshTask")
@@ -113,7 +120,7 @@ app.get("/getAdminData/:token", async (req, res) => {
   // retrieve income verification information
   try {
     const accessTokenResponse = await getAccessToken(req.params.token)
-    const accessToken = accessTokenResponse.access_token
+    accessToken = accessTokenResponse.access_token
 
     const directory = await getEmployeeDirectoryByToken(accessToken)
 
