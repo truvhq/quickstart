@@ -40,6 +40,8 @@ namespace c_sharp.Controllers
       switch (_productType) {
         case "employment":
           return await _citadel.GetEmploymentInfoByToken(null);
+        case "income":
+          return await _citadel.GetIncomeInfoByToken(null);
         default:
           return "{ \"success\": false }";
       }

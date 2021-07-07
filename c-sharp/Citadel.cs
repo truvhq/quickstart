@@ -69,6 +69,8 @@ namespace c_sharp
 
     public async Task<string> GetIncomeInfoByToken(string accessToken)
     {
+      if(accessToken == null)
+        accessToken = Citadel.accessToken;
       Console.WriteLine("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes");
       Console.WriteLine("CITADEL: Access Token - {0}", accessToken);
       return await SendRequest("verifications/incomes/", "{\"access_token\": \"" + accessToken + "\" }");

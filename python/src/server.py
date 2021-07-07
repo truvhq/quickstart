@@ -116,7 +116,7 @@ def create_refresh_task_by_token():
     finishedStatuses = ["done", "login_error", "mfa_error", "config_error", "account_locked", "no_data", "unavailable", "error"]
     
     while refreshTask['status'] not in finishedStatuses:
-        logging.info("CITADEL: Report not complete. Waiting and trying again")
+        logging.info("CITADEL: Refresh task is not finished. Waiting 2 seconds, then checking again.")
         time.sleep(5)
         refreshTask = api_client.get_refresh_task(task_id)
 
@@ -127,6 +127,8 @@ def create_refresh_task_by_token():
     # When the refresh status is complete we can get the latest info
     if product_type == 'employment':
         data = api_client.get_employment_info_by_token(access_token)
+    elif product_type == 'income':
+        data = api_client.get_income_info_by_token(access_token)
 
     return data
 

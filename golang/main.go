@@ -105,6 +105,8 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 	refreshResponse := ""
 	if productType == "employment" {
 		refreshResponse, err = getEmploymentInfoByToken(accessToken)
+	} else if productType == "income" {
+		refreshResponse, err = getIncomeInfoByToken(accessToken)
 	}
 	if err != nil {
 		fmt.Println("Error getting refresh data", err)

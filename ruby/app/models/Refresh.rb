@@ -18,6 +18,8 @@ class Refresh
 
     if Refresh.product_type == "employment"
       return Citadel.getEmploymentInfoByToken(nil)
+    elsif Refresh.product_type == "income"
+      return Citadel.getIncomeInfoByToken(nil)
     end
   end
 end

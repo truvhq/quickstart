@@ -98,6 +98,9 @@ app.get("/createRefreshTask", async (req, res) => {
       case "employment":
         res.json(await getEmploymentInfoByToken(accessToken))
         break;
+        case "income":
+          res.json(await getIncomeInfoByToken(accessToken))
+          break;
     }
   } catch (e) {
     console.error("error with createRefreshTask")

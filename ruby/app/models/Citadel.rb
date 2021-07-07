@@ -40,6 +40,9 @@ class Citadel
 
   def self.getIncomeInfoByToken(access_token)
     # https://docs.citadelid.com/?ruby#income-verification
+    if access_token == nil 
+      access_token = Citadel.access_token
+    end
     puts "CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes"
     puts "CITADEL: Access Token - #{access_token}"
     body = { "access_token" => access_token }.to_json
