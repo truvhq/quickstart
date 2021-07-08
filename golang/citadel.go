@@ -101,7 +101,7 @@ func getBridgeToken() (string, error) {
 // with the given public token
 func getAccessToken(public_token string) (string, error) {
 	fmt.Println("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens")
-	fmt.Printf("CITADEL: Public Token - %v\n", public_token)
+	fmt.Printf("CITADEL: Public Token - %s\n", public_token)
 	publicToken := PublicTokenRequest{PublicToken: public_token}
 	jsonPublicToken, _ := json.Marshal(publicToken)
 	accessToken := AccessTokenResponse{}
@@ -127,7 +127,7 @@ func getAccessToken(public_token string) (string, error) {
 // the associated employment verification info
 func getEmploymentInfoByToken(access_token string) (string, error) {
 	fmt.Println("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments")
-	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	fmt.Printf("CITADEL: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("verifications/employments", "POST", jsonAccessToken)
@@ -149,7 +149,7 @@ func getEmploymentInfoByToken(access_token string) (string, error) {
 // the associated income verification info
 func getIncomeInfoByToken(access_token string) (string, error) {
 	fmt.Println("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes")
-	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	fmt.Printf("CITADEL: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("verifications/incomes", "POST", jsonAccessToken)
@@ -171,7 +171,7 @@ func getIncomeInfoByToken(access_token string) (string, error) {
 // a task refresh
 func createRefreshTask(access_token string) (string, error) {
 	fmt.Println("CITADEL: Requesting a data refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
-	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	fmt.Printf("CITADEL: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
@@ -199,7 +199,7 @@ func createRefreshTask(access_token string) (string, error) {
 // getRefreshTask requests a task refresh update
 func getRefreshTask(taskId string) (string, error) {
 	fmt.Println("CITADEL: Requesting a refresh task using a task_id from https://prod.citadelid.com/v1/refresh/tasks/{task_id}")
-	fmt.Printf("CITADEL: Task ID - %v\n", taskId)
+	fmt.Printf("CITADEL: Task ID - %s\n", taskId)
 	request, err := getRequest(fmt.Sprintf("refresh/tasks/%s", taskId), "GET", nil)
 	if err != nil {
 		return "", err
@@ -219,7 +219,7 @@ func getRefreshTask(taskId string) (string, error) {
 // the associated employee directory info
 func getEmployeeDirectoryByToken(access_token string) (string, error) {
 	fmt.Println("CITADEL: Requesting employee directory data using an access_token from https://prod.citadelid.com/v1/administrators/directories")
-	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	fmt.Printf("CITADEL: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("administrators/directories", "POST", jsonAccessToken)
@@ -255,7 +255,7 @@ type PayrollReportResponse struct {
 // the associated payroll report
 func requestPayrollReport(access_token, start_date, end_date string) (*PayrollReportResponse, error) {
 	fmt.Println("CITADEL: Requesting a payroll report be created using an access_token from https://prod.citadelid.com/v1/administrators/payrolls")
-	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	fmt.Printf("CITADEL: Access Token - %s\n", access_token)
 	reportRequest := PayrollReportRequest{AccessToken: access_token, StartDate: start_date, EndDate: end_date}
 	jsonReportRequest, _ := json.Marshal(reportRequest)
 	payrollReport := PayrollReportResponse{}
@@ -280,7 +280,7 @@ func requestPayrollReport(access_token, start_date, end_date string) (*PayrollRe
 // getPayrollById requests the payroll report associated to the given id
 func getPayrollById(reportId string) (string, error) {
 	fmt.Println("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}")
-	fmt.Printf("CITADEL: Report ID - %v\n", reportId)
+	fmt.Printf("CITADEL: Report ID - %s\n", reportId)
 	request, err := getRequest(fmt.Sprintf("administrators/payrolls/%s", reportId), "GET", nil)
 	if err != nil {
 		return "", err
@@ -300,7 +300,7 @@ func getPayrollById(reportId string) (string, error) {
 // the associated funding switch requests
 func getFundingSwitchStatusByToken(access_token string) (string, error) {
 	fmt.Println("CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches")
-	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	fmt.Printf("CITADEL: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("account-switches", "POST", jsonAccessToken)
@@ -322,7 +322,7 @@ func getFundingSwitchStatusByToken(access_token string) (string, error) {
 // a task refresh to complete the Funding account switch flow
 func completeFundingSwitchFlowByToken(access_token string, first_micro string, second_micro string) (string, error) {
 	fmt.Println("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
-	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	fmt.Printf("CITADEL: Access Token - %s\n", access_token)
 	accessToken := RefreshRequest{AccessToken: access_token, Settings: SettingsRequest{ MicroDeposits: []string{first_micro, second_micro} }}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
@@ -344,7 +344,7 @@ func completeFundingSwitchFlowByToken(access_token string, first_micro string, s
 // the associated deposit switch info
 func getDepositSwitchByToken(access_token string) (string, error) {
 	fmt.Println("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
-	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
+	fmt.Printf("CITADEL: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("deposit-switches", "POST", jsonAccessToken)

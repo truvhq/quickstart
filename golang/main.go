@@ -190,7 +190,6 @@ func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err = getAccessToken(token)
-	fmt.Println(accessToken)
 	if err != nil {
 		fmt.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
@@ -283,9 +282,9 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	signature := generate_webhook_sign(convertedBody, os.Getenv("API_SECRET"))
 
 	fmt.Println("CITADEL: Webhook received")
-	fmt.Printf("CITADEL: Event type:      %v\n", parsedJson.EventType)
-	fmt.Printf("CITADEL: Status:          %v\n", parsedJson.Status)
-	fmt.Printf("CITADEL: Signature match: %v\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
+	fmt.Printf("CITADEL: Event type:      %s\n", parsedJson.EventType)
+	fmt.Printf("CITADEL: Status:          %s\n", parsedJson.Status)
+	fmt.Printf("CITADEL: Signature match: %s\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
 
 	fmt.Fprintf(w, "")
 }
