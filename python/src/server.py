@@ -117,7 +117,7 @@ def create_refresh_task_by_token():
     
     while refreshTask['status'] not in finishedStatuses:
         logging.info("CITADEL: Refresh task is not finished. Waiting 2 seconds, then checking again.")
-        time.sleep(5)
+        time.sleep(2)
         refreshTask = api_client.get_refresh_task(task_id)
 
     logging.info("CITADEL: Refresh task is finished. Pulling the latest data.")
