@@ -146,7 +146,7 @@
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <script>
-      function getApiRequests(apiEnpoint) {
+      function getApiRequests(apiEndpoint) {
         const headers = {
           "Content-Type": "application/json;charset=UTF-8",
         }
@@ -154,7 +154,7 @@
         // requests a bridge_token from the quickstart back end
         const getBridgeToken = async () => {
           console.log("Requesting a bridge_token from the quickstart back end.")
-          const response = await fetch(apiEnpoint + `getBridgeToken`, {
+          const response = await fetch(apiEndpoint + `getBridgeToken`, {
             method: "get",
             headers,
           }).then((r) => r.json())
@@ -166,7 +166,7 @@
         // back end can exchange it with Citadel for an access_token
         const getDepositSwitchData = async (public_token) => {
           const response = await fetch(
-            apiEnpoint + `getDepositSwitchData/${public_token}`,
+            apiEndpoint + `getDepositSwitchData/${public_token}`,
             {
               method: "get",
               headers,

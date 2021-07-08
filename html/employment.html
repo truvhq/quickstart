@@ -149,14 +149,14 @@
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <script>
-      function getApiRequests(apiEnpoint) {
+      function getApiRequests(apiEndpoint) {
         const headers = {
           "Content-Type": "application/json;charset=UTF-8",
         }
 
         const getBridgeToken = async () => {
           console.log("Requesting a bridge_token from the quickstart back end.")
-          const response = await fetch(apiEnpoint + `getBridgeToken`, {
+          const response = await fetch(apiEndpoint + `getBridgeToken`, {
             method: "get",
             headers,
           }).then((r) => r.json())
@@ -166,7 +166,7 @@
 
         const createRefreshTask = async () => {
           console.log("Requesting a data refresh from the quickstart back end.")
-          const response = await fetch(apiEnpoint + `createRefreshTask`, {
+          const response = await fetch(apiEndpoint + `createRefreshTask`, {
             method: "get",
             headers,
           }).then((r) => r.json())
@@ -181,7 +181,7 @@
         const getVerificationInfoByToken = async (public_token) => {
           console.log("Requesting employment verification data from the quickstart back end with public_token.")
           const response = await fetch(
-            apiEnpoint + `getVerifications/${public_token}`,
+            apiEndpoint + `getVerifications/${public_token}`,
             {
               method: "get",
               headers,

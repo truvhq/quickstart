@@ -72,7 +72,7 @@ examples in the respective `README.md` files:
 
 ```javascript
   const getBridgeToken = async () => {
-    const response = await fetch(apiEnpoint + `getBridgeToken`, {
+    const response = await fetch(apiEndpoint + `getBridgeToken`, {
       method: 'get',
       headers,
     }).then((r) => r.json());
