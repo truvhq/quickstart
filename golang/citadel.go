@@ -22,7 +22,7 @@ type AccessTokenRequest struct {
 }
 
 type SettingsRequest struct {
-	MicroDeposits []float32 `json:"micro_deposits"`
+	MicroDeposits []string `json:"micro_deposits"`
 }
 
 // RefreshRequest is used to define the body for the task refresh
@@ -320,10 +320,10 @@ func getFundingSwitchStatusByToken(access_token string) (string, error) {
 
 // completeFundingSwitchFlowByToken uses the given access token to request
 // a task refresh to complete the Funding account switch flow
-func completeFundingSwitchFlowByToken(access_token string, first_micro float32, second_micro float32) (string, error) {
+func completeFundingSwitchFlowByToken(access_token string, first_micro string, second_micro string) (string, error) {
 	fmt.Println("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
 	fmt.Printf("CITADEL: Access Token - %v\n", access_token)
-	accessToken := RefreshRequest{AccessToken: access_token, Settings: SettingsRequest{ MicroDeposits: []float32{first_micro, second_micro} }}
+	accessToken := RefreshRequest{AccessToken: access_token, Settings: SettingsRequest{ MicroDeposits: []string{first_micro, second_micro} }}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
 	if err != nil {

@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -23,7 +22,6 @@ func check(e error) {
 }
 
 var accessToken string
-var err error
 
 // homePage writes the html page for the product type
 // given in the API_PRODUCT_TYPE environment variable
@@ -49,6 +47,7 @@ func bridgeToken(w http.ResponseWriter, r *http.Request) {
 
 // verifications accepts requests for a verification and sends the response
 func verifications(w http.ResponseWriter, r *http.Request) {
+	var err error
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
@@ -149,6 +148,7 @@ func find(slice []string, val string) (int, bool) {
 
 // adminData accepts requests for admin data and sends the response
 func adminData(w http.ResponseWriter, r *http.Request) {
+	var err error
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err = getAccessToken(token)
@@ -184,6 +184,7 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 
 // startFundingSwitchFlow retrieves funding switch data
 func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
+	var err error
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err = getAccessToken(token)
@@ -205,10 +206,10 @@ func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
 // completeFundingSwitchFlow finishes the funding switch flow with two micro deposit values
 func completeFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
-	first_micro, _ := strconv.ParseFloat(splitPath[2], 32)
-	second_micro, _ := strconv.ParseFloat(splitPath[3], 32)
+	first_micro := splitPath[2]
+	second_micro := splitPath[3]
 
-	fundingSwitchResponse, err := completeFundingSwitchFlowByToken(accessToken, float32(first_micro), float32(second_micro))
+	fundingSwitchResponse, err := completeFundingSwitchFlowByToken(accessToken, first_micro, second_micro)
 	if err != nil {
 		fmt.Println("Error getting funding switch Status", err)
 		fmt.Fprintf(w, `{ "success": false }`)
