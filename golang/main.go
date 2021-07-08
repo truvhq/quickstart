@@ -113,6 +113,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, `{ "success": false }`)
 			return
 		}
+		// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
 		report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
 		if err != nil {
 			fmt.Println("Error requesting payroll report", err)
@@ -163,6 +164,7 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
+	// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
 	report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
 	if err != nil {
 		fmt.Println("Error requesting payroll report", err)

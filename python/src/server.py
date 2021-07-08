@@ -192,6 +192,7 @@ def get_admin_data():
     directory = api_client.get_employee_directory_by_token(access_token)
 
     # create request for payroll report
+    # A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
     report_id = api_client.request_payroll_report(access_token, '2020-01-01', '2020-02-01')['payroll_report_id']
 
     # collect prepared payroll report

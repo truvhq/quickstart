@@ -103,6 +103,7 @@ app.get("/createRefreshTask", async (req, res) => {
           break;
         case "admin":
           const directory = await getEmployeeDirectoryByToken(accessToken)
+          // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
           const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id
           const payroll = await getPayrollById(reportId)
           const data = { directory, payroll }
@@ -124,6 +125,7 @@ app.get("/getAdminData/:token", async (req, res) => {
 
     const directory = await getEmployeeDirectoryByToken(accessToken)
 
+    // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
     const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id
 
     const payroll = await getPayrollById(reportId)

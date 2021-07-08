@@ -44,6 +44,7 @@ namespace c_sharp.Controllers
           return await _citadel.GetIncomeInfoByToken(null);
         case "admin":
           var directory = await _citadel.GetEmployeeDirectoryByToken(null);
+          // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
           var reportId = await _citadel.RequestPayrollReport(null, "2020-01-01", "2020-02-01");
           var payroll = await _citadel.GetPayrollById(reportId);
           var finalResponse = "{ \"directory\": " + directory + ", \"payroll\": " + payroll + "}";
