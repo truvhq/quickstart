@@ -136,19 +136,27 @@
         border-bottom: 0px solid #e2e2e2;
         margin-bottom: 0px;
       }
+
+      #refreshMessage {
+        margin-bottom: 20px;
+      }
+
+      #refreshTime {
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <script>
-      function getApiRequests(apiEnpoint) {
+      function getApiRequests(apiEndpoint) {
         const headers = {
           "Content-Type": "application/json;charset=UTF-8",
         }
 
         const getBridgeToken = async () => {
           console.log("Requesting a bridge_token from the quickstart back end.")
-          const response = await fetch(apiEnpoint + `getBridgeToken`, {
+          const response = await fetch(apiEndpoint + `getBridgeToken`, {
             method: "get",
             headers,
           }).then((r) => r.json())
@@ -162,7 +170,7 @@
         const getVerificationInfoByToken = async (public_token) => {
           console.log("Requesting income verification data from the quickstart back end with public_token.")
           const response = await fetch(
-            apiEnpoint + `getVerifications/${public_token}`,
+            apiEndpoint + `getVerifications/${public_token}`,
             {
               method: "get",
               headers,
@@ -173,14 +181,27 @@
           return response.employments
         }
 
+        const createRefreshTask = async () => {
+          console.log("Requesting a data refresh from the quickstart back end.")
+          const response = await fetch(apiEndpoint + `createRefreshTask`, {
+            method: "get",
+            headers,
+          }).then((r) => r.json())
+          console.table(response)
+          console.table(response.employments)
+          return response.employments
+        }
+
         return {
           getVerificationInfoByToken,
           getBridgeToken,
+          createRefreshTask,
         }
       }
 
+      const apiRequests = getApiRequests("{{ server_url }}")
+
       ;(async function () {
-        const apiRequests = getApiRequests("{{ server_url }}")
 
         let successClosing
 
@@ -233,6 +254,29 @@
         })
         window.bridge = bridge
       })()
+
+      async function refresh() {
+        const content = document.querySelector(".spinnerContainer")
+
+            content.classList.remove("hidden")
+            let refreshedInfo
+            try {
+              refreshedInfo = await apiRequests.createRefreshTask()
+              document.getElementById("refreshMessage").classList.remove("hidden")
+              document.getElementById("refreshTime").innerHTML = new Date()
+            } catch (e) {
+              console.error(e)
+              content.classList.add("hidden")
+              return
+            }
+            content.classList.add("hidden")
+
+            if (!refreshedInfo.length) {
+              return
+            }
+
+            renderPayrollData(refreshedInfo)
+      }
 
       /**
        *
@@ -297,6 +341,12 @@
               <div>
                 <pre><code id="history"></code></pre>
               </div>
+              <p>Did you know that you can use the same <code>access_token</code> from this payroll provider connection to refresh the user's data at a later point in time? Click the button below and follow along
+                in the console logs to see what happens.</p>
+                <div id="refreshMessage" class="hidden">The above data was last refreshed <span id="refreshTime"></span></div>
+                <button type="button" id="refreshButton" onclick="refresh()">
+                  Refresh
+                </button>
             </div>
           </div>
         </div>

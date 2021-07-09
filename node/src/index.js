@@ -14,7 +14,9 @@ import {
   getEmployeeDirectoryByToken,
   getPayrollById,
   requestPayrollReport,
-  getFundingSwitchStatusByToken
+  getFundingSwitchStatusByToken,
+  createRefreshTask,
+  getRefreshTask
 } from "./citadel.js"
 
 const {
@@ -30,6 +32,7 @@ const generate_webhook_sign = (body, key) => {
 }
 
 const app = express()
+let accessToken = null
 
 // ensure all request bodies are parsed to JSON
 app.use(bodyParser.json({
@@ -60,7 +63,7 @@ app.get("/getVerifications/:token", async (req, res) => {
   // retrieve income verification information
   try {
     const accessTokenResponse = await getAccessToken(req.params.token)
-    const accessToken = accessTokenResponse.access_token
+    accessToken = accessTokenResponse.access_token
     let verifications
     if(API_PRODUCT_TYPE === "employment") {
       verifications = await getEmploymentInfoByToken(accessToken)
@@ -75,14 +78,54 @@ app.get("/getVerifications/:token", async (req, res) => {
   }
 })
 
+app.get("/createRefreshTask", async (req, res) => {
+  // create a refresh task for a payroll connection that's already been made.
+  try {
+    const refreshTask = await createRefreshTask(accessToken)
+
+    let taskStatus = await getRefreshTask(refreshTask.task_id)
+
+    const finishedStatuses = ["done", "login_error", "mfa_error", "config_error", "account_locked", "no_data", "unavailable", "error"]
+
+    while(finishedStatuses.indexOf(taskStatus.status) < 0) {
+      console.log("CITADEL: Refresh task is not finished. Waiting 2 seconds, then checking again.")
+      await sleep(2000)
+      taskStatus = await getRefreshTask(refreshTask.task_id)
+    }
+
+    console.log("CITADEL: Refresh task is finished. Pulling the latest data.")
+    switch (API_PRODUCT_TYPE) {
+      case "employment":
+        res.json(await getEmploymentInfoByToken(accessToken))
+        break;
+      case "income":
+        res.json(await getIncomeInfoByToken(accessToken))
+        break;
+      case "admin":
+        const directory = await getEmployeeDirectoryByToken(accessToken)
+        // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
+        const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id
+        const payroll = await getPayrollById(reportId)
+        const data = { directory, payroll }
+        res.json(data)
+        break;
+    }
+  } catch (e) {
+    console.error("error with createRefreshTask")
+    console.error(e)
+    res.status(500).json({ success: false })
+  }
+})
+
 app.get("/getAdminData/:token", async (req, res) => {
   // retrieve income verification information
   try {
     const accessTokenResponse = await getAccessToken(req.params.token)
-    const accessToken = accessTokenResponse.access_token
+    accessToken = accessTokenResponse.access_token
 
     const directory = await getEmployeeDirectoryByToken(accessToken)
 
+    // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
     const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id
 
     const payroll = await getPayrollById(reportId)
@@ -95,8 +138,6 @@ app.get("/getAdminData/:token", async (req, res) => {
     res.status(500).json({ success: false })
   }
 })
-
-let accessToken = null
 
 app.get("/startFundingSwitchFlow/:token", async (req, res) => {
   // retrieve funding switch status information
@@ -155,6 +196,12 @@ app.post("/webhook", async (req, res) => {
   
   res.status(200).end()
 })
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}   
 
 app.listen(5000, () => {
   // output environment information

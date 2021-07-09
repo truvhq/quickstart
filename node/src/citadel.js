@@ -73,6 +73,21 @@ const getEmploymentInfoByToken = async (access_token) => {
   return await sendRequest("verifications/employments/", {body})
 }
 
+const createRefreshTask = async (access_token) => {
+  console.log("CITADEL: Requesting a data refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
+  console.log(`CITADEL: Access Token - ${access_token}`)
+  const body = JSON.stringify({
+    access_token,
+  })
+  return await sendRequest("refresh/tasks/", {body})
+}
+
+const getRefreshTask = async (task_id) => {
+  console.log("CITADEL: Requesting a refresh task using a task_id from https://prod.citadelid.com/v1/refresh/tasks/{task_id}")
+  console.log(`CITADEL: Task ID - ${task_id}`)
+  return await sendRequest(`refresh/tasks/${task_id}`, {method: "GET"})
+}
+
 /**
  * Retrieves income verifications from Citadel
  * https://docs.citadelid.com/?javascript--nodejs#income-verification
@@ -212,4 +227,6 @@ export {
   getEmployeeDirectoryByToken,
   requestPayrollReport,
   getPayrollById,
+  createRefreshTask,
+  getRefreshTask,
 }

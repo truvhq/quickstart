@@ -88,6 +88,7 @@ def get_verification_info_by_token(public_token: str):
     """ Back end API endpoint to retrieve employment or income verification
         data using a front end public_token """
 
+    global access_token
     # First exchange public_token to access_token
     tokenResult = api_client.get_access_token(public_token)
     access_token = tokenResult["access_token"]
@@ -100,6 +101,38 @@ def get_verification_info_by_token(public_token: str):
     else:
         raise Exception('Unsupported product type!')
     return verifications
+
+@app.route('/createRefreshTask', methods=['GET'])
+def create_refresh_task_by_token():
+    """ Back end API endpoint to create a refresh task
+        from an existing access token """
+
+    global access_token
+    # Create a refresh task
+    task_id = api_client.create_refresh_task(access_token)['task_id']
+
+    # Check the status of a refresh task
+    refreshTask = api_client.get_refresh_task(task_id)
+    finishedStatuses = ["done", "login_error", "mfa_error", "config_error", "account_locked", "no_data", "unavailable", "error"]
+    
+    while refreshTask['status'] not in finishedStatuses:
+        logging.info("CITADEL: Refresh task is not finished. Waiting 2 seconds, then checking again.")
+        time.sleep(2)
+        refreshTask = api_client.get_refresh_task(task_id)
+
+    logging.info("CITADEL: Refresh task is finished. Pulling the latest data.")
+
+    data = None
+
+    # When the refresh status is complete we can get the latest info
+    if product_type == 'employment':
+        data = api_client.get_employment_info_by_token(access_token)
+    elif product_type == 'income':
+        data = api_client.get_income_info_by_token(access_token)
+    elif product_type == 'admin':
+        data = get_admin_data()
+
+    return data
 
 @app.route('/getDepositSwitchData/<public_token>', methods=['GET'])
 def get_deposit_switch_data_by_token(public_token: str):
@@ -143,21 +176,30 @@ def get_admin_data_by_token(public_token: str):
     """ Back end API endpoint to retrieve payroll admin data
         using a front end public_token """
 
+    global access_token
+
     # First, exchange public_token to access_token
     tokenResult = api_client.get_access_token(public_token)
     access_token = tokenResult["access_token"]
 
-    # Second, request employee directory
+    # Second, request admin data
+    return get_admin_data()
+
+def get_admin_data():
+
+    global access_token
+    # request employee directory
     directory = api_client.get_employee_directory_by_token(access_token)
 
-    # Third, create request for payroll report
+    # create request for payroll report
+    # A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
     report_id = api_client.request_payroll_report(access_token, '2020-01-01', '2020-02-01')['payroll_report_id']
 
-    # Last, collect prepared payroll report
+    # collect prepared payroll report
     payroll = api_client.get_payroll_report_by_id(report_id)
     if payroll['status'] != 'done':
         logging.info("CITADEL: Report not complete. Waiting and trying again")
-        time.sleep(5)
+        time.sleep(2)
         payroll = api_client.get_payroll_report_by_id(report_id)
 
     return {

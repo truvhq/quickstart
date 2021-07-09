@@ -10,8 +10,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
+	"time"
 )
 
 // check will cause a panic if there an error given
@@ -20,6 +20,8 @@ func check(e error) {
 		panic(e)
 	}
 }
+
+var accessToken string
 
 // homePage writes the html page for the product type
 // given in the API_PRODUCT_TYPE environment variable
@@ -45,10 +47,11 @@ func bridgeToken(w http.ResponseWriter, r *http.Request) {
 
 // verifications accepts requests for a verification and sends the response
 func verifications(w http.ResponseWriter, r *http.Request) {
+	var err error
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
-	accessToken, err := getAccessToken(token)
+	accessToken, err = getAccessToken(token)
 	if err != nil {
 		fmt.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
@@ -68,11 +71,88 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type RefreshStatusResponse struct {
+	Status    string `json:"status"`
+}
+// verifications accepts requests for a verification and sends the response
+func refresh(w http.ResponseWriter, r *http.Request) {
+	productType := os.Getenv("API_PRODUCT_TYPE")
+	
+	taskId, err := createRefreshTask(accessToken)
+
+	if err != nil {
+		fmt.Println("Error creating refresh task", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+
+	finishedStatuses := []string{"done", "login_error", "mfa_error", "config_error", "account_locked", "no_data", "unavailable", "error"}
+	refreshStatus, err := getRefreshTask(taskId)
+	var refreshStatusResponse RefreshStatusResponse
+	json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
+	_, found := find(finishedStatuses, refreshStatusResponse.Status)
+	for found {
+		fmt.Println("CITADEL: Refresh task is not finished. Waiting 2 seconds, then checking again.")
+		time.Sleep(2 * time.Second)
+		refreshStatus, err = getRefreshTask(taskId)
+		json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
+		_, found = find(finishedStatuses, refreshStatusResponse.Status)
+	}
+
+	fmt.Println("CITADEL: Refresh task is finished. Pulling the latest data.")
+
+	refreshResponse := ""
+	if productType == "employment" {
+		refreshResponse, err = getEmploymentInfoByToken(accessToken)
+	} else if productType == "income" {
+		refreshResponse, err = getIncomeInfoByToken(accessToken)
+	} else if productType == "admin" {
+		directory, err := getEmployeeDirectoryByToken(accessToken)
+		if err != nil {
+			fmt.Println("Error getting Employee Directory", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+		// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
+		report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
+		if err != nil {
+			fmt.Println("Error requesting payroll report", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+		reportId := report.PayrollReportId
+		payroll, err := getPayrollById(reportId)
+		if err != nil {
+			fmt.Println("Error getting payroll by id", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+
+		refreshResponse = fmt.Sprintf(`{ "directory": %s, "payroll": %s }`, directory, payroll)
+	}
+	if err != nil {
+		fmt.Println("Error getting refresh data", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+	} else {
+		fmt.Fprintf(w, refreshResponse)
+	}
+}
+
+func find(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+		if item == val {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
 // adminData accepts requests for admin data and sends the response
 func adminData(w http.ResponseWriter, r *http.Request) {
+	var err error
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
-	accessToken, err := getAccessToken(token)
+	accessToken, err = getAccessToken(token)
 	if err != nil {
 		fmt.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
@@ -84,6 +164,7 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
+	// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
 	report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
 	if err != nil {
 		fmt.Println("Error requesting payroll report", err)
@@ -103,15 +184,12 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, data)
 }
 
-var accessToken string
-var err error
-
 // startFundingSwitchFlow retrieves funding switch data
 func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
+	var err error
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 	accessToken, err = getAccessToken(token)
-	fmt.Println(accessToken)
 	if err != nil {
 		fmt.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
@@ -129,10 +207,10 @@ func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
 // completeFundingSwitchFlow finishes the funding switch flow with two micro deposit values
 func completeFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
-	first_micro, _ := strconv.ParseFloat(splitPath[2], 32)
-	second_micro, _ := strconv.ParseFloat(splitPath[3], 32)
+	first_micro := splitPath[2]
+	second_micro := splitPath[3]
 
-	fundingSwitchResponse, err := completeFundingSwitchFlowByToken(accessToken, float32(first_micro), float32(second_micro))
+	fundingSwitchResponse, err := completeFundingSwitchFlowByToken(accessToken, first_micro, second_micro)
 	if err != nil {
 		fmt.Println("Error getting funding switch Status", err)
 		fmt.Fprintf(w, `{ "success": false }`)
@@ -204,9 +282,9 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	signature := generate_webhook_sign(convertedBody, os.Getenv("API_SECRET"))
 
 	fmt.Println("CITADEL: Webhook received")
-	fmt.Printf("CITADEL: Event type:      %v\n", parsedJson.EventType)
-	fmt.Printf("CITADEL: Status:          %v\n", parsedJson.Status)
-	fmt.Printf("CITADEL: Signature match: %v\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
+	fmt.Printf("CITADEL: Event type:      %s\n", parsedJson.EventType)
+	fmt.Printf("CITADEL: Status:          %s\n", parsedJson.Status)
+	fmt.Printf("CITADEL: Signature match: %s\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
 
 	fmt.Fprintf(w, "")
 }
@@ -220,6 +298,7 @@ func handleRequests() {
 	http.HandleFunc("/startFundingSwitchFlow/", startFundingSwitchFlow)
 	http.HandleFunc("/completeFundingSwitchFlow/", completeFundingSwitchFlow)
 	http.HandleFunc("/getDepositSwitchData/", depositSwitch)
+	http.HandleFunc("/createRefreshTask/", refresh)
 	http.HandleFunc("/webhook", webhook)
 
 	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.")

@@ -68,7 +68,7 @@ Here is the flow that a successful verification process takes in our example:
 
 ```javascript
 const getBridgeToken = async () => {
-  const response = await fetch(apiEnpoint + `getBridgeToken`, {
+  const response = await fetch(apiEndpoint + `getBridgeToken`, {
     method: 'get',
     headers,
   }).then((r) => r.json());

@@ -20,6 +20,7 @@ namespace c_sharp.Controllers
       var accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
 
       var directory = await _citadel.GetEmployeeDirectoryByToken(accessToken);
+      // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
       var reportId = await _citadel.RequestPayrollReport(accessToken, "2020-01-01", "2020-02-01");
       var payroll = await _citadel.GetPayrollById(reportId);
       var finalResponse = "{ \"directory\": " + directory + ", \"payroll\": " + payroll + "}";
