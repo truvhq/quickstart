@@ -98,17 +98,17 @@ app.get("/createRefreshTask", async (req, res) => {
       case "employment":
         res.json(await getEmploymentInfoByToken(accessToken))
         break;
-        case "income":
-          res.json(await getIncomeInfoByToken(accessToken))
-          break;
-        case "admin":
-          const directory = await getEmployeeDirectoryByToken(accessToken)
-          // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-          const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id
-          const payroll = await getPayrollById(reportId)
-          const data = { directory, payroll }
-          res.json(data)
-          break;
+      case "income":
+        res.json(await getIncomeInfoByToken(accessToken))
+        break;
+      case "admin":
+        const directory = await getEmployeeDirectoryByToken(accessToken)
+        // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
+        const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id
+        const payroll = await getPayrollById(reportId)
+        const data = { directory, payroll }
+        res.json(data)
+        break;
     }
   } catch (e) {
     console.error("error with createRefreshTask")
