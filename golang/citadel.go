@@ -89,10 +89,11 @@ func getBridgeToken() (string, error) {
 	}
 	client := &http.Client{}
 	response, err := client.Do(request)
-
 	if err != nil {
 		return "", err
 	}
+
+	defer response.Body.Close()
 	data, _ := ioutil.ReadAll(response.Body)
 	return (string(data)), nil
 }
@@ -111,11 +112,11 @@ func getAccessToken(public_token string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	err = json.NewDecoder(res.Body).Decode(&accessToken)
 	if err != nil {
 		return "", err
@@ -136,11 +137,11 @@ func getEmploymentInfoByToken(access_token string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	data, _ := ioutil.ReadAll(res.Body)
 	return string(data), nil
 }
@@ -158,11 +159,11 @@ func getIncomeInfoByToken(access_token string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	data, _ := ioutil.ReadAll(res.Body)
 	return string(data), nil
 }
@@ -180,12 +181,12 @@ func createRefreshTask(access_token string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
-	
+
+	defer res.Body.Close()
+
 	refreshTask := CreateRefreshTaskResponse{}
 	err = json.NewDecoder(res.Body).Decode(&refreshTask)
 
@@ -206,11 +207,11 @@ func getRefreshTask(taskId string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	data, _ := ioutil.ReadAll(res.Body)
 	return string(data), nil
 }
@@ -228,11 +229,11 @@ func getEmployeeDirectoryByToken(access_token string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	data, _ := ioutil.ReadAll(res.Body)
 	return string(data), nil
 }
@@ -265,11 +266,11 @@ func requestPayrollReport(access_token, start_date, end_date string) (*PayrollRe
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return nil, err
 	}
+
+	defer res.Body.Close()
 	err = json.NewDecoder(res.Body).Decode(&payrollReport)
 	if err != nil {
 		return nil, err
@@ -287,11 +288,11 @@ func getPayrollById(reportId string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	data, _ := ioutil.ReadAll(res.Body)
 	return string(data), nil
 }
@@ -309,11 +310,11 @@ func getFundingSwitchStatusByToken(access_token string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	data, _ := ioutil.ReadAll(res.Body)
 	return string(data), nil
 }
@@ -331,11 +332,11 @@ func completeFundingSwitchFlowByToken(access_token string, first_micro string, s
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	data, _ := ioutil.ReadAll(res.Body)
 	return string(data), nil
 }
@@ -353,11 +354,11 @@ func getDepositSwitchByToken(access_token string) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
-	defer res.Body.Close()
-
 	if err != nil {
 		return "", err
 	}
+
+	defer res.Body.Close()
 	data, _ := ioutil.ReadAll(res.Body)
 	return string(data), nil
 }
