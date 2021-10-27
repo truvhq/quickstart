@@ -284,7 +284,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("CITADEL: Webhook received")
 	fmt.Printf("CITADEL: Event type:      %s\n", parsedJson.EventType)
 	fmt.Printf("CITADEL: Status:          %s\n", parsedJson.Status)
-	fmt.Printf("CITADEL: Signature match: %s\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
+	fmt.Printf("CITADEL: Signature match: %t\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
 
 	fmt.Fprintf(w, "")
 }
