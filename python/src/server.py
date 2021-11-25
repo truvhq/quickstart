@@ -57,6 +57,8 @@ def index():
         return render_template('fas.html')
     elif product_type == 'deposit_switch':
         return render_template('deposit_switch.html')
+    elif product_type == 'pll':
+        return render_template('pll.html')
     else:
         return render_template('employment.html')
 
@@ -147,6 +149,20 @@ def get_deposit_switch_data_by_token(public_token: str):
     depositSwitch = api_client.get_deposit_switch_by_token(access_token)
 
     return depositSwitch
+
+@app.route('/getPaycheckLinkedLoanData/<public_token>', methods=['GET'])
+def get_pll_data_by_token(public_token: str):
+    """ Back end API endpoint to retrieve paycheck linked loan
+        data using a front end public_token """
+
+    # First exchange public_token to access_token
+    tokenResult = api_client.get_access_token(public_token)
+    access_token = tokenResult["access_token"]
+
+    # Use access_token to retrieve the data
+    pllData = api_client.get_pll_by_token(access_token)
+
+    return pllData
 
 @app.route('/startFundingSwitchFlow/<public_token>', methods=['GET'])
 def start_funding_switch_flow_by_token(public_token: str):

@@ -53,13 +53,17 @@ class NaiveApiClient:
             'tracking_info': '1337'
         }
 
-        if self.PRODUCT_TYPE == 'fas' or self.PRODUCT_TYPE == 'deposit_switch':
+        if self.PRODUCT_TYPE == 'fas' or self.PRODUCT_TYPE == 'deposit_switch' or self.PRODUCT_TYPE == 'pll':
             request_data['account'] = {
                 'account_number': '16002600',
                 'account_type': 'checking',
                 'routing_number': '123456789',
                 'bank_name': 'TD Bank'
             }
+
+            if self.PRODUCT_TYPE == 'pll':
+                request_data['account']['deposit_type'] = 'amount'
+                request_data['account']['deposit_value'] = '1'
 
         tokens: Any = requests.post(
             self.API_URL + 'bridge-tokens/',
@@ -202,6 +206,26 @@ class NaiveApiClient:
 
         return requests.post(
             self.API_URL + 'deposit-switches/',
+            json=request_data,
+            headers=self.API_HEADERS,
+        ).json()
+
+    def get_pll_by_token(self, access_token: str) -> Any:
+        """
+        https://docs.citadelid.com/#paycheck-linked-loans
+        :param access_token:
+        :return:
+        """
+
+        logging.info("CITADEL: Requesting pll data using an access_token from https://prod.citadelid.com/v1/paycheck-linked-loans/")
+        logging.info("CITADEL: Access Token - %s", access_token)
+        class PLLRequest(TypedDict):
+            access_token: str
+
+        request_data: PLLRequest = {'access_token': access_token}
+
+        return requests.post(
+            self.API_URL + 'paycheck-linked-loans/',
             json=request_data,
             headers=self.API_HEADERS,
         ).json()
