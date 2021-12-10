@@ -28,25 +28,26 @@ Once you have your API keys, it's time to run the Citadel Python Quickstart app 
 After running this command, you should see:
 
 ```output
-web_1  | ======================================== ENVIRONMENT ======================================== 
-web_1  |  https://prod.citadelid.com/v1/ 
-web_1  |  {
-web_1  |     "X-Access-Secret": "<YOUR SECRET_KEY HERE>",
-web_1  |     "X-Access-Client-Id": "<YOUR CLIENT_ID HERE>",
-web_1  |     "Content-Type": "application/json;charset=UTF-8"
-web_1  | } 
-web_1  |  ============================================================================================== 
-web_1  | 
-web_1  |  * Serving Flask app "server" (lazy loading)
-web_1  |  * Environment: development
-web_1  |  * Debug mode: on
-web_1  |  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-web_1  |  * Restarting with stat
-web_1  |  * Debugger is active!
-web_1  |  * Debugger PIN: 593-914-178
+ * Serving Flask app "server" (lazy loading)
+ * Environment: development
+ * Debug mode: on
+======================================== ENVIRONMENT ========================================
+ {
+    "X-Access-Secret": "<YOUR SECRET_KEY HERE>",
+    "X-Access-Client-Id": "<YOUR CLIENT_ID HERE>",
+    "Content-Type": "application/json;charset=UTF-8"
+}
+ ==============================================================================================
+
+Quickstart Loaded. Navigate to http://localhost:5001 to view Quickstart.
 ```
 
-To access the app, open [http://127.0.0.1:5000/](http://127.0.0.1:5000/) in your browser.
+To access the app, open [http://127.0.0.1:5001/](http://127.0.0.1:5001/) in your browser.
+
+Since Apple released MacOS Monterey, we changed the default Flask port to `5001`, to prevent conflict with AirPlay Receiver. More information
+on this issue could be found [here](https://stackoverflow.com/questions/69818376/localhost5000-unavailable-in-macos-v12-monterey/).
+
+But you can redefine this behavior by adding `FLASK_PORT=<custom port number>` to `.env` file.
 
 ## What happens under the hood
 

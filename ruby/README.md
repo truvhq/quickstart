@@ -30,11 +30,11 @@ After running this command, you should see:
 ```output
 * Min threads: 5, max threads: 5
 * Environment: development
-* Listening on tcp://127.0.0.1:5000
-* Listening on tcp://[::1]:5000
+* Listening on tcp://127.0.0.1:5001
+* Listening on tcp://[::1]:5001
 ```
 
-To access the app, open [http://127.0.0.1:5000/](http://127.0.0.1:5000/) in your browser.
+To access the app, open [http://127.0.0.1:5001/](http://127.0.0.1:5001/) in your browser.
 
 ## What happens under the hood
 

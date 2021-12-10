@@ -4,5 +4,5 @@ WORKDIR /app
 ADD . .
 WORKDIR /app/golang
 
-EXPOSE 5000
+EXPOSE 5001
 CMD ["go", "run", "citadel"]

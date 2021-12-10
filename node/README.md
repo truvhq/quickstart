@@ -34,10 +34,10 @@ After running this command, you should see:
   API_PRODUCT_TYPE: <YOUR PRODUCT TYPE HERE>
 }
 ==============================================================================================
-listening on port 5000
+listening on port 5001
 ```
 
-To access the app, open [http://127.0.0.1:5000/](http://127.0.0.1:5000/) in your browser.
+To access the app, open [http://127.0.0.1:5001/](http://127.0.0.1:5001/) in your browser.
 
 ## What happens under the hood
 

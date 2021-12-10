@@ -8,9 +8,11 @@ import hmac
 import flask
 from flask import Flask, render_template, request
 from flask_cors import CORS
+from dotenv import load_dotenv
 
 from .naive_api_client import NaiveApiClient
 
+load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 log = logging.getLogger('werkzeug')
@@ -22,6 +24,8 @@ CORS(app)
 secret = os.environ.get('API_SECRET')
 client_id = os.environ.get('API_CLIENT_ID')
 product_type = os.environ.get('API_PRODUCT_TYPE', 'employment')
+flask_port = os.environ.get('FLASK_PORT', 5001)
+
 
 access_token = None
 
@@ -223,9 +227,11 @@ def get_admin_data():
         'payroll': payroll
     }
 
-print("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.", )
+
+print(f"Quickstart Loaded. Navigate to http://localhost:{flask_port} to view Quickstart.", )
+
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
+    app.run(port=flask_port)
     

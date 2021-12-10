@@ -29,7 +29,7 @@ node_local:
 python_local:
 	python3 -m venv quickstart_venv && \
  		./quickstart_venv/bin/pip3 install -r python/requirements.txt && \
- 		set -a && source .env && set +a && ./quickstart_venv/bin/python3 -m python.src.server
+		FLASK_ENV=development ./quickstart_venv/bin/python3 -m python.src.server
 
 ruby_local:
 	cd ruby && \
