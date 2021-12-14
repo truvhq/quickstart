@@ -9,7 +9,7 @@ RUN bundle install
 COPY ./ruby/entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
-EXPOSE 5000
+EXPOSE 5001
 
 # Start the main process.
-CMD ["rails", "server", "-b", "0.0.0.0", "-p", "5000"]
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "5001"]
