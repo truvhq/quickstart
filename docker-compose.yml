@@ -15,7 +15,7 @@ services:
     env_file:
       - .env
     ports:
-      - "5001:5001"
+      - "5050:5050"
   ruby:
     build:
       context: .
@@ -23,7 +23,7 @@ services:
     env_file:
       - .env
     ports:
-      - "5001:5001"
+      - "3000:3000"
   csharp:
     build:
       context: .
@@ -31,7 +31,7 @@ services:
     env_file:
       - .env
     ports:
-      - "5000:80"
+      - "5080:80"
   go:
     build:
       context: .
@@ -39,5 +39,5 @@ services:
     env_file:
       - .env
     ports:
-      - "5001:5001"
+      - "5010:5010"
 

@@ -15,5 +15,5 @@ WORKDIR /html
 COPY html .
 WORKDIR /app
 COPY --from=build-env /app/out .
-EXPOSE 5000
+EXPOSE 80
 ENTRYPOINT ["dotnet", "c-sharp.dll"]

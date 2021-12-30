@@ -47,7 +47,7 @@ To access the app, open [http://127.0.0.1:5001/](http://127.0.0.1:5001/) in your
 Since Apple released MacOS Monterey, we changed the default Flask port to `5001`, to prevent conflict with AirPlay Receiver. More information
 on this issue could be found [here](https://stackoverflow.com/questions/69818376/localhost5000-unavailable-in-macos-v12-monterey/).
 
-But you can redefine this behavior by adding `FLASK_PORT=<custom port number>` to `.env` file.
+But you can redefine this behavior by adding `FLASK_RUN_PORT=<custom port number>` to `.env` file.
 
 ## What happens under the hood
 

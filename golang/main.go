@@ -301,9 +301,9 @@ func handleRequests() {
 	http.HandleFunc("/createRefreshTask/", refresh)
 	http.HandleFunc("/webhook", webhook)
 
-	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5001 to view Quickstart.")
+	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5010 to view Quickstart.")
 
-	log.Fatal(http.ListenAndServe(":5001", nil))
+	log.Fatal(http.ListenAndServe(":5010", nil))
 }
 
 func main() {
