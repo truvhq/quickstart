@@ -8,9 +8,17 @@ make env
 docker-compose up -d
 ```
 
-check integration for your programming language:
-1. http://localhost:3000 Ruby
-2. http://localhost:5001 Python
-3. http://localhost:5010 Go
-4. http://localhost:5050 Node.Js
-5. http://localhost:5080 C#
+or run specific image  
+```shell
+cd quickstart
+make env
+make [python_docker|ruby_docker|go_docker|node_docker|csharp_docker]
+```
+
+Check the quickstart demo for your programming language:
+1. http://localhost:5001 Python
+2. http://localhost:5002 Ruby
+3. http://localhost:5003 Go
+4. http://localhost:5004 Node.Js
+5. http://localhost:5005 C#
+
