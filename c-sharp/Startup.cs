@@ -39,7 +39,7 @@ namespace c_sharp
 
     private void OnStarted()
     {
-        Console.WriteLine("Quickstart Loaded. Navigate to http://localhost:5000 to view Quickstart.");
+        Console.WriteLine("Quickstart Loaded. Navigate to http://localhost to view Quickstart.");
     }
   }
 }

@@ -203,7 +203,7 @@ function sleep(ms) {
   });
 }   
 
-app.listen(5001, () => {
+app.listen(5004, () => {
   // output environment information
   console.log("=".repeat(40), "ENVIRONMENT", "=".repeat(40))
   const environment = {
@@ -213,5 +213,5 @@ app.listen(5001, () => {
   }
   console.log(environment)
   console.log("=".repeat(94))
-  console.log("Quickstart Loaded. Navigate to http://localhost:5001 to view Quickstart.")
+  console.log("Quickstart Loaded. Navigate to http://localhost:5004 to view Quickstart.")
 })
