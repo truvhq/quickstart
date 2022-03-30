@@ -1,6 +1,6 @@
 {
   "name": "quickstart",
-  "description": "The Citadel NodeJS Quickstart app.",
+  "description": "The Truv NodeJS Quickstart app.",
   "type": "module",
   "main": "index.js",
   "scripts": {

@@ -13,24 +13,24 @@ namespace c_sharp.Controllers
   public class VerificationController : ControllerBase
   {
 
-    private Citadel _citadel = new Citadel();
+    private Truv _truv = new Truv();
     private string _productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
 
     [Route("{token}")]
     [HttpGet]
     public async Task<string> Get(string token)
     {
-      var accessTokenResponse = await _citadel.GetAccessToken(token);
+      var accessTokenResponse = await _truv.GetAccessToken(token);
       var parsedResponse = JsonDocument.Parse(accessTokenResponse);
       var accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
 
       if (_productType == "employment")
       {
-        return await _citadel.GetEmploymentInfoByToken(accessToken);
+        return await _truv.GetEmploymentInfoByToken(accessToken);
       }
       else
       {
-        return await _citadel.GetIncomeInfoByToken(accessToken);
+        return await _truv.GetIncomeInfoByToken(accessToken);
       }
     }
   }

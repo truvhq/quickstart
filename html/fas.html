@@ -18,7 +18,7 @@
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
     <!-- Step 1 - add the bridge library to your app with a script tag -->
-    <script src="https://cdn.citadelid.com/bridge.js"></script>
+    <script src="https://cdn.truv.com/bridge.js"></script>
     <style>
       header {
         position: fixed;
@@ -163,7 +163,7 @@
         }
 
         // sends a public_token to quickstart back end so the quickstart
-        // back end can exchange it with Citadel for an access_token
+        // back end can exchange it with Truv for an access_token
         const startFundingSwitchFlow = async (public_token) => {
           const response = await fetch(
             apiEndpoint + `startFundingSwitchFlow/${public_token}`,
@@ -201,26 +201,26 @@
 
         let successClosing
 
-        // Step 2 - Call your back end to retrieve a bridge token from citadel
+        // Step 2 - Call your back end to retrieve a bridge token from truv
         const bridgeToken = await apiRequests.getBridgeToken()
 
-        // Step 3 - Initialize the Citadel Bridge
-        const bridge = CitadelBridge.init({
+        // Step 3 - Initialize the Truv Bridge
+        const bridge = TruvBridge.init({
           bridgeToken: bridgeToken.bridge_token,
           onLoad: function () {
-            // onLoad function is called by the Citadel Bridge when the Citadel Bridge is opened via bridge.open()
+            // onLoad function is called by the Truv Bridge when the Truv Bridge is opened via bridge.open()
             console.log("onLoad callback called")
             successClosing = null
           },
           onEvent: function (eventType, payload) {
-            // onEvent function is called by the Citadel Bridge when various events occur, including errors, successful
-            // connection to a payroll provider, Citadel Bridge loading and Citadel Bridge closing.
+            // onEvent function is called by the Truv Bridge when various events occur, including errors, successful
+            // connection to a payroll provider, Truv Bridge loading and Truv Bridge closing.
             console.log(`onEvent callback called. Event Type: ${eventType}`)
             if (payload) console.log("onEvent payload:", payload)
           },
           onSuccess: async function (public_token, meta) {
-            // onSuccess function is called by the Citadel Bridge when the user successfully connects to their payroll
-            // provider and closes the Citadel Bridge.
+            // onSuccess function is called by the Truv Bridge when the user successfully connects to their payroll
+            // provider and closes the Truv Bridge.
             console.log(
               `onSuccess callback called. public_token: ${public_token}`
             )
@@ -247,7 +247,7 @@
             document.getElementById("microContainer").classList.remove("hidden")
           },
           onClose: function () {
-            // onClose function is called by the Citadel Bridge when the user closes the Citadel Bridge without
+            // onClose function is called by the Truv Bridge when the user closes the Truv Bridge without
             // successfully connecting to their payroll provider.
             console.log("onClose callback called.")
           },
@@ -275,7 +275,7 @@
       }
 
       function renderPayrollData(data) {
-        console.log("Returned from Citadel:")
+        console.log("Returned from Truv:")
         console.table(data)
       }
     </script>
@@ -291,14 +291,14 @@
         <div>
           <h2>Funding account switching</h2>
           <span
-            >Funding account switch (FAS) allows payroll administrators to change the financial account their payroll provider uses to fund their payroll. Citadel makes FAS easy to integrate into your system with a simple process.
+            >Funding account switch (FAS) allows payroll administrators to change the financial account their payroll provider uses to fund their payroll. Truv makes FAS easy to integrate into your system with a simple process.
             Click "Connect" below to start the FAS process. <strong>Monitor console logs to learn what's happening behind the scenes</strong>.
           </span>
         </div>
       </div>
       <form>
         <div class="formSection historyContainer">
-          <!-- Step 4 - Create a button or action that calls bridge.open() to open the Citadel Bridge -->
+          <!-- Step 4 - Create a button or action that calls bridge.open() to open the Truv Bridge -->
           <button type="button" id="connectButton" onclick="bridge.open()">
             Connect
           </button>
@@ -317,28 +317,28 @@
           <div id="fundingSwitchComplete" class="hidden">
             <p>The FAS process is now complete. Here's what happened. <a href="#dataView">What data was returned?</a></p>
 
-            <h3>Initializing the Citadel Bridge</h3>
+            <h3>Initializing the Truv Bridge</h3>
             <ol>
               <li>The quickstart front end requested a bridge token from the quickstart back end.</li>
               <li>
-                The quickstart back end requested a bridge token from Citadel, providing <code>fas</code> as the value for <code>product_type</code>
+                The quickstart back end requested a bridge token from Truv, providing <code>fas</code> as the value for <code>product_type</code>
                 and all the account information for the new bank account to fund the administrator payroll.
               </li>
-              <li>Citadel provided the quickstart backend with a bridge token, which the quickstart back end returned to the quickstart front end.</li>
-              <li>The quickstart front end initialized the Citadel Bridge with the provided bridge_token.</li>
+              <li>Truv provided the quickstart backend with a bridge token, which the quickstart back end returned to the quickstart front end.</li>
+              <li>The quickstart front end initialized the Truv Bridge with the provided bridge_token.</li>
             </ol>
             <h3>Starting the FAS process</h3>
             <ol>
-              <li>The user logged into their payroll provider through the Citadel Bridge.</li>
-              <li>The Citadel Bridge provided a public_token to the quickstart front end, who passed that public_token to the quickstart back end.</li>
-              <li>The quickstart back end exchanged that public_token with Citadel for an access_token and stored that access_token for later use.</li>
+              <li>The user logged into their payroll provider through the Truv Bridge.</li>
+              <li>The Truv Bridge provided a public_token to the quickstart front end, who passed that public_token to the quickstart back end.</li>
+              <li>The quickstart back end exchanged that public_token with Truv for an access_token and stored that access_token for later use.</li>
             </ol>
             <h3>Completing the FAS process</h3>
             <ol>
               <li>The user provided the quickstart front end with the values of the two micro deposits the payroll provider sent to the new bank account.</li>
               <li>The quickstart front end provided these micro deposit values to the quickstart back end.</li>
-              <li>The quickstart back end sent Citadel a Task refresh request providing the previously stored access_token and the two micro deposit values.</li>
-              <li>Citadel provided these two micro deposit values to the payroll provider, completing the Funding account switch process.</li>
+              <li>The quickstart back end sent Truv a Task refresh request providing the previously stored access_token and the two micro deposit values.</li>
+              <li>Truv provided these two micro deposit values to the payroll provider, completing the Funding account switch process.</li>
             </ol>
             <div id="dataView">
               <h3>What data was returned?</h3>

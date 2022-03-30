@@ -9,20 +9,20 @@ namespace c_sharp.Controllers
   public class AdminController : ControllerBase
   {
 
-    private Citadel _citadel = new Citadel();
+    private Truv _truv = new Truv();
 
     [Route("{token}")]
     [HttpGet]
     public async Task<string> Get(string token)
     {
-      var accessTokenResponse = await _citadel.GetAccessToken(token);
+      var accessTokenResponse = await _truv.GetAccessToken(token);
       var parsedResponse = JsonDocument.Parse(accessTokenResponse);
       var accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
 
-      var directory = await _citadel.GetEmployeeDirectoryByToken(accessToken);
+      var directory = await _truv.GetEmployeeDirectoryByToken(accessToken);
       // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-      var reportId = await _citadel.RequestPayrollReport(accessToken, "2020-01-01", "2020-02-01");
-      var payroll = await _citadel.GetPayrollById(reportId);
+      var reportId = await _truv.RequestPayrollReport(accessToken, "2020-01-01", "2020-02-01");
+      var payroll = await _truv.GetPayrollById(reportId);
       var finalResponse = "{ \"directory\": " + directory + ", \"payroll\": " + payroll + "}";
       return finalResponse;
     }

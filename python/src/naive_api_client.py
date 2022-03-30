@@ -3,7 +3,7 @@ from typing import TypedDict, List, Any
 import requests
 import logging
 
-# https://docs.citadelid.com
+# https://docs.truv.com
 # Header which using in private api calls
 ApiHeaders = TypedDict('ApiHeaders', {
     'X-Access-Secret': str,
@@ -26,7 +26,7 @@ class NaiveApiClient:
                  client_id: str,
                  product_type: str,
                  ):
-        self.API_URL = 'https://prod.citadelid.com/v1/'
+        self.API_URL = 'https://prod.truv.com/v1/'
         self.PRODUCT_TYPE = product_type
         self.API_HEADERS = {
             'X-Access-Secret': secret,
@@ -36,11 +36,11 @@ class NaiveApiClient:
 
     def get_bridge_token(self) -> Any:
         """
-        https://docs.citadelid.com/?python#bridge-tokens_create
+        https://docs.truv.com/?python#bridge-tokens_create
         :param public_token:
         :return:
         """
-        logging.info("CITADEL: Requesting bridge token from https://prod.citadelid.com/v1/bridge-tokens")
+        logging.info("TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens")
         class BridgeTokenRequest(TypedDict):
             product_type: str
             client_name: str
@@ -49,7 +49,7 @@ class NaiveApiClient:
 
         request_data: BridgeTokenRequest = {
             'product_type': self.PRODUCT_TYPE,
-            'client_name': 'Citadel Quickstart',
+            'client_name': 'Truv Quickstart',
             'tracking_info': '1337'
         }
 
@@ -74,12 +74,12 @@ class NaiveApiClient:
 
     def get_access_token(self, public_token: str) -> str:
         """
-        https://docs.citadelid.com/?python#exchange-token-flow
+        https://docs.truv.com/?python#exchange-token-flow
         :param public_token:
         :return:
         """
-        logging.info("CITADEL: Exchanging a public_token for an access_token from https://prod.citadelid.com/v1/link-access-tokens")
-        logging.info("CITADEL: Public Token - %s", public_token)
+        logging.info("TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens")
+        logging.info("TRUV: Public Token - %s", public_token)
         class AccessTokenRequest(TypedDict):
             public_token: str
 
@@ -100,12 +100,12 @@ class NaiveApiClient:
 
     def get_employment_info_by_token(self, access_token: str) -> Any:
         """
-        https://docs.citadelid.com/#employment-verification
+        https://docs.truv.com/#employment-verification
         :param access_token:
         :return:
         """
-        logging.info("CITADEL: Requesting employment verification data using an access_token from https://prod.citadelid.com/v1/verifications/employments")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/verifications/employments")
+        logging.info("TRUV: Access Token - %s", access_token)
         class VerificationRequest(TypedDict):
             access_token: str
 
@@ -119,13 +119,13 @@ class NaiveApiClient:
 
     def get_income_info_by_token(self, access_token: str) -> Any:
         """
-        https://docs.citadelid.com/#income-verification
+        https://docs.truv.com/#income-verification
         :param access_token:
         :return:
         """
 
-        logging.info("CITADEL: Requesting income verification data using an access_token from https://prod.citadelid.com/v1/verifications/incomes")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/verifications/incomes")
+        logging.info("TRUV: Access Token - %s", access_token)
         class VerificationRequest(TypedDict):
             access_token: str
 
@@ -139,12 +139,12 @@ class NaiveApiClient:
     
     def create_refresh_task(self, access_token: str) -> Any:
         """
-        https://docs.citadelid.com/#data-refresh
+        https://docs.truv.com/#data-refresh
         :param access_token:
         :return:
         """
-        logging.info("CITADEL: Requesting a data refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Requesting a data refresh using an access_token from https://prod.truv.com/v1/refresh/tasks")
+        logging.info("TRUV: Access Token - %s", access_token)
         class CreateRefreshTaskRequest(TypedDict):
             access_token: str
 
@@ -158,12 +158,12 @@ class NaiveApiClient:
     
     def get_refresh_task(self, task_id: str) -> Any:
         """
-        https://docs.citadelid.com/#data-refresh
+        https://docs.truv.com/#data-refresh
         :param task_id:
         :return:
         """
-        logging.info("CITADEL: Requesting a refresh task using a task_id from https://prod.citadelid.com/v1/refresh/tasks/{task_id}")
-        logging.info("CITADEL: Task ID - %s", task_id)
+        logging.info("TRUV: Requesting a refresh task using a task_id from https://prod.truv.com/v1/refresh/tasks/{task_id}")
+        logging.info("TRUV: Task ID - %s", task_id)
 
         return requests.get(
             self.API_URL + f'refresh/tasks/{task_id}',
@@ -172,13 +172,13 @@ class NaiveApiClient:
 
     def get_employee_directory_by_token(self, access_token: str) -> Any:
         """
-        https://docs.citadelid.com/#payroll-admin
+        https://docs.truv.com/#payroll-admin
         :param access_token:
         :return:
         """
 
-        logging.info("CITADEL: Requesting employee directory data using an access_token from https://prod.citadelid.com/v1/administrators/directories")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/administrators/directories")
+        logging.info("TRUV: Access Token - %s", access_token)
         class DirectoryRequest(TypedDict):
             access_token: str
 
@@ -192,13 +192,13 @@ class NaiveApiClient:
 
     def get_deposit_switch_by_token(self, access_token: str) -> Any:
         """
-        https://docs.citadelid.com/#direct-deposit
+        https://docs.truv.com/#direct-deposit
         :param access_token:
         :return:
         """
 
-        logging.info("CITADEL: Requesting direct deposit switch data using an access_token from https://prod.citadelid.com/v1/deposit-switches")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/deposit-switches")
+        logging.info("TRUV: Access Token - %s", access_token)
         class DepositSwitchRequest(TypedDict):
             access_token: str
 
@@ -212,13 +212,13 @@ class NaiveApiClient:
 
     def get_pll_by_token(self, access_token: str) -> Any:
         """
-        https://docs.citadelid.com/#paycheck-linked-loans
+        https://docs.truv.com/#paycheck-linked-loans
         :param access_token:
         :return:
         """
 
-        logging.info("CITADEL: Requesting pll data using an access_token from https://prod.citadelid.com/v1/paycheck-linked-loans/")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/paycheck-linked-loans/")
+        logging.info("TRUV: Access Token - %s", access_token)
         class PLLRequest(TypedDict):
             access_token: str
 
@@ -232,15 +232,15 @@ class NaiveApiClient:
 
     def request_payroll_report(self, access_token: str, start_date: str , end_date: str) -> Any:
         """
-        https://docs.citadelid.com/#payroll-admin
+        https://docs.truv.com/#payroll-admin
         :param access_token:
         :param start_date:
         :param end_date:
         :return: Payroll report ID
         """
 
-        logging.info("CITADEL: Requesting a payroll report be created using an access_token from https://prod.citadelid.com/v1/administrators/payrolls")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls")
+        logging.info("TRUV: Access Token - %s", access_token)
         class PayrollReportRequest(TypedDict):
             access_token: str
             start_date: str
@@ -260,13 +260,13 @@ class NaiveApiClient:
 
     def get_payroll_report_by_id(self, report_id: str) -> Any:
         """
-        https://docs.citadelid.com/#payroll-admin
+        https://docs.truv.com/#payroll-admin
         :param report_id:
         :return:
         """
 
-        logging.info("CITADEL: Requesting a payroll report using a report_id from https://prod.citadelid.com/v1/administrators/payrolls/{report_id}")
-        logging.info("CITADEL: Report ID - %s", report_id)
+        logging.info("TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}")
+        logging.info("TRUV: Report ID - %s", report_id)
         return requests.get(
             self.API_URL + f'administrators/payrolls/{report_id}',
             headers=self.API_HEADERS,
@@ -274,12 +274,12 @@ class NaiveApiClient:
     
     def get_funding_switch_status_by_token(self, access_token: str) -> Any:
         """
-        https://docs.citadelid.com/#fas-report
+        https://docs.truv.com/#fas-report
         :param access_token:
         :return:
         """
-        logging.info("CITADEL: Requesting funding switch update data using an access_token from https://prod.citadelid.com/v1/account-switches")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Requesting funding switch update data using an access_token from https://prod.truv.com/v1/account-switches")
+        logging.info("TRUV: Access Token - %s", access_token)
         class FundingSwitchRequest(TypedDict):
             access_token: str
 
@@ -293,12 +293,12 @@ class NaiveApiClient:
 
     def complete_funding_switch_flow_by_token(self, access_token: str, first_micro: float, second_micro: float) -> Any:
         """
-        https://docs.citadelid.com/#funding-account
+        https://docs.truv.com/#funding-account
         :param access_token:
         :return:
         """
-        logging.info("CITADEL: Completing funding switch flow with a Task refresh using an access_token from https://prod.citadelid.com/v1/refresh/tasks")
-        logging.info("CITADEL: Access Token - %s", access_token)
+        logging.info("TRUV: Completing funding switch flow with a Task refresh using an access_token from https://prod.truv.com/v1/refresh/tasks")
+        logging.info("TRUV: Access Token - %s", access_token)
 
         class SettingsRequest(TypedDict):
             micro_deposits: List[float]

@@ -21,10 +21,10 @@ namespace c_sharp.Controllers
         string body = await reader.ReadToEndAsync();
         var signature = generateWebhookSign(body, Environment.GetEnvironmentVariable("API_SECRET"));
         var document = JsonDocument.Parse(body);
-        Console.WriteLine("CITADEL: Webhook Received");
-        Console.WriteLine("CITADEL: Event type:      {0}", document.RootElement.GetProperty("event_type").GetString());
-        Console.WriteLine("CITADEL: Status:          {0}", document.RootElement.GetProperty("status").GetString());
-        Console.WriteLine("CITADEL: Signature match: {0}\n", Request.Headers["x-webhook-sign"].ToString() == signature);
+        Console.WriteLine("TRUV: Webhook Received");
+        Console.WriteLine("TRUV: Event type:      {0}", document.RootElement.GetProperty("event_type").GetString());
+        Console.WriteLine("TRUV: Status:          {0}", document.RootElement.GetProperty("status").GetString());
+        Console.WriteLine("TRUV: Signature match: {0}\n", Request.Headers["x-webhook-sign"].ToString() == signature);
         return String.Empty;
       }
     }

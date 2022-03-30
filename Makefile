@@ -47,4 +47,4 @@ go_local:
 	go get && \
 	set -a && source ../.env && set +a && \
 	go install && \
-	go run citadel
+	go run truv

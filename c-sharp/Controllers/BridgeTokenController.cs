@@ -12,12 +12,12 @@ namespace c_sharp.Controllers
   public class BridgeTokenController : ControllerBase
   {
 
-    private Citadel _citadel = new Citadel();
+    private Truv _truv = new Truv();
 
     [HttpGet]
     public async Task<string> Get()
     {
-      return await _citadel.GetBridgeToken();
+      return await _truv.GetBridgeToken();
     }
   }
 }

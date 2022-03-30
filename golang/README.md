@@ -2,13 +2,13 @@
 
 ## Introduction
 
-Let's get you started with Citadel by walking through this Go Quickstart app. You'll need a set of API keys which you can get by signing up at [https://dashboard.citadelid.com](https://dashboard.citadelid.com)
+Let's get you started with Truv by walking through this Go Quickstart app. You'll need a set of API keys which you can get by signing up at [https://dashboard.truv.com](https://dashboard.truv.com)
 
 You'll have two different API keys used by the back end, `Client ID` and `Access key`.
 
 ## Set up the Go Quickstart
 
-Once you have your API keys, it's time to run the Citadel Go Quickstart app locally.
+Once you have your API keys, it's time to run the Truv Go Quickstart app locally.
 *Requirements*: The latest version of `golang`
 
 1. `git clone https://github.com/citadelid/quickstart`
@@ -42,14 +42,14 @@ To access the app, open [http://127.0.0.1:5003/](http://127.0.0.1:5003/) in your
 Here is the flow that a successful verification process takes in our example:
 
 1. [Front end sends request to back end for `bridge_token`](#step-1)
-2. [Back end sends API request to Citadel for `bridge_token`, sends response to front end](#step-2)
-3. [Front end runs `CitadelBridge.init` with `bridge_token`](#step-3)
+2. [Back end sends API request to Truv for `bridge_token`, sends response to front end](#step-2)
+3. [Front end runs `TruvBridge.init` with `bridge_token`](#step-3)
 4. [User clicks `Connect` button](#step-4)
-5. [Front end displays Citadel widget, executes `onLoad` callback function](#step-5)
+5. [Front end displays Truv widget, executes `onLoad` callback function](#step-5)
 6. [User follows instructions, choses provider, logs in, clicks `Done`](#step-6)
 7. [Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget](#step-7)
-8. [Back end sends API request to Citadel exchanging `public_token` for `access_token`](#step-8)
-9. [Back end sends API request to Citadel with `access_token` for payroll data](#step-9)
+8. [Back end sends API request to Truv exchanging `public_token` for `access_token`](#step-8)
+9. [Back end sends API request to Truv with `access_token` for payroll data](#step-9)
 10. [Back end sends payroll data back to front end](#step-10)
 11. [Front end renders the verification info sent back by back end for user to view](#step-11)
 
@@ -65,13 +65,13 @@ Here is the flow that a successful verification process takes in our example:
   }
 ```
 
-### <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
+### <a id="step-2"></a>2. Back end sends API request to Truv for `bridge_token`, sends response to front end
 
 ```go
 func getRequest(endpoint string, method string, body []byte) (*http.Request) {
   clientId := os.Getenv("API_CLIENT_ID")
   accessKey := os.Getenv("API_SECRET")
-  fullEndpoint := fmt.Sprintf("%s%s", "https://prod.citadelid.com/v1/", endpoint)
+  fullEndpoint := fmt.Sprintf("%s%s", "https://prod.truv.com/v1/", endpoint)
   request, _ := http.NewRequest(method, fullEndpoint, bytes.NewBuffer(body))
   request.Header.Set("Content-Type", "application/json")
   request.Header.Set("X-Access-Client-Id", clientId)
@@ -100,10 +100,10 @@ func bridgeToken(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-### <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
+### <a id="step-3"></a>3. Front end runs `TruvBridge.init` with `bridge_token`
 
 ```javascript
-  const bridge = CitadelBridge.init({
+  const bridge = TruvBridge.init({
     bridgeToken: bridgeToken.bridge_token,
     ...
   });
@@ -112,7 +112,7 @@ func bridgeToken(w http.ResponseWriter, r *http.Request) {
 
 ### <a id="step-4"></a>4. User clicks `Connect` button
 
-### <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
+### <a id="step-5"></a>5. Front end displays Truv widget, executes `onLoad` callback function
 
 ```javascript
   onLoad: function () {
@@ -160,7 +160,7 @@ onClose: function () {
 },
 ```
 
-### <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
+### <a id="step-8"></a>8. Back end sends API request to Truv exchanging `public_token` for `access_token`
 
 ```go
 
@@ -196,7 +196,7 @@ func getAccessToken(public_token string) (string) {
 }
 ```
 
-### <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
+### <a id="step-9"></a>9. Back end sends API request to Truv with `access_token` for payroll data
 
 ```go
 type AccessTokenRequest struct {
