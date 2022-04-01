@@ -12,7 +12,7 @@ Once you have your API keys, it's time to run the Truv Ruby on Rails Quickstart 
 
 *Requirements*: Ruby 2.6.5
 
-1. `git clone https://github.com/citadelid/quickstart`
+1. `git clone https://github.com/truvhq/quickstart`
 2. `cd quickstart`
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):

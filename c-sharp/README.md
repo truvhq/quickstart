@@ -11,7 +11,7 @@ You'll have two different API keys used by the back end, `Client ID` and `Access
 Once you have your API keys, it's time to run the Truv C# Quickstart app locally.
 *Requirements*: .NET Core 5.0, .NET SDK 5.0
 
-1. `git clone https://github.com/citadelid/quickstart`
+1. `git clone https://github.com/truvhq/quickstart`
 2. `cd quickstart`
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
