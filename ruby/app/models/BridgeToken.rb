@@ -1,5 +1,5 @@
 class BridgeToken
   def self.get
-    return Citadel.getBridgeToken()
+    return Truv.getBridgeToken()
   end
 end

@@ -10,24 +10,24 @@ namespace c_sharp.Controllers
   public class FundingSwitchController : ControllerBase
   {
     private static string accessToken = null;
-    private Citadel _citadel = new Citadel();
+    private Truv _truv = new Truv();
 
     [Route("startFundingSwitchFlow/{token}")]
     [HttpGet]
     public async Task<string> Get(string token)
     {
-      var accessTokenResponse = await _citadel.GetAccessToken(token);
+      var accessTokenResponse = await _truv.GetAccessToken(token);
       var parsedResponse = JsonDocument.Parse(accessTokenResponse);
       accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
       
-      return await _citadel.GetFundingSwitchStatusByToken(accessToken);
+      return await _truv.GetFundingSwitchStatusByToken(accessToken);
     }
 
     [Route("completeFundingSwitchFlow/{first_micro}/{second_micro}")]
     [HttpGet]
     public async Task<string> Get(float first_micro, float second_micro)
     {
-      return await _citadel.CompleteFundingSwitchFlowByToken(accessToken, first_micro, second_micro);
+      return await _truv.CompleteFundingSwitchFlowByToken(accessToken, first_micro, second_micro);
     }
   }
 }

@@ -5,4 +5,4 @@ ADD . .
 WORKDIR /app/golang
 
 EXPOSE 5003
-CMD ["go", "run", "citadel"]
+CMD ["go", "run", "truv"]

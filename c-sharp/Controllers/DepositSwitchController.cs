@@ -9,17 +9,17 @@ namespace c_sharp.Controllers
   public class DepositSwitchController : ControllerBase
   {
 
-    private Citadel _citadel = new Citadel();
+    private Truv _truv = new Truv();
 
     [Route("{token}")]
     [HttpGet]
     public async Task<string> Get(string token)
     {
-      var accessTokenResponse = await _citadel.GetAccessToken(token);
+      var accessTokenResponse = await _truv.GetAccessToken(token);
       var parsedResponse = JsonDocument.Parse(accessTokenResponse);
       var accessToken = parsedResponse.RootElement.GetProperty("access_token").GetString();
 
-      return await _citadel.GetDepositSwitchByToken(accessToken);
+      return await _truv.GetDepositSwitchByToken(accessToken);
     }
   }
 }

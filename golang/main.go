@@ -92,14 +92,14 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
 	_, found := find(finishedStatuses, refreshStatusResponse.Status)
 	for found {
-		fmt.Println("CITADEL: Refresh task is not finished. Waiting 2 seconds, then checking again.")
+		fmt.Println("TRUV: Refresh task is not finished. Waiting 2 seconds, then checking again.")
 		time.Sleep(2 * time.Second)
 		refreshStatus, err = getRefreshTask(taskId)
 		json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
 		_, found = find(finishedStatuses, refreshStatusResponse.Status)
 	}
 
-	fmt.Println("CITADEL: Refresh task is finished. Pulling the latest data.")
+	fmt.Println("TRUV: Refresh task is finished. Pulling the latest data.")
 
 	refreshResponse := ""
 	if productType == "employment" {
@@ -281,10 +281,10 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(b, &parsedJson)
 	signature := generate_webhook_sign(convertedBody, os.Getenv("API_SECRET"))
 
-	fmt.Println("CITADEL: Webhook received")
-	fmt.Printf("CITADEL: Event type:      %s\n", parsedJson.EventType)
-	fmt.Printf("CITADEL: Status:          %s\n", parsedJson.Status)
-	fmt.Printf("CITADEL: Signature match: %t\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
+	fmt.Println("TRUV: Webhook received")
+	fmt.Printf("TRUV: Event type:      %s\n", parsedJson.EventType)
+	fmt.Printf("TRUV: Status:          %s\n", parsedJson.Status)
+	fmt.Printf("TRUV: Signature match: %t\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
 
 	fmt.Fprintf(w, "")
 }

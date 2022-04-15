@@ -1,5 +1,5 @@
 # Get started with Quickstart for web
-To get started with Citadel API, we recommend following a step-by-step walkthrough in our docs https://docs.citadelid.com/docs/web-quickstart.
+To get started with Truv, we recommend following a step-by-step walkthrough in our docs https://docs.truv.com/docs/web-quickstart.
 
 or run all-in-one docker-compose
 ```shell

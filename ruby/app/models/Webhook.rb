@@ -7,12 +7,12 @@ class Webhook
   end
   
   def self.post(body, headerSignature)
-    signature = self.generate_webhook_sign(body, Citadel.client_secret)
+    signature = self.generate_webhook_sign(body, Truv.client_secret)
     jsonParse = JSON.parse(body)
-    puts "CITADEL: Webhook received"
-    puts "CITADEL: Event type: #{jsonParse['event_type']}"
-    puts "CITADEL: Status:     #{jsonParse['status']}"
-    puts "CITADEL: Signature match: #{signature == headerSignature}\n"
+    puts "TRUV: Webhook received"
+    puts "TRUV: Event type: #{jsonParse['event_type']}"
+    puts "TRUV: Status:     #{jsonParse['status']}"
+    puts "TRUV: Signature match: #{signature == headerSignature}\n"
     return ""
   end
 end

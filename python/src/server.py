@@ -82,10 +82,10 @@ def generate_webhook_sign(payload: str, key: str) -> str:
 @app.route('/webhook', methods=['POST'])
 def webhook():
     signature = generate_webhook_sign(request.data.decode('UTF-8'), secret)
-    logging.info("CITADEL: Webhook received")
-    logging.info("CITADEL: Event type:      %s", request.json["event_type"])
-    logging.info("CITADEL: Status:          %s", request.json["status"])
-    logging.info("CITADEL: Signature match: %s\n", request.headers["X-WEBHOOK-SIGN"] == signature)
+    logging.info("TRUV: Webhook received")
+    logging.info("TRUV: Event type:      %s", request.json["event_type"])
+    logging.info("TRUV: Status:          %s", request.json["status"])
+    logging.info("TRUV: Signature match: %s\n", request.headers["X-WEBHOOK-SIGN"] == signature)
     return ""
 
 
@@ -122,11 +122,11 @@ def create_refresh_task_by_token():
     finishedStatuses = ["done", "login_error", "mfa_error", "config_error", "account_locked", "no_data", "unavailable", "error"]
     
     while refreshTask['status'] not in finishedStatuses:
-        logging.info("CITADEL: Refresh task is not finished. Waiting 2 seconds, then checking again.")
+        logging.info("TRUV: Refresh task is not finished. Waiting 2 seconds, then checking again.")
         time.sleep(2)
         refreshTask = api_client.get_refresh_task(task_id)
 
-    logging.info("CITADEL: Refresh task is finished. Pulling the latest data.")
+    logging.info("TRUV: Refresh task is finished. Pulling the latest data.")
 
     data = None
 
@@ -218,7 +218,7 @@ def get_admin_data():
     # collect prepared payroll report
     payroll = api_client.get_payroll_report_by_id(report_id)
     if payroll['status'] != 'done':
-        logging.info("CITADEL: Report not complete. Waiting and trying again")
+        logging.info("TRUV: Report not complete. Waiting and trying again")
         time.sleep(2)
         payroll = api_client.get_payroll_report_by_id(report_id)
 

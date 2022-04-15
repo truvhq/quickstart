@@ -2,16 +2,16 @@
 
 ## Introduction
 
-Let's get you started with Citadel by walking through this NodeJS Quickstart app. You'll need a set of API keys which you can get by signing up at [https://dashboard.citadelid.com](https://dashboard.citadelid.com)
+Let's get you started with Truv by walking through this NodeJS Quickstart app. You'll need a set of API keys which you can get by signing up at [https://dashboard.truv.com](https://dashboard.truv.com)
 
 You'll have two different API keys used by the back end, `Client ID` and `Access key`.
 
 ## Set up the NodeJS Quickstart
 
-Once you have your API keys, it's time to run the Citadel NodeJS Quickstart app locally.
+Once you have your API keys, it's time to run the Truv NodeJS Quickstart app locally.
 *Requirements*: The latest LTS version of `nodejs`
 
-1. `git clone https://github.com/citadelid/quickstart`
+1. `git clone https://github.com/truvhq/quickstart`
 2. `cd quickstart`
 3. `make env`
 4. update the `.env` file in the root of the project. The contents of the `.env` has to look like this (values with <> should be replaced by the proper keys or values):
@@ -44,14 +44,14 @@ To access the app, open [http://127.0.0.1:5004/](http://127.0.0.1:5004/) in your
 Here is the flow that a successful verification process takes in our example:
 
 1. [Front end sends request to back end for `bridge_token`](#step-1)
-2. [Back end sends API request to Citadel for `bridge_token`, sends response to front end](#step-2)
-3. [Front end runs `CitadelBridge.init` with `bridge_token`](#step-3)
+2. [Back end sends API request to Truv for `bridge_token`, sends response to front end](#step-2)
+3. [Front end runs `TruvBridge.init` with `bridge_token`](#step-3)
 4. [User clicks `Connect` button](#step-4)
-5. [Front end displays Citadel widget, executes `onLoad` callback function](#step-5)
+5. [Front end displays Truv widget, executes `onLoad` callback function](#step-5)
 6. [User follows instructions, choses provider, logs in, clicks `Done`](#step-6)
 7. [Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget](#step-7)
-8. [Back end sends API request to Citadel exchanging `public_token` for `access_token`](#step-8)
-9. [Back end sends API request to Citadel with `access_token` for payroll data](#step-9)
+8. [Back end sends API request to Truv exchanging `public_token` for `access_token`](#step-8)
+9. [Back end sends API request to Truv with `access_token` for payroll data](#step-9)
 10. [Back end sends payroll data back to front end](#step-10)
 11. [Front end renders the verification info sent back by back end for user to view](#step-11)
 
@@ -67,7 +67,7 @@ Here is the flow that a successful verification process takes in our example:
   }
 ```
 
-### <a id="step-2"></a>2. Back end sends API request to Citadel for `bridge_token`, sends response to front end
+### <a id="step-2"></a>2. Back end sends API request to Truv for `bridge_token`, sends response to front end
 
 ```javascript
   const getHeaders = () => {
@@ -91,7 +91,7 @@ Here is the flow that a successful verification process takes in our example:
   const sendRequest = async (endpoint, body) => {
     const headers = getHeaders()
     try {
-      const response = await fetch(`https://prod.citadelid.com/v1/${endpoint}`, {
+      const response = await fetch(`https://prod.truv.com/v1/${endpoint}`, {
         method: "POST",
         body,
         headers,
@@ -120,10 +120,10 @@ Here is the flow that a successful verification process takes in our example:
   })
 ```
 
-### <a id="step-3"></a>3. Front end runs `CitadelBridge.init` with `bridge_token`
+### <a id="step-3"></a>3. Front end runs `TruvBridge.init` with `bridge_token`
 
 ```javascript
-  const bridge = CitadelBridge.init({
+  const bridge = TruvBridge.init({
     bridgeToken: bridgeToken.bridge_token,
     ...
   });
@@ -132,7 +132,7 @@ Here is the flow that a successful verification process takes in our example:
 
 ### <a id="step-4"></a>4. User clicks `Connect` button
 
-### <a id="step-5"></a>5. Front end displays Citadel widget, executes `onLoad` callback function
+### <a id="step-5"></a>5. Front end displays Truv widget, executes `onLoad` callback function
 
 ```javascript
   onLoad: function () {
@@ -180,7 +180,7 @@ onClose: function () {
 },
 ```
 
-### <a id="step-8"></a>8. Back end sends API request to Citadel exchanging `public_token` for `access_token`
+### <a id="step-8"></a>8. Back end sends API request to Truv exchanging `public_token` for `access_token`
 
 ```javascript
 const getAccessToken = async (public_token) => {
@@ -192,7 +192,7 @@ const getAccessToken = async (public_token) => {
 }
 ```
 
-### <a id="step-9"></a>9. Back end sends API request to Citadel with `access_token` for payroll data
+### <a id="step-9"></a>9. Back end sends API request to Truv with `access_token` for payroll data
 
 ```javascript
 const getEmploymentInfoByToken = async (access_token) => {
