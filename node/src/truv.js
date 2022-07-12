@@ -2,6 +2,13 @@ import fetch from "node-fetch";
 
 const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env;
 
+if (!API_CLIENT_ID || !API_SECRET) {
+    console.error(
+        "Please specify API_CLIENT_ID and API_SECRET!"
+    )
+    process.exit(-1)
+}
+
 /**
  * Returns the default headers used when interacting with Truv
  * @return The headers used when making requests to Truv
