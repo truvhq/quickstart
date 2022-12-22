@@ -1,4 +1,4 @@
-FROM python:3.8.13
+FROM python:3.12.0a3
 
 WORKDIR /app
 ADD . .
