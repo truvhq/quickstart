@@ -19,7 +19,7 @@ Once you have your API keys, it's time to run the Truv NodeJS Quickstart app loc
     ```bash
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-    API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or fas>
+    API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or pll>
     ```
 
 5. `make node_local`
@@ -48,7 +48,7 @@ Here is the flow that a successful verification process takes in our example:
 3. [Front end runs `TruvBridge.init` with `bridge_token`](#step-3)
 4. [User clicks `Connect` button](#step-4)
 5. [Front end displays Truv widget, executes `onLoad` callback function](#step-5)
-6. [User follows instructions, choses provider, logs in, clicks `Done`](#step-6)
+6. [User follows instructions, chooses provider, logs in, clicks `Done`](#step-6)
 7. [Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget](#step-7)
 8. [Back end sends API request to Truv exchanging `public_token` for `access_token`](#step-8)
 9. [Back end sends API request to Truv with `access_token` for payroll data](#step-9)
@@ -141,7 +141,7 @@ Here is the flow that a successful verification process takes in our example:
   },
 ```
 
-### <a id="step-6"></a>6. User follows instructions, choses provider, logs in, clicks `Done`
+### <a id="step-6"></a>6. User follows instructions, chooses provider, logs in, clicks `Done`
 
 ### <a id="step-7"></a>7. Front end executes `onSuccess` callback function, sends request to back end with `public_token`, closes widget
 

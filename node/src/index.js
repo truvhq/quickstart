@@ -6,6 +6,7 @@ import crypto from "crypto"
 
 import {
   getDepositSwitchByToken,
+  getPaycheckLinkedLoanByToken,
   completeFundingSwitchFlowByToken,
   getAccessToken,
   getBridgeToken,
@@ -14,7 +15,6 @@ import {
   getEmployeeDirectoryByToken,
   getPayrollById,
   requestPayrollReport,
-  getFundingSwitchStatusByToken,
   createRefreshTask,
   getRefreshTask,
 } from "./truv.js";
@@ -150,24 +150,6 @@ app.get("/getAdminData/:token", async (req, res) => {
   }
 });
 
-app.get("/startFundingSwitchFlow/:token", async (req, res) => {
-  // retrieve funding switch status information
-  try {
-    const accessTokenResponse = await getAccessToken(req.params.token);
-    accessToken = accessTokenResponse.access_token;
-
-    const fundingSwitchResult = await getFundingSwitchStatusByToken(
-      accessToken
-    );
-
-    res.json(fundingSwitchResult);
-  } catch (e) {
-    console.error("error with startFundingSwitchFlow");
-    console.error(e);
-    res.status(500).json({ success: false });
-  }
-});
-
 app.get("/getDepositSwitchData/:token", async (req, res) => {
   // retrieve deposit switch status information
   try {
@@ -179,6 +161,22 @@ app.get("/getDepositSwitchData/:token", async (req, res) => {
     res.json(depositSwitchResult);
   } catch (e) {
     console.error("error with getDepositSwitchData");
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.get("/getPaycheckLinkedLoanData/:token", async (req, res) => {
+  // retrieve paycheck linked loan information
+  try {
+    const accessTokenResponse = await getAccessToken(req.params.token);
+    accessToken = accessTokenResponse.access_token;
+
+    const payCheckLinkedLoadResult = await getPaycheckLinkedLoanByToken(accessToken);
+
+    res.json(payCheckLinkedLoadResult);
+  } catch (e) {
+    console.error("error with getPaycheckLinkedLoanData");
     console.error(e);
     res.status(500).json({ success: false });
   }
@@ -222,7 +220,7 @@ function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
-}   
+}
 
 app.listen(5004, () => {
   // output environment information

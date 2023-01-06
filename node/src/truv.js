@@ -3,10 +3,10 @@ import fetch from "node-fetch";
 const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env;
 
 if (!API_CLIENT_ID || !API_SECRET) {
-    console.error(
-        "Please specify API_CLIENT_ID and API_SECRET!"
-    )
-    process.exit(-1)
+  console.error(
+    "Please specify API_CLIENT_ID and API_SECRET!"
+  )
+  process.exit(-1)
 }
 
 /**
@@ -36,13 +36,17 @@ const getBridgeToken = async () => {
     client_name: "Truv Quickstart",
     tracking_info: "1337",
   };
-  if (API_PRODUCT_TYPE === "fas" || API_PRODUCT_TYPE === "deposit_switch") {
+  if (API_PRODUCT_TYPE === "pll" || API_PRODUCT_TYPE === "deposit_switch") {
     bodyObj.account = {
       account_number: "16002600",
       account_type: "checking",
       routing_number: "123456789",
       bank_name: "TD Bank",
     };
+    if (API_PRODUCT_TYPE === "pll") {
+      bodyObj.account.deposit_type = "amount";
+      bodyObj.account.deposit_value = "1";
+    }
   }
   const body = JSON.stringify(bodyObj);
 
@@ -177,23 +181,6 @@ const getPayrollById = async (report_id) => {
 };
 
 /**
- * Retrieves funding switch status from Truv
- * https://docs.truv.com/?javascript--nodejs#funding-account
- * @param {String} access_token
- * @return The response from Truv - https://docs.truv.com/?javascript--nodejs#schemafas
- **/
-const getFundingSwitchStatusByToken = async (access_token) => {
-  console.log(
-    "TRUV: Requesting funding switch update data using an access_token from https://prod.truv.com/v1/account-switches"
-  );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-  });
-  return await sendRequest("account-switches/", { body });
-};
-
-/**
  * Requests a task refresh from Truv to complete the Funding account switch flow
  * https://docs.truv.com/?javascript--nodejs#data-refresh
  * @param {String} access_token
@@ -236,6 +223,23 @@ const getDepositSwitchByToken = async (access_token) => {
   return await sendRequest("deposit-switches/", { body });
 };
 
+/**
+ * Retrieves pll status from Truv
+ * https://docs.truv.com/?javascript--nodejs#paycheck-linked-loans
+ * @param {String} access_token
+ * @return The response from Truv - https://docs.truv.com/?javascript--nodejs#schemapll
+ **/
+const getPaycheckLinkedLoanByToken = async (access_token) => {
+  console.log(
+    "TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/paycheck-linked-loans/"
+  );
+  console.log(`TRUV: Access Token - ${access_token}`);
+  const body = JSON.stringify({
+    access_token,
+  });
+  return await sendRequest("paycheck-linked-loans/", { body })
+}
+
 const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
   const headers = getHeaders();
   try {
@@ -255,7 +259,7 @@ const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
 
 export {
   getDepositSwitchByToken,
-  getFundingSwitchStatusByToken,
+  getPaycheckLinkedLoanByToken,
   completeFundingSwitchFlowByToken,
   getEmploymentInfoByToken,
   getAccessToken,
