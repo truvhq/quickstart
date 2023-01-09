@@ -7,7 +7,6 @@ import crypto from "crypto"
 import {
   getDepositSwitchByToken,
   getPaycheckLinkedLoanByToken,
-  completeFundingSwitchFlowByToken,
   getAccessToken,
   getBridgeToken,
   getEmploymentInfoByToken,
@@ -181,26 +180,6 @@ app.get("/getPaycheckLinkedLoanData/:token", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-
-app.get(
-  "/completeFundingSwitchFlow/:first_micro/:second_micro",
-  async (req, res) => {
-    // retrieve income verification information
-    try {
-      const fundingSwitchResult = await completeFundingSwitchFlowByToken(
-        accessToken,
-        req.params.first_micro,
-        req.params.second_micro
-      );
-
-      res.json(fundingSwitchResult);
-    } catch (e) {
-      console.error("error with completeFundingSwitchFlow");
-      console.error(e);
-      res.status(500).json({ success: false });
-    }
-  }
-);
 
 app.post("/webhook", async (req, res) => {
   console.log("TRUV: Webhook Received");

@@ -28,15 +28,15 @@ type SettingsRequest struct {
 // RefreshRequest is used to define the body for the task refresh
 // endpoint
 type RefreshRequest struct {
-	AccessToken string `json:"access_token"`
-	Settings SettingsRequest `json:"settings"`
+	AccessToken string          `json:"access_token"`
+	Settings    SettingsRequest `json:"settings"`
 }
 
 // AccessTokenResponse is used to define the body for the
 // response of requesting an access token
 type AccessTokenResponse struct {
 	AccessToken string `json:"access_token"`
-	LinkId string `json:"link_id"`
+	LinkId      string `json:"link_id"`
 }
 
 // CreateRefreshTaskResponse is used to define the body for the
@@ -46,18 +46,20 @@ type CreateRefreshTaskResponse struct {
 }
 
 type AccountRequest struct {
-	AccountNumber  string `json:"account_number"`
-	AccountType  string `json:"account_type"`
-	RoutingNumber  string `json:"routing_number"`
-	BankName  string `json:"bank_name"`
+	AccountNumber string `json:"account_number"`
+	AccountType   string `json:"account_type"`
+	RoutingNumber string `json:"routing_number"`
+	BankName      string `json:"bank_name"`
+	DepositType   string `json:"deposit_type"`
+	DepositValue  string `json:"deposit_value"`
 }
 
 // PayrollReportRequest defines the body of the request when requesting
 // a payroll report
 type BridgeTokenRequest struct {
-	ProductType  string `json:"product_type"`
-	ClientName   string `json:"client_name"`
-	TrackingInfo string `json:"tracking_info"`
+	ProductType  string          `json:"product_type"`
+	ClientName   string          `json:"client_name"`
+	TrackingInfo string          `json:"tracking_info"`
 	Account      *AccountRequest `json:"account,omitempty"`
 }
 
@@ -78,8 +80,12 @@ func getBridgeToken() (string, error) {
 	fmt.Println("TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens")
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	bridgeTokenRequest := BridgeTokenRequest{ProductType: productType, ClientName: "Truv Quickstart", TrackingInfo: "1337"}
-	if productType == "fas" || productType == "deposit_switch" {
+	if productType == "pll" || productType == "deposit_switch" {
 		account := AccountRequest{AccountNumber: "16002600", AccountType: "checking", RoutingNumber: "123456789", BankName: "TD Bank"}
+		if productType == "pll" {
+			account.DepositType = "amount"
+			account.DepositValue = "1"
+		}
 		bridgeTokenRequest.Account = &account
 	}
 	bridgeJson, _ := json.Marshal(bridgeTokenRequest)
@@ -277,7 +283,7 @@ func requestPayrollReport(access_token, start_date, end_date string) (*PayrollRe
 	}
 	return &payrollReport, nil
 }
-	
+
 // getPayrollById requests the payroll report associated to the given id
 func getPayrollById(reportId string) (string, error) {
 	fmt.Println("TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}")
@@ -297,36 +303,14 @@ func getPayrollById(reportId string) (string, error) {
 	return string(data), nil
 }
 
-// getFundingSwitchStatusByToken uses the given access token to request
-// the associated funding switch requests
-func getFundingSwitchStatusByToken(access_token string) (string, error) {
-	fmt.Println("TRUV: Requesting funding switch update data using an access_token from https://prod.truv.com/v1/account-switches")
+// getPaycheckLinkedLoanByToken uses the given access token to request
+// the associated pll data
+func getPaycheckLinkedLoanByToken(access_token string) (string, error) {
+	fmt.Println("TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/paycheck-linked-loans/")
 	fmt.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("account-switches", "POST", jsonAccessToken)
-	if err != nil {
-		return "", err
-	}
-	client := &http.Client{}
-	res, err := client.Do(request)
-	if err != nil {
-		return "", err
-	}
-
-	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
-	return string(data), nil
-}
-
-// completeFundingSwitchFlowByToken uses the given access token to request
-// a task refresh to complete the Funding account switch flow
-func completeFundingSwitchFlowByToken(access_token string, first_micro string, second_micro string) (string, error) {
-	fmt.Println("TRUV: Completing funding switch flow with a Task refresh using an access_token from https://prod.truv.com/v1/refresh/tasks")
-	fmt.Printf("TRUV: Access Token - %s\n", access_token)
-	accessToken := RefreshRequest{AccessToken: access_token, Settings: SettingsRequest{ MicroDeposits: []string{first_micro, second_micro} }}
-	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
+	request, err := getRequest("paycheck-linked-loans", "POST", jsonAccessToken)
 	if err != nil {
 		return "", err
 	}

@@ -181,32 +181,6 @@ const getPayrollById = async (report_id) => {
 };
 
 /**
- * Requests a task refresh from Truv to complete the Funding account switch flow
- * https://docs.truv.com/?javascript--nodejs#data-refresh
- * @param {String} access_token
- * @param {Number} first_micro
- * @param {Number} second_micro
- * @return The response from Truv - https://docs.truv.com/?javascript--nodejs#schemarefreshtaskcreateresponse
- */
-const completeFundingSwitchFlowByToken = async (
-  access_token,
-  first_micro,
-  second_micro
-) => {
-  console.log(
-    "TRUV: Completing funding switch flow with a Task refresh using an access_token from https://prod.truv.com/v1/refresh/tasks"
-  );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-    settings: {
-      micro_deposits: [parseFloat(first_micro), parseFloat(second_micro)],
-    },
-  });
-  return await sendRequest("refresh/tasks/", { body });
-};
-
-/**
  * Retrieves deposit switch status from Truv
  * https://docs.truv.com/?javascript--nodejs#direct-deposit
  * @param {String} access_token The access token provided by Truv
@@ -260,7 +234,6 @@ const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
 export {
   getDepositSwitchByToken,
   getPaycheckLinkedLoanByToken,
-  completeFundingSwitchFlowByToken,
   getEmploymentInfoByToken,
   getAccessToken,
   getBridgeToken,
