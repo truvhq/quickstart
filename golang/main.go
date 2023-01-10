@@ -72,12 +72,13 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 }
 
 type RefreshStatusResponse struct {
-	Status    string `json:"status"`
+	Status string `json:"status"`
 }
+
 // verifications accepts requests for a verification and sends the response
 func refresh(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
-	
+
 	taskId, err := createRefreshTask(accessToken)
 
 	if err != nil {
@@ -184,8 +185,8 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, data)
 }
 
-// startFundingSwitchFlow retrieves funding switch data
-func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
+// getPaycheckLinkedLoanData retrieves pll data
+func getPaycheckLinkedLoanData(w http.ResponseWriter, r *http.Request) {
 	var err error
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
@@ -195,24 +196,9 @@ func startFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
-	fundingSwitchResponse, err := getFundingSwitchStatusByToken(accessToken)
+	fundingSwitchResponse, err := getPaycheckLinkedLoanByToken(accessToken)
 	if err != nil {
-		fmt.Println("Error getting funding switch Status", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-	} else {
-		fmt.Fprintf(w, fundingSwitchResponse)
-	}
-}
-
-// completeFundingSwitchFlow finishes the funding switch flow with two micro deposit values
-func completeFundingSwitchFlow(w http.ResponseWriter, r *http.Request) {
-	splitPath := strings.Split(r.URL.Path, "/")
-	first_micro := splitPath[2]
-	second_micro := splitPath[3]
-
-	fundingSwitchResponse, err := completeFundingSwitchFlowByToken(accessToken, first_micro, second_micro)
-	if err != nil {
-		fmt.Println("Error getting funding switch Status", err)
+		fmt.Println("Error getting pll data", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
 		fmt.Fprintf(w, fundingSwitchResponse)
@@ -230,7 +216,7 @@ func depositSwitch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	depositSwitchResponse, err := getDepositSwitchByToken(accessToken)
-	
+
 	if err != nil {
 		fmt.Println("Error getting deposit switch", err)
 		fmt.Fprintf(w, `{ "success": false }`)
@@ -256,8 +242,8 @@ func checkEnv() {
 		fmt.Println("No API_PRODUCT_TYPE provided")
 		os.Exit(1)
 	}
-	if productType != "employment" && productType != "income" && productType != "admin" && productType != "fas" && productType != "deposit_switch" {
-		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or fas")
+	if productType != "employment" && productType != "income" && productType != "admin" && productType != "pll" && productType != "deposit_switch" {
+		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or pll")
 		os.Exit(1)
 	}
 }
@@ -295,8 +281,7 @@ func handleRequests() {
 	http.HandleFunc("/getBridgeToken", bridgeToken)
 	http.HandleFunc("/getVerifications/", verifications)
 	http.HandleFunc("/getAdminData/", adminData)
-	http.HandleFunc("/startFundingSwitchFlow/", startFundingSwitchFlow)
-	http.HandleFunc("/completeFundingSwitchFlow/", completeFundingSwitchFlow)
+	http.HandleFunc("/getPaycheckLinkedLoanData/", getPaycheckLinkedLoanData)
 	http.HandleFunc("/getDepositSwitchData/", depositSwitch)
 	http.HandleFunc("/createRefreshTask/", refresh)
 	http.HandleFunc("/webhook", webhook)
