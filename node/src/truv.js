@@ -1,12 +1,10 @@
-import fetch from "node-fetch";
+import fetch from 'node-fetch';
 
 const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env;
 
 if (!API_CLIENT_ID || !API_SECRET) {
-  console.error(
-    "Please specify API_CLIENT_ID and API_SECRET!"
-  )
-  process.exit(-1)
+  console.error('Please specify API_CLIENT_ID and API_SECRET!');
+  process.exit(-1);
 }
 
 /**
@@ -15,10 +13,10 @@ if (!API_CLIENT_ID || !API_SECRET) {
  **/
 const getHeaders = () => {
   return {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    "X-Access-Client-Id": API_CLIENT_ID,
-    "X-Access-Secret": API_SECRET,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'X-Access-Client-Id': API_CLIENT_ID,
+    'X-Access-Secret': API_SECRET,
   };
 };
 
@@ -28,29 +26,27 @@ const getHeaders = () => {
  * @return The response from Truv - https://docs.truv.com/javascript--nodejs#schemabridgetoken
  */
 const getBridgeToken = async () => {
-  console.log(
-    "TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens"
-  );
+  console.log('TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens');
   const bodyObj = {
     product_type: API_PRODUCT_TYPE,
-    client_name: "Truv Quickstart",
-    tracking_info: "1337",
+    client_name: 'Truv Quickstart',
+    tracking_info: '1337',
   };
-  if (API_PRODUCT_TYPE === "pll" || API_PRODUCT_TYPE === "deposit_switch") {
+  if (API_PRODUCT_TYPE === 'pll' || API_PRODUCT_TYPE === 'deposit_switch') {
     bodyObj.account = {
-      account_number: "16002600",
-      account_type: "checking",
-      routing_number: "123456789",
-      bank_name: "TD Bank",
+      account_number: '16002600',
+      account_type: 'checking',
+      routing_number: '123456789',
+      bank_name: 'TD Bank',
     };
-    if (API_PRODUCT_TYPE === "pll") {
-      bodyObj.account.deposit_type = "amount";
-      bodyObj.account.deposit_value = "1";
+    if (API_PRODUCT_TYPE === 'pll') {
+      bodyObj.account.deposit_type = 'amount';
+      bodyObj.account.deposit_value = '1';
     }
   }
   const body = JSON.stringify(bodyObj);
 
-  const responseBody = await sendRequest("bridge-tokens/", { body });
+  const responseBody = await sendRequest('bridge-tokens/', { body });
   return responseBody;
 };
 
@@ -62,14 +58,12 @@ const getBridgeToken = async () => {
  * @return The access token provided by truv
  **/
 const getAccessToken = async (public_token) => {
-  console.log(
-    "TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens"
-  );
+  console.log('TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens');
   console.log(`TRUV: Public Token - ${public_token}`);
   const body = JSON.stringify({
     public_token: public_token,
   });
-  const responseBody = await sendRequest("link-access-tokens/", { body });
+  const responseBody = await sendRequest('link-access-tokens/', { body });
   return responseBody;
 };
 
@@ -81,32 +75,28 @@ const getAccessToken = async (public_token) => {
  */
 const getEmploymentInfoByToken = async (access_token) => {
   console.log(
-    "TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/verifications/employments"
+    'TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/verifications/employments',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest("verifications/employments/", { body });
+  return await sendRequest('verifications/employments/', { body });
 };
 
 const createRefreshTask = async (access_token) => {
-  console.log(
-    "TRUV: Requesting a data refresh using an access_token from https://prod.truv.com/v1/refresh/tasks"
-  );
+  console.log('TRUV: Requesting a data refresh using an access_token from https://prod.truv.com/v1/refresh/tasks');
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest("refresh/tasks/", { body });
+  return await sendRequest('refresh/tasks/', { body });
 };
 
 const getRefreshTask = async (task_id) => {
-  console.log(
-    "TRUV: Requesting a refresh task using a task_id from https://prod.truv.com/v1/refresh/tasks/{task_id}"
-  );
+  console.log('TRUV: Requesting a refresh task using a task_id from https://prod.truv.com/v1/refresh/tasks/{task_id}');
   console.log(`TRUV: Task ID - ${task_id}`);
-  return await sendRequest(`refresh/tasks/${task_id}`, { method: "GET" });
+  return await sendRequest(`refresh/tasks/${task_id}`, { method: 'GET' });
 };
 
 /**
@@ -117,13 +107,13 @@ const getRefreshTask = async (task_id) => {
  */
 const getIncomeInfoByToken = async (access_token) => {
   console.log(
-    "TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/verifications/incomes"
+    'TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/verifications/incomes',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest("verifications/incomes/", { body });
+  return await sendRequest('verifications/incomes/', { body });
 };
 
 /**
@@ -134,13 +124,13 @@ const getIncomeInfoByToken = async (access_token) => {
  */
 const getEmployeeDirectoryByToken = async (access_token) => {
   console.log(
-    "TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/administrators/directories"
+    'TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/administrators/directories',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest("administrators/directories/", { body });
+  return await sendRequest('administrators/directories/', { body });
 };
 
 /**
@@ -153,7 +143,7 @@ const getEmployeeDirectoryByToken = async (access_token) => {
  */
 const requestPayrollReport = async (access_token, start_date, end_date) => {
   console.log(
-    "TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls"
+    'TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
@@ -161,7 +151,7 @@ const requestPayrollReport = async (access_token, start_date, end_date) => {
     start_date,
     end_date,
   });
-  return await sendRequest("administrators/payrolls/", { body });
+  return await sendRequest('administrators/payrolls/', { body });
 };
 
 /**
@@ -172,11 +162,11 @@ const requestPayrollReport = async (access_token, start_date, end_date) => {
  */
 const getPayrollById = async (report_id) => {
   console.log(
-    "TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}"
+    'TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}',
   );
   console.log(`TRUV: Report ID - ${report_id}`);
   return await sendRequest(`administrators/payrolls/${report_id}`, {
-    method: "GET",
+    method: 'GET',
   });
 };
 
@@ -188,13 +178,13 @@ const getPayrollById = async (report_id) => {
  */
 const getDepositSwitchByToken = async (access_token) => {
   console.log(
-    "TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/deposit_switches"
+    'TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/deposit_switches',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest("deposit-switches/", { body });
+  return await sendRequest('deposit-switches/', { body });
 };
 
 /**
@@ -204,17 +194,15 @@ const getDepositSwitchByToken = async (access_token) => {
  * @return The response from Truv - https://docs.truv.com/?javascript--nodejs#schemapll
  **/
 const getPaycheckLinkedLoanByToken = async (access_token) => {
-  console.log(
-    "TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/paycheck-linked-loans/"
-  );
+  console.log('TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/paycheck-linked-loans/');
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest("paycheck-linked-loans/", { body })
-}
+  return await sendRequest('paycheck-linked-loans/', { body });
+};
 
-const sendRequest = async (endpoint, { body = undefined, method = "POST" }) => {
+const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
   const headers = getHeaders();
   try {
     const response = await fetch(`https://prod.truv.com/v1/${endpoint}`, {
