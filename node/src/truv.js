@@ -22,8 +22,8 @@ const getHeaders = () => {
 
 /**
  * Retrieves a bridge token from Truv
- * https://docs.truv.com/javascript--nodejs#bridge-tokens_create
- * @return The response from Truv - https://docs.truv.com/javascript--nodejs#schemabridgetoken
+ * https://docs.truv.com/reference/bridge-tokens_create
+ * @return The response from Truv
  */
 const getBridgeToken = async () => {
   console.log('TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens');
@@ -53,7 +53,7 @@ const getBridgeToken = async () => {
 /**
  * Calls out to Truv exchanging the public token given by the API request
  * for an access token to make subsequent requests
- * https://docs.truv.com/?javascript--nodejs#exchange-token-flow
+ * https://docs.truv.com/reference/link_exchange_token_flow
  * @param {String} public_token The token provided by the API request to exchange
  * @return The access token provided by truv
  **/
@@ -69,19 +69,19 @@ const getAccessToken = async (public_token) => {
 
 /**
  * Retrieves employment verifications from Truv
- * https://docs.truv.com/?javascript--nodejs#employment-verification
+ * https://docs.truv.com/reference/employment_verification
  * @param {String} access_token The access token provided by Truv
- * @return The response from Truv - https://docs.truv.com/javascript--nodejs#schemaemploymentcheck
+ * @return The response from Truv
  */
 const getEmploymentInfoByToken = async (access_token) => {
   console.log(
-    'TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/verifications/employments',
+    'TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/links/reports/employment/',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest('verifications/employments/', { body });
+  return await sendRequest('links/reports/employment/', { body });
 };
 
 const createRefreshTask = async (access_token) => {
@@ -101,45 +101,43 @@ const getRefreshTask = async (task_id) => {
 
 /**
  * Retrieves income verifications from Truv
- * https://docs.truv.com/?javascript--nodejs#income-verification
+ * https://docs.truv.com/reference/income_verification
  * @param {String} access_token
- * @return The response from Truv - https://docs.truv.com/javascript--nodejs#schemaincomecheck
+ * @return The response from Truv
  */
 const getIncomeInfoByToken = async (access_token) => {
   console.log(
-    'TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/verifications/incomes',
+    'TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/links/reports/income/',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest('verifications/incomes/', { body });
+  return await sendRequest('links/reports/income/', { body });
 };
 
 /**
  * Retrieves employee directories from Truv
- * https://docs.truv.com/?javascript--nodejs#employee-directory
  * @param {String} access_token
- * @return The response from Truv - https://docs.truv.com/?javascript--nodejs#schemadirectoryresponse
+ * @return The response from Truv
  */
 const getEmployeeDirectoryByToken = async (access_token) => {
   console.log(
-    'TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/administrators/directories',
+    'TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/links/reports/admin/',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest('administrators/directories/', { body });
+  return await sendRequest('links/reports/admin/', { body });
 };
 
 /**
  * Creates a payroll report in Truv
- * https://docs.truv.com/?javascript--nodejs#create-payroll-report
  * @param {String} access_token
  * @param {String} start_date
  * @param {String} end_date
- * @return The payroll report ID from Truv - https://docs.truv.com/?javascript--nodejs#create-payroll-admin-report-request-responseschema
+ * @return The payroll report ID from Truv
  */
 const requestPayrollReport = async (access_token, start_date, end_date) => {
   console.log(
@@ -156,9 +154,8 @@ const requestPayrollReport = async (access_token, start_date, end_date) => {
 
 /**
  * Retrieves a payroll report from Truv
- * https://docs.truv.com/?javascript--nodejs#retrieve-payroll-report
  * @param {String} report_id
- * @return The payroll report ID from Truv - https://docs.truv.com/?javascript--nodejs#create-payroll-admin-report-request-responseschema
+ * @return The payroll report ID from Truv
  */
 const getPayrollById = async (report_id) => {
   console.log(
@@ -172,34 +169,34 @@ const getPayrollById = async (report_id) => {
 
 /**
  * Retrieves deposit switch status from Truv
- * https://docs.truv.com/?javascript--nodejs#direct-deposit
+ * https://docs.truv.com/reference/dds_report
  * @param {String} access_token The access token provided by Truv
- * @return The response from Truv - https://docs.truv.com/?javascript--nodejs#schemadds
+ * @return The response from Truv
  */
 const getDepositSwitchByToken = async (access_token) => {
   console.log(
-    'TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/deposit_switches',
+    'TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/links/reports/direct_deposit/',
   );
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest('deposit-switches/', { body });
+  return await sendRequest('links/reports/direct_deposit/', { body });
 };
 
 /**
  * Retrieves pll status from Truv
- * https://docs.truv.com/?javascript--nodejs#paycheck-linked-loans
+ * https://docs.truv.com/reference/pll_report
  * @param {String} access_token
- * @return The response from Truv - https://docs.truv.com/?javascript--nodejs#schemapll
+ * @return The response from Truv
  **/
 const getPaycheckLinkedLoanByToken = async (access_token) => {
-  console.log('TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/paycheck-linked-loans/');
+  console.log('TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/links/reports/ppl/');
   console.log(`TRUV: Access Token - ${access_token}`);
   const body = JSON.stringify({
     access_token,
   });
-  return await sendRequest('paycheck-linked-loans/', { body });
+  return await sendRequest('links/reports/ppl/', { body });
 };
 
 const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
