@@ -1,9 +1,10 @@
-FROM node:14.15.0
+FROM node:16.19.0
+
+COPY html /html
 
 WORKDIR /app
-ADD . .
-WORKDIR /app/node
 
+COPY node .
 RUN npm install
 
 EXPOSE 5004
