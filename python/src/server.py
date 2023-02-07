@@ -7,7 +7,7 @@ import time
 
 import flask
 from dotenv import load_dotenv
-from flask import Flask, render_template, request
+from flask import Flask, g, render_template, request
 from flask_cors import CORS
 
 from .truv import TruvClient
@@ -30,7 +30,6 @@ flask_port = os.environ.get("FLASK_RUN_PORT", 5001)
 if not secret or not client_id:
     raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID'")
 
-access_token = None
 
 api_client = TruvClient(
     secret=secret,
@@ -38,16 +37,7 @@ api_client = TruvClient(
     product_type=product_type,
 )
 
-print(
-    "=" * 40,
-    "ENVIRONMENT",
-    "=" * 40,
-    "\n",
-    json.dumps(api_client.headers, indent=4),
-    "\n",
-    "=" * 94,
-    "\n",
-)
+logging.info("ENVIRONMENT: %s \n", json.dumps(api_client.headers, indent=4))
 
 
 @app.context_processor
@@ -55,6 +45,15 @@ def inject_product_type():
     return dict(
         server_url=flask.request.url_root,
     )
+
+
+def get_access_token():
+    return g.get("access_token", None)
+
+
+def set_access_token(value):
+    g.access_token = value
+    return g.access_token
 
 
 @app.route("/")
@@ -83,7 +82,8 @@ def create_bridge_token():
     """
     API endpoint to request a bridge token
     """
-    return api_client.get_bridge_token()
+    user = api_client.create_user()
+    return api_client.create_user_bridge_token(user_id=user["id"])
 
 
 def generate_webhook_sign(payload: str, key: str) -> str:
@@ -118,11 +118,9 @@ def get_verification_info_by_token(public_token: str):
     """
     API endpoint to retrieve employment or income verification data
     """
-    global access_token
-
     # First exchange public_token to access_token
     token = api_client.get_access_token(public_token)
-    access_token = token["access_token"]
+    access_token = set_access_token(token["access_token"])
 
     # Use access_token to retrieve the data
     if product_type == "employment":
@@ -131,7 +129,7 @@ def get_verification_info_by_token(public_token: str):
     if product_type == "income":
         return api_client.get_income_info_by_token(access_token)
 
-    raise Exception("Unsupported product type!")
+    raise ValueError("Unsupported product type!")
 
 
 @app.route("/createRefreshTask", methods=["GET"])
@@ -139,7 +137,9 @@ def create_refresh_task_by_token():
     """
     API endpoint to create a refresh task from an existing access token
     """
-    global access_token
+    access_token = get_access_token()
+    if not access_token:
+        raise ValueError("No access_token found")
 
     # Create a refresh task
     task_id = api_client.create_refresh_task(access_token)["task_id"]
@@ -174,9 +174,9 @@ def create_refresh_task_by_token():
         return api_client.get_income_info_by_token(access_token)
 
     if product_type == "admin":
-        return get_admin_data()
+        return get_admin_data(access_token)
 
-    raise Exception("Unsupported product type!")
+    raise ValueError("Unsupported product type!")
 
 
 @app.route("/getDepositSwitchData/<public_token>", methods=["GET"])
@@ -190,9 +190,7 @@ def get_deposit_switch_data_by_token(public_token: str):
     access_token = tokenResult["access_token"]
 
     # Use access_token to retrieve the data
-    depositSwitch = api_client.get_deposit_switch_by_token(access_token)
-
-    return depositSwitch
+    return api_client.get_deposit_switch_by_token(access_token)
 
 
 @app.route("/getPaycheckLinkedLoanData/<public_token>", methods=["GET"])
@@ -206,9 +204,7 @@ def get_pll_data_by_token(public_token: str):
     access_token = tokenResult["access_token"]
 
     # Use access_token to retrieve the data
-    pllData = api_client.get_pll_by_token(access_token)
-
-    return pllData
+    return api_client.get_pll_by_token(access_token)
 
 
 @app.route("/getAdminData/<public_token>", methods=["GET"])
@@ -216,19 +212,15 @@ def get_admin_data_by_token(public_token: str):
     """
     API endpoint to retrieve payroll admin data
     """
-
-    global access_token
-
     # First, exchange public_token to access_token
     tokenResult = api_client.get_access_token(public_token)
     access_token = tokenResult["access_token"]
 
     # Second, request admin data
-    return get_admin_data()
+    return get_admin_data(access_token)
 
 
-def get_admin_data():
-    global access_token
+def get_admin_data(access_token: str) -> dict:
     # request employee directory
     directory = api_client.get_employee_directory_by_token(access_token)
 
@@ -253,7 +245,6 @@ if __name__ == "__main__":
     app.debug = True
     app.run(port=flask_port)
 
-    print(
-        "Quickstart Loaded. "
-        f"Navigate to http://localhost:{flask_port} to view Quickstart.",
+    logging.info(
+        "Quickstart Loaded. Navigate to http://localhost:%s to view.", flask_port
     )

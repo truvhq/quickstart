@@ -1,6 +1,10 @@
 import logging
+from uuid import uuid4
 
 import requests
+from faker import Faker
+
+fake = Faker()
 
 
 class TruvClient:
@@ -23,12 +27,29 @@ class TruvClient:
         headers = kwargs.pop("headers", {})
         headers.update(self.headers)
 
-        return requests.request(
-            method,
-            self.api_url + endpoint,
-            headers=headers,
-            **kwargs,
-        ).json()
+        url = self.api_url + endpoint
+
+        try:
+            response = requests.request(
+                method,
+                url,
+                headers=headers,
+                **kwargs,
+            )
+            logging.info(
+                "TRUV: Response: %s %s - %s:\n %s\n",
+                method.upper(),
+                url,
+                response.status_code,
+                response.content,
+            )
+
+            response.raise_for_status()
+            return response.json()
+
+        except requests.exceptions.HTTPError as err:
+            logging.exception("API Request Error: %s", err.response.text)
+            raise err
 
     def post(self, endpoint: str, **kwargs) -> dict:
         return self._request("post", endpoint, **kwargs)
@@ -36,34 +57,44 @@ class TruvClient:
     def get(self, endpoint: str, **kwargs) -> dict:
         return self._request("get", endpoint, **kwargs)
 
-    def get_bridge_token(self) -> dict:
+    def create_user(self, **kwargs) -> dict:
+        logging.info("TRUV: Requesting new user from https://prod.truv.com/v1/users/")
+        payload = {
+            "external_user_id": f"qs-{uuid4().hex}",
+            "first_name": fake.first_name(),
+            "last_name": fake.last_name(),
+            "email": fake.email(domain="example.com"),
+            **kwargs,
+        }
+        return self.post("users/", json=payload)
+
+    def create_user_bridge_token(self, user_id: str) -> dict:
         logging.info(
-            "TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens"
+            "TRUV: Requesting user bridge token from https://prod.truv.com/v1/users/{user_id}/tokens"
         )
+        logging.info("TRUV: User ID - %s", user_id)
 
         payload = {
             "product_type": self.product_type,
-            "client_name": "Truv QuickStart",
-            "tracking_info": "1337",
+            "tracking_info": "1338-0111-A",
         }
 
         if self.product_type in ["deposit_switch", "pll"]:
             payload["account"] = {
                 "account_number": "16002600",
                 "account_type": "checking",
-                "routing_number": "123456789",
-                "bank_name": "TD Bank",
+                "routing_number": "12345678",
+                "bank_name": fake.company(),
             }
 
             if self.product_type == "pll":
                 payload["account"].update(
                     {
                         "deposit_type": "amount",
-                        "deposit_value": "1",
+                        "deposit_value": "100",
                     }
                 )
-
-        return self.post("bridge-tokens/", json=payload)
+        return self.post(f"users/{user_id}/tokens/", json=payload)
 
     def get_access_token(self, public_token: str) -> dict:
         logging.info(
@@ -123,7 +154,7 @@ class TruvClient:
         )
         logging.info("TRUV: Task ID - %s", task_id)
 
-        return self.get("refresh/tasks/" + task_id)
+        return self.get(f"refresh/tasks/{task_id}/")
 
     def get_employee_directory_by_token(self, access_token: str) -> dict:
         logging.info(
@@ -187,4 +218,4 @@ class TruvClient:
         )
         logging.info("TRUV: Report ID - %s", report_id)
 
-        return self.get("administrators/payrolls/" + report_id)
+        return self.get(f"administrators/payrolls/{report_id}")
