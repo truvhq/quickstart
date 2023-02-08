@@ -3,7 +3,7 @@
 .mypy_cache
 __pycache__
 .env
-quickstart_venv
+.venv
 node_modules
 
 [Bb]in/

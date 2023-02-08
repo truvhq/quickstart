@@ -27,9 +27,9 @@ node_local:
 	npm start
 
 python_local:
-	python3 -m venv quickstart_venv && \
- 		./quickstart_venv/bin/pip3 install -r python/requirements.txt && \
-		FLASK_DEBUG=true ./quickstart_venv/bin/python3 -m python.src.server
+	python3 -m venv ./python/.venv && \
+	./python/.venv/bin/pip3 install -r python/requirements.txt && \
+	FLASK_DEBUG=true ./python/.venv/bin/python3 -m python.src.server
 
 ruby_local:
 	cd ruby && \
