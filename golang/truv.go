@@ -89,6 +89,7 @@ func getRequest(endpoint string, method string, body []byte) (*http.Request, err
 	return request, nil
 }
 
+// createUser creates a user from the Truv API
 func createUser() (string, error) {
 	fmt.Println("TRUV: Requesting new user from https://prod.truv.com/v1/users/")
 	userRequest := UserRequest{
@@ -116,6 +117,8 @@ func createUser() (string, error) {
 	return user.UserId, nil
 }
 
+// createUser creates a bridge token from the Truv API
+// with the given userId
 func createUserBridgeToken(userId string) (string, error) {
 	fmt.Println("TRUV: Requesting user bridge token from https://prod.truv.com/v1/users/{user_id}/tokens")
 	fmt.Printf("TRUV: User ID - %s\n", userId)
@@ -140,44 +143,6 @@ func createUserBridgeToken(userId string) (string, error) {
 	}
 	bridgeJson, _ := json.Marshal(bridgeTokenRequest)
 	request, err := getRequest(fmt.Sprintf("users/%s/tokens/", userId), "POST", bridgeJson)
-	if err != nil {
-		return "", err
-	}
-	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil {
-		return "", err
-	}
-
-	defer response.Body.Close()
-	data, _ := ioutil.ReadAll(response.Body)
-	return (string(data)), nil
-}
-
-// getBridgeToken requests a bridge token from the Truv API
-func getBridgeToken() (string, error) {
-	fmt.Println("TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens")
-	productType := os.Getenv("API_PRODUCT_TYPE")
-	bridgeTokenRequest := BridgeTokenRequest{
-		ProductType:  productType,
-		ClientName:   "Truv Quickstart",
-		TrackingInfo: "1337",
-	}
-	if productType == "pll" || productType == "deposit_switch" {
-		account := AccountRequest{
-			AccountNumber: "16002600",
-			AccountType:   "checking",
-			RoutingNumber: "123456789",
-			BankName:      "TD Bank",
-		}
-		if productType == "pll" {
-			account.DepositType = "amount"
-			account.DepositValue = "1"
-		}
-		bridgeTokenRequest.Account = &account
-	}
-	bridgeJson, _ := json.Marshal(bridgeTokenRequest)
-	request, err := getRequest("bridge-tokens/", "POST", bridgeJson)
 	if err != nil {
 		return "", err
 	}
