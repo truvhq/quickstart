@@ -9,7 +9,6 @@ import {
   getDepositSwitchByToken,
   getPaycheckLinkedLoanByToken,
   getAccessToken,
-  getBridgeToken,
   getEmploymentInfoByToken,
   getIncomeInfoByToken,
   getEmployeeDirectoryByToken,
@@ -17,6 +16,8 @@ import {
   requestPayrollReport,
   createRefreshTask,
   getRefreshTask,
+  createUser,
+  createUserBridgeToken,
 } from './truv.js';
 
 const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env;
@@ -46,7 +47,8 @@ app.get('/', htmlFile);
 app.get('/getBridgeToken', async (req, res) => {
   // retrieve bridge token
   try {
-    const bridgeToken = await getBridgeToken();
+    const user = await createUser();
+    const bridgeToken = await createUserBridgeToken(user.id);
     res.json(bridgeToken);
   } catch (e) {
     console.error('error with getBridgeToken');
@@ -66,6 +68,7 @@ app.get('/getVerifications/:token', async (req, res) => {
     } else {
       verifications = await getIncomeInfoByToken(accessToken);
     }
+
     res.json(verifications);
   } catch (e) {
     console.error('error with getVerifications');

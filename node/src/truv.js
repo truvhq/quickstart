@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { v4 as uuidv4 } from 'uuid';
 
 const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env;
 
@@ -18,6 +19,60 @@ const getHeaders = () => {
     'X-Access-Client-Id': API_CLIENT_ID,
     'X-Access-Secret': API_SECRET,
   };
+};
+
+/**
+ * Create a user
+ * https://docs.truv.com/reference/users_create
+ * @returns The response from Truv
+ */
+const createUser = async () => {
+  console.log('TRUV: Requesting a user from https://prod.truv.com/v1/users/');
+  const bodyObj = {
+    external_user_id: `qs-${uuidv4()}`,
+    first_name: 'John',
+    last_name: 'Johnson',
+    email: 'j.johnson@example.com',
+  };
+  const body = JSON.stringify(bodyObj);
+
+  const responseBody = await sendRequest('users/', { body });
+  return responseBody;
+};
+
+/**
+ * Create a bridge token for a user
+ * https://docs.truv.com/reference/users_tokens
+ * @param {String} user_id
+ * @returns The response from Truv
+ */
+const createUserBridgeToken = async (user_id) => {
+  console.log('TRUV: Requesting user bridge token from https://prod.truv.com/v1/users/{user_id}/tokens');
+  console.log(`TRUV: User ID - ${user_id}`);
+
+  const bodyObj = {
+    product_type: API_PRODUCT_TYPE,
+    client_name: 'Truv Quickstart',
+    tracking_info: '1338-0111-A',
+  };
+
+  if (API_PRODUCT_TYPE === 'pll' || API_PRODUCT_TYPE === 'deposit_switch') {
+    bodyObj.account = {
+      account_number: '16002600',
+      account_type: 'checking',
+      routing_number: '123456789',
+      bank_name: 'TD Bank',
+    };
+
+    if (API_PRODUCT_TYPE === 'pll') {
+      bodyObj.account = { ...bodyObj.account, deposit_type: 'amount', deposit_value: '100' };
+    }
+  }
+
+  const body = JSON.stringify(bodyObj);
+
+  const responseBody = await sendRequest(`users/${user_id}/tokens/`, { body });
+  return responseBody;
 };
 
 /**
@@ -208,6 +263,7 @@ const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
       headers,
     });
     const responseBody = await response.json();
+    console.log(`Response: ${method} ${endpoint} - ${response.status}\n ${JSON.stringify(responseBody)}`);
     return responseBody;
   } catch (e) {
     console.error(`Error with ${endpoint} request`);
@@ -228,4 +284,6 @@ export {
   getPayrollById,
   createRefreshTask,
   getRefreshTask,
+  createUser,
+  createUserBridgeToken,
 };
