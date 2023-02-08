@@ -1,8 +1,10 @@
-FROM ruby:2.7.5
+FROM ruby:2.7.7
 
-WORKDIR /myapp
-COPY . /myapp
-WORKDIR /myapp/ruby
+COPY html /html
+
+WORKDIR /app
+
+COPY ruby .
 
 RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 RUN bundle install
