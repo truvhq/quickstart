@@ -1,5 +1,6 @@
 class BridgeToken
   def self.get
-    return Truv.getBridgeToken()
+    user_id = Truv.createUser()
+    return Truv.createUserBridgeToken(user_id)
   end
 end
