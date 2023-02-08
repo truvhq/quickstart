@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import time
+from pathlib import Path
 
 import flask
 from dotenv import load_dotenv
@@ -15,11 +16,9 @@ from .truv import TruvClient
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
-access_token = None
-
 app = Flask(
     __name__,
-    template_folder=os.path.abspath("../html"),
+    template_folder=Path(__file__).resolve(strict=True).parent.parent.parent / "html",
 )
 CORS(app)
 
@@ -40,26 +39,25 @@ api_client = TruvClient(
 
 logging.info("ENVIRONMENT: %s \n", json.dumps(api_client.headers, indent=4))
 
-
-@app.context_processor
-def inject_product_type():
-    return dict(
-        server_url=flask.request.url_root,
-    )
+access_token = None
 
 
 def get_access_token():
     global access_token
     return access_token
-    # return g.get("access_token", None)
 
 
 def set_access_token(value):
     global access_token
     access_token = value
     return access_token
-    # g.access_token = value
-    # return g.access_token
+
+
+@app.context_processor
+def inject_product_type():
+    return dict(
+        server_url=flask.request.url_root,
+    )
 
 
 @app.route("/")
