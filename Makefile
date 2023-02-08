@@ -6,19 +6,19 @@ env:
 	test -f .env || cp .env.example .env
 
 python_docker:
-	docker-compose --file docker-compose.yml up --build python
+	docker-compose up --build python
 
 node_docker:
-	docker-compose --file docker-compose.yml up --build node
+	docker-compose up --build node
 
 ruby_docker:
-	docker-compose --file docker-compose.yml up --build ruby
+	docker-compose up --build ruby
 
 csharp_docker:
-	docker-compose --file docker-compose.yml up --build csharp
+	docker-compose up --build csharp
 
 go_docker:
-	docker-compose --file docker-compose.yml up --build go
+	docker-compose up --build go
 
 node_local:
 	cd node && \
@@ -27,9 +27,9 @@ node_local:
 	npm start
 
 python_local:
-	python3 -m venv quickstart_venv && \
- 		./quickstart_venv/bin/pip3 install -r python/requirements.txt && \
-		FLASK_ENV=development ./quickstart_venv/bin/python3 -m python.src.server
+	python3 -m venv ./python/.venv && \
+	./python/.venv/bin/pip3 install -r python/requirements.txt && \
+	FLASK_DEBUG=true ./python/.venv/bin/python3 -m python.src.server
 
 ruby_local:
 	cd ruby && \
