@@ -7,7 +7,7 @@ import time
 
 import flask
 from dotenv import load_dotenv
-from flask import Flask, g, render_template, request
+from flask import Flask, render_template, request
 from flask_cors import CORS
 
 from .truv import TruvClient
@@ -15,10 +15,11 @@ from .truv import TruvClient
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
+access_token = None
 
 app = Flask(
     __name__,
-    template_folder=os.path.abspath("./html"),
+    template_folder=os.path.abspath("../html"),
 )
 CORS(app)
 
@@ -48,12 +49,17 @@ def inject_product_type():
 
 
 def get_access_token():
-    return g.get("access_token", None)
+    global access_token
+    return access_token
+    # return g.get("access_token", None)
 
 
 def set_access_token(value):
-    g.access_token = value
-    return g.access_token
+    global access_token
+    access_token = value
+    return access_token
+    # g.access_token = value
+    # return g.access_token
 
 
 @app.route("/")
