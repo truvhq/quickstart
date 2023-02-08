@@ -36,7 +36,14 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 // bridgeToken accepts requests for a bridge token and sends the response
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
-	bridgeData, err := getBridgeToken()
+	userId, err := createUser()
+	if err != nil {
+		fmt.Println("Error creating user", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+
+	bridgeData, err := createUserBridgeToken(userId)
 	if err != nil {
 		fmt.Println("Error in bridgeToken\n", err)
 		fmt.Fprintf(w, `{ "success": false }`)
