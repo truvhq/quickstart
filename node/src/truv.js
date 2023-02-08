@@ -76,36 +76,6 @@ const createUserBridgeToken = async (user_id) => {
 };
 
 /**
- * Retrieves a bridge token from Truv
- * https://docs.truv.com/reference/bridge-tokens_create
- * @return The response from Truv
- */
-const getBridgeToken = async () => {
-  console.log('TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens');
-  const bodyObj = {
-    product_type: API_PRODUCT_TYPE,
-    client_name: 'Truv Quickstart',
-    tracking_info: '1337',
-  };
-  if (API_PRODUCT_TYPE === 'pll' || API_PRODUCT_TYPE === 'deposit_switch') {
-    bodyObj.account = {
-      account_number: '16002600',
-      account_type: 'checking',
-      routing_number: '123456789',
-      bank_name: 'TD Bank',
-    };
-    if (API_PRODUCT_TYPE === 'pll') {
-      bodyObj.account.deposit_type = 'amount';
-      bodyObj.account.deposit_value = '1';
-    }
-  }
-  const body = JSON.stringify(bodyObj);
-
-  const responseBody = await sendRequest('bridge-tokens/', { body });
-  return responseBody;
-};
-
-/**
  * Calls out to Truv exchanging the public token given by the API request
  * for an access token to make subsequent requests
  * https://docs.truv.com/reference/link_exchange_token_flow
@@ -277,7 +247,6 @@ export {
   getPaycheckLinkedLoanByToken,
   getEmploymentInfoByToken,
   getAccessToken,
-  getBridgeToken,
   getIncomeInfoByToken,
   getEmployeeDirectoryByToken,
   requestPayrollReport,
