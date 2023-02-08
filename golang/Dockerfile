@@ -1,8 +1,10 @@
-FROM golang:1.15
+FROM golang:1.20
+
+COPY html /html
 
 WORKDIR /app
-ADD . .
-WORKDIR /app/golang
+
+COPY golang .
 
 EXPOSE 5003
 CMD ["go", "run", "truv"]
