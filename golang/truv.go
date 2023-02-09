@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 // PublicTokenRequest is used to define the body for requesting an
@@ -92,8 +93,9 @@ func getRequest(endpoint string, method string, body []byte) (*http.Request, err
 // createUser creates a user from the Truv API
 func createUser() (string, error) {
 	fmt.Println("TRUV: Requesting new user from https://prod.truv.com/v1/users/")
+	uniqueNumber := time.Now().UnixNano() / (1 << 22)
 	userRequest := UserRequest{
-		ExternalUserId: "qs-uuid",
+		ExternalUserId: fmt.Sprintf("qs-%s", uniqueNumber),
 		FirstName:      "John",
 		LastName:       "Johnson",
 		Email:          "j.johnson@example.com",
@@ -125,7 +127,6 @@ func createUserBridgeToken(userId string) (string, error) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	bridgeTokenRequest := BridgeTokenRequest{
 		ProductType:  productType,
-		ClientName:   "Truv Quickstart",
 		TrackingInfo: "1338-0111-A",
 	}
 	if productType == "pll" || productType == "deposit_switch" {
@@ -282,7 +283,7 @@ func getEmployeeDirectoryByToken(access_token string) (string, error) {
 	fmt.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("links/reports/admin/", "POST", jsonAccessToken)
+	request, err := getRequest("link/reports/admin/", "POST", jsonAccessToken)
 	if err != nil {
 		return "", err
 	}
