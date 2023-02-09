@@ -40,9 +40,10 @@ namespace c_sharp
         public async Task<string> CreateUser()
         {
             Console.WriteLine("TRUV: Requesting new user from https://prod.truv.com/v1/users/");
+            string uuid = Guid.NewGuid().ToString();
             var body = new UserRequest
             {
-                ExternalUserId = "qs-uuid",
+                ExternalUserId = $"qs-{uuid}",
                 FirstName = "John",
                 LastName = "Johnson",
                 Email = "j.johnson@example.com",
@@ -78,35 +79,6 @@ namespace c_sharp
                 }
             }
             return await SendRequest(HttpMethod.Post, $"users/{UserId}/tokens/", body);
-        }
-
-        public async Task<string> GetBridgeToken()
-        {
-            Console.WriteLine("TRUV: Requesting bridge token from https://prod.truv.com/v1/bridge-tokens/");
-            var body = new BridgeTokenRequest
-            {
-                ProductType = productType,
-                TrackingInfo = "1337",
-                ClientName = "Truv QuickStart"
-            };
-
-            if (productType == "pll" || productType == "deposit_switch")
-            {
-                body.Account = new AccountRequest
-                {
-                    AccountNumber = "16002600",
-                    AccountType = "checking",
-                    RountingNumber = "123456789",
-                    BankName = "TD Bank"
-                };
-
-                if (productType == "pll")
-                {
-                    body.Account.DepositType = "amount";
-                    body.Account.DepositValue = "1";
-                }
-            }
-            return await SendRequest(HttpMethod.Post, "bridge-tokens/", body);
         }
 
         public async Task<string> GetAccessToken(string publicToken)
