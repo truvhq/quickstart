@@ -35,7 +35,7 @@ ruby_local:
 	cd ruby && \
 	bundle install && \
 	set -a && source ../.env && set +a && \
-	rails server
+	./bin/rails server
 
 csharp_local:
 	cd c-sharp && \
