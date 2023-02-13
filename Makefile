@@ -40,7 +40,7 @@ ruby_local:
 csharp_local:
 	cd c-sharp && \
 	set -a && source ../.env && set +a && \
-	dotnet run
+	dotnet watch run
 
 go_local:
 	cd golang && \
