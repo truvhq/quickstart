@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"log"
 )
 
 // PublicTokenRequest is used to define the body for requesting an
@@ -92,7 +93,7 @@ func getRequest(endpoint string, method string, body []byte) (*http.Request, err
 
 // createUser creates a user from the Truv API
 func createUser() (string, error) {
-	fmt.Println("TRUV: Requesting new user from https://prod.truv.com/v1/users/")
+	log.Println("TRUV: Requesting new user from https://prod.truv.com/v1/users/")
 	uniqueNumber := time.Now().UnixNano() / (1 << 22)
 	userRequest := UserRequest{
 		ExternalUserId: fmt.Sprintf("qs-%d", uniqueNumber),
@@ -122,8 +123,8 @@ func createUser() (string, error) {
 // createUser creates a bridge token from the Truv API
 // with the given userId
 func createUserBridgeToken(userId string) (string, error) {
-	fmt.Println("TRUV: Requesting user bridge token from https://prod.truv.com/v1/users/{user_id}/tokens")
-	fmt.Printf("TRUV: User ID - %s\n", userId)
+	log.Println("TRUV: Requesting user bridge token from https://prod.truv.com/v1/users/{user_id}/tokens")
+	log.Printf("TRUV: User ID - %s\n", userId)
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	bridgeTokenRequest := BridgeTokenRequest{
 		ProductType:  productType,
@@ -161,8 +162,8 @@ func createUserBridgeToken(userId string) (string, error) {
 // getAccessToken requests an access token from the Truv API
 // with the given public token
 func getAccessToken(public_token string) (string, error) {
-	fmt.Println("TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens")
-	fmt.Printf("TRUV: Public Token - %s\n", public_token)
+	log.Println("TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens")
+	log.Printf("TRUV: Public Token - %s\n", public_token)
 	publicToken := PublicTokenRequest{PublicToken: public_token}
 	jsonPublicToken, _ := json.Marshal(publicToken)
 	accessToken := AccessTokenResponse{}
@@ -187,8 +188,8 @@ func getAccessToken(public_token string) (string, error) {
 // getEmploymentInfoByToken uses the given access token to request
 // the associated employment verification info
 func getEmploymentInfoByToken(access_token string) (string, error) {
-	fmt.Println("TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/links/reports/employment/")
-	fmt.Printf("TRUV: Access Token - %s\n", access_token)
+	log.Println("TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/links/reports/employment/")
+	log.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("links/reports/employment/", "POST", jsonAccessToken)
@@ -209,8 +210,8 @@ func getEmploymentInfoByToken(access_token string) (string, error) {
 // getIncomeInfoByToken uses the given access token to request
 // the associated income verification info
 func getIncomeInfoByToken(access_token string) (string, error) {
-	fmt.Println("TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/links/reports/income/")
-	fmt.Printf("TRUV: Access Token - %s\n", access_token)
+	log.Println("TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/links/reports/income/")
+	log.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("links/reports/income/", "POST", jsonAccessToken)
@@ -231,8 +232,8 @@ func getIncomeInfoByToken(access_token string) (string, error) {
 // createRefreshTask uses the given access token to request
 // a task refresh
 func createRefreshTask(access_token string) (string, error) {
-	fmt.Println("TRUV: Requesting a data refresh using an access_token from https://prod.truv.com/v1/refresh/tasks")
-	fmt.Printf("TRUV: Access Token - %s\n", access_token)
+	log.Println("TRUV: Requesting a data refresh using an access_token from https://prod.truv.com/v1/refresh/tasks")
+	log.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
@@ -259,8 +260,8 @@ func createRefreshTask(access_token string) (string, error) {
 
 // getRefreshTask requests a task refresh update
 func getRefreshTask(taskId string) (string, error) {
-	fmt.Println("TRUV: Requesting a refresh task using a task_id from https://prod.truv.com/v1/refresh/tasks/{task_id}")
-	fmt.Printf("TRUV: Task ID - %s\n", taskId)
+	log.Println("TRUV: Requesting a refresh task using a task_id from https://prod.truv.com/v1/refresh/tasks/{task_id}")
+	log.Printf("TRUV: Task ID - %s\n", taskId)
 	request, err := getRequest(fmt.Sprintf("refresh/tasks/%s", taskId), "GET", nil)
 	if err != nil {
 		return "", err
@@ -279,8 +280,8 @@ func getRefreshTask(taskId string) (string, error) {
 // getEmployeeDirectoryByToken uses the given access token to request
 // the associated employee directory info
 func getEmployeeDirectoryByToken(access_token string) (string, error) {
-	fmt.Println("TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/links/reports/admin/")
-	fmt.Printf("TRUV: Access Token - %s\n", access_token)
+	log.Println("TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/links/reports/admin/")
+	log.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("link/reports/admin/", "POST", jsonAccessToken)
@@ -301,8 +302,8 @@ func getEmployeeDirectoryByToken(access_token string) (string, error) {
 // requestPayrollReport uses the given access token to request
 // the associated payroll report
 func requestPayrollReport(access_token, start_date, end_date string) (*PayrollReportResponse, error) {
-	fmt.Println("TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls")
-	fmt.Printf("TRUV: Access Token - %s\n", access_token)
+	log.Println("TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls")
+	log.Printf("TRUV: Access Token - %s\n", access_token)
 	reportRequest := PayrollReportRequest{AccessToken: access_token, StartDate: start_date, EndDate: end_date}
 	jsonReportRequest, _ := json.Marshal(reportRequest)
 	payrollReport := PayrollReportResponse{}
@@ -326,8 +327,8 @@ func requestPayrollReport(access_token, start_date, end_date string) (*PayrollRe
 
 // getPayrollById requests the payroll report associated to the given id
 func getPayrollById(reportId string) (string, error) {
-	fmt.Println("TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}")
-	fmt.Printf("TRUV: Report ID - %s\n", reportId)
+	log.Println("TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}")
+	log.Printf("TRUV: Report ID - %s\n", reportId)
 	request, err := getRequest(fmt.Sprintf("administrators/payrolls/%s", reportId), "GET", nil)
 	if err != nil {
 		return "", err
@@ -346,8 +347,8 @@ func getPayrollById(reportId string) (string, error) {
 // getPaycheckLinkedLoanByToken uses the given access token to request
 // the associated pll data
 func getPaycheckLinkedLoanByToken(access_token string) (string, error) {
-	fmt.Println("TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/links/reports/pll/")
-	fmt.Printf("TRUV: Access Token - %s\n", access_token)
+	log.Println("TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/links/reports/pll/")
+	log.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("links/reports/pll/", "POST", jsonAccessToken)
@@ -368,8 +369,8 @@ func getPaycheckLinkedLoanByToken(access_token string) (string, error) {
 // getDepositSwitchByToken uses the given access token to request
 // the associated deposit switch info
 func getDepositSwitchByToken(access_token string) (string, error) {
-	fmt.Println("TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/links/reports/direct_deposit/")
-	fmt.Printf("TRUV: Access Token - %s\n", access_token)
+	log.Println("TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/links/reports/direct_deposit/")
+	log.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
 	request, err := getRequest("links/reports/direct_deposit/", "POST", jsonAccessToken)
