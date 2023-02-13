@@ -95,7 +95,7 @@ func createUser() (string, error) {
 	fmt.Println("TRUV: Requesting new user from https://prod.truv.com/v1/users/")
 	uniqueNumber := time.Now().UnixNano() / (1 << 22)
 	userRequest := UserRequest{
-		ExternalUserId: fmt.Sprintf("qs-%s", uniqueNumber),
+		ExternalUserId: fmt.Sprintf("qs-%d", uniqueNumber),
 		FirstName:      "John",
 		LastName:       "Johnson",
 		Email:          "j.johnson@example.com",
