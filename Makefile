@@ -17,8 +17,8 @@ ruby_docker:
 csharp_docker:
 	docker-compose up --build csharp
 
-go_docker:
-	docker-compose up --build go
+golang_docker:
+	docker-compose up --build golang
 
 node_local:
 	cd node && \
@@ -42,7 +42,7 @@ csharp_local:
 	set -a && source ../.env && set +a && \
 	dotnet watch run
 
-go_local:
+golang_local:
 	cd golang && \
 	go get && \
 	set -a && source ../.env && set +a && \

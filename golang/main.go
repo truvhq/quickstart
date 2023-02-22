@@ -36,9 +36,16 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 // bridgeToken accepts requests for a bridge token and sends the response
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
-	bridgeData, err := getBridgeToken()
+	userId, err := createUser()
 	if err != nil {
-		fmt.Println("Error in bridgeToken\n", err)
+		log.Println("Error creating user", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+
+	bridgeData, err := createUserBridgeToken(userId)
+	if err != nil {
+		log.Println("Error in bridgeToken\n", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
 		fmt.Fprintf(w, bridgeData)
@@ -53,7 +60,7 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 	token := splitPath[2]
 	accessToken, err = getAccessToken(token)
 	if err != nil {
-		fmt.Println("Error getting access token", err)
+		log.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
@@ -64,7 +71,7 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 		verificationResponse, err = getIncomeInfoByToken(accessToken)
 	}
 	if err != nil {
-		fmt.Println("Error getting verification", err)
+		log.Println("Error getting verification", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
 		fmt.Fprintf(w, verificationResponse)
@@ -82,7 +89,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 	taskId, err := createRefreshTask(accessToken)
 
 	if err != nil {
-		fmt.Println("Error creating refresh task", err)
+		log.Println("Error creating refresh task", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
@@ -93,14 +100,14 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
 	_, found := find(finishedStatuses, refreshStatusResponse.Status)
 	for found {
-		fmt.Println("TRUV: Refresh task is not finished. Waiting 2 seconds, then checking again.")
+		log.Println("TRUV: Refresh task is not finished. Waiting 2 seconds, then checking again.")
 		time.Sleep(2 * time.Second)
 		refreshStatus, err = getRefreshTask(taskId)
 		json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
 		_, found = find(finishedStatuses, refreshStatusResponse.Status)
 	}
 
-	fmt.Println("TRUV: Refresh task is finished. Pulling the latest data.")
+	log.Println("TRUV: Refresh task is finished. Pulling the latest data.")
 
 	refreshResponse := ""
 	if productType == "employment" {
@@ -110,21 +117,21 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 	} else if productType == "admin" {
 		directory, err := getEmployeeDirectoryByToken(accessToken)
 		if err != nil {
-			fmt.Println("Error getting Employee Directory", err)
+			log.Println("Error getting Employee Directory", err)
 			fmt.Fprintf(w, `{ "success": false }`)
 			return
 		}
 		// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
 		report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
 		if err != nil {
-			fmt.Println("Error requesting payroll report", err)
+			log.Println("Error requesting payroll report", err)
 			fmt.Fprintf(w, `{ "success": false }`)
 			return
 		}
 		reportId := report.PayrollReportId
 		payroll, err := getPayrollById(reportId)
 		if err != nil {
-			fmt.Println("Error getting payroll by id", err)
+			log.Println("Error getting payroll by id", err)
 			fmt.Fprintf(w, `{ "success": false }`)
 			return
 		}
@@ -132,7 +139,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		refreshResponse = fmt.Sprintf(`{ "directory": %s, "payroll": %s }`, directory, payroll)
 	}
 	if err != nil {
-		fmt.Println("Error getting refresh data", err)
+		log.Println("Error getting refresh data", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
 		fmt.Fprintf(w, refreshResponse)
@@ -155,27 +162,27 @@ func adminData(w http.ResponseWriter, r *http.Request) {
 	token := splitPath[2]
 	accessToken, err = getAccessToken(token)
 	if err != nil {
-		fmt.Println("Error getting access token", err)
+		log.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
 	directory, err := getEmployeeDirectoryByToken(accessToken)
 	if err != nil {
-		fmt.Println("Error getting Employee Directory", err)
+		log.Println("Error getting Employee Directory", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
 	// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
 	report, err := requestPayrollReport(accessToken, "2020-01-01", "2020-02-01")
 	if err != nil {
-		fmt.Println("Error requesting payroll report", err)
+		log.Println("Error requesting payroll report", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
 	reportId := report.PayrollReportId
 	payroll, err := getPayrollById(reportId)
 	if err != nil {
-		fmt.Println("Error getting payroll by id", err)
+		log.Println("Error getting payroll by id", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
@@ -192,13 +199,13 @@ func getPaycheckLinkedLoanData(w http.ResponseWriter, r *http.Request) {
 	token := splitPath[2]
 	accessToken, err = getAccessToken(token)
 	if err != nil {
-		fmt.Println("Error getting access token", err)
+		log.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
 	fundingSwitchResponse, err := getPaycheckLinkedLoanByToken(accessToken)
 	if err != nil {
-		fmt.Println("Error getting pll data", err)
+		log.Println("Error getting pll data", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
 		fmt.Fprintf(w, fundingSwitchResponse)
@@ -211,14 +218,14 @@ func depositSwitch(w http.ResponseWriter, r *http.Request) {
 	token := splitPath[2]
 	accessToken, err := getAccessToken(token)
 	if err != nil {
-		fmt.Println("Error getting access token", err)
+		log.Println("Error getting access token", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
 	depositSwitchResponse, err := getDepositSwitchByToken(accessToken)
 
 	if err != nil {
-		fmt.Println("Error getting deposit switch", err)
+		log.Println("Error getting deposit switch", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 	} else {
 		fmt.Fprintf(w, depositSwitchResponse)
@@ -229,21 +236,21 @@ func depositSwitch(w http.ResponseWriter, r *http.Request) {
 func checkEnv() {
 	clientId := os.Getenv("API_CLIENT_ID")
 	if clientId == "" {
-		fmt.Println("No API_CLIENT_ID provided")
+		log.Println("No API_CLIENT_ID provided")
 		os.Exit(1)
 	}
 	accessKey := os.Getenv("API_SECRET")
 	if accessKey == "" {
-		fmt.Println("No API_SECRET provided")
+		log.Println("No API_SECRET provided")
 		os.Exit(1)
 	}
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	if productType == "" {
-		fmt.Println("No API_PRODUCT_TYPE provided")
+		log.Println("No API_PRODUCT_TYPE provided")
 		os.Exit(1)
 	}
 	if productType != "employment" && productType != "income" && productType != "admin" && productType != "pll" && productType != "deposit_switch" {
-		fmt.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or pll")
+		log.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or pll")
 		os.Exit(1)
 	}
 }
@@ -267,10 +274,10 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(b, &parsedJson)
 	signature := generate_webhook_sign(convertedBody, os.Getenv("API_SECRET"))
 
-	fmt.Println("TRUV: Webhook received")
-	fmt.Printf("TRUV: Event type:      %s\n", parsedJson.EventType)
-	fmt.Printf("TRUV: Status:          %s\n", parsedJson.Status)
-	fmt.Printf("TRUV: Signature match: %t\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
+	log.Println("TRUV: Webhook received")
+	log.Printf("TRUV: Event type:      %s\n", parsedJson.EventType)
+	log.Printf("TRUV: Status:          %s\n", parsedJson.Status)
+	log.Printf("TRUV: Signature match: %t\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
 
 	fmt.Fprintf(w, "")
 }
@@ -286,7 +293,7 @@ func handleRequests() {
 	http.HandleFunc("/createRefreshTask/", refresh)
 	http.HandleFunc("/webhook", webhook)
 
-	fmt.Println("Quickstart Loaded. Navigate to http://localhost:5003 to view Quickstart.")
+	log.Println("Quickstart Loaded. Navigate to http://localhost:5003 to view Quickstart.")
 
 	log.Fatal(http.ListenAndServe(":5003", nil))
 }
@@ -294,11 +301,11 @@ func handleRequests() {
 func main() {
 	checkEnv()
 
-	fmt.Println(strings.Repeat("=", 40), "ENVIRONMENT", strings.Repeat("=", 40))
-	fmt.Println(fmt.Sprintf("API_CLIENT_ID: %s", os.Getenv("API_CLIENT_ID")))
-	fmt.Println(fmt.Sprintf("API_SECRET: %s", os.Getenv("API_SECRET")))
-	fmt.Println(fmt.Sprintf("API_PRODUCT_TYPE: %s", os.Getenv("API_PRODUCT_TYPE")))
-	fmt.Println(strings.Repeat("=", 94))
+	log.Println(strings.Repeat("=", 40), "ENVIRONMENT", strings.Repeat("=", 40))
+	log.Println(fmt.Sprintf("API_CLIENT_ID: %s", os.Getenv("API_CLIENT_ID")))
+	log.Println(fmt.Sprintf("API_SECRET: %s", os.Getenv("API_SECRET")))
+	log.Println(fmt.Sprintf("API_PRODUCT_TYPE: %s", os.Getenv("API_PRODUCT_TYPE")))
+	log.Println(strings.Repeat("=", 94))
 
 	handleRequests()
 }

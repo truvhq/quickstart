@@ -16,7 +16,7 @@ services:
       - .env
     ports:
       - "5002:5002"
-  go:
+  golang:
     build:
       context: .
       dockerfile: ./golang/Dockerfile

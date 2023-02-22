@@ -9,6 +9,7 @@ You'll have two different API keys used by the back end, `Client ID` and `Access
 ## Set up the Go Quickstart
 
 Once you have your API keys, it's time to run the Truv Go Quickstart app locally.
+
 *Requirements*: The latest version of `golang`
 
 1. `git clone https://github.com/truvhq/quickstart`
@@ -22,7 +23,7 @@ Once you have your API keys, it's time to run the Truv Go Quickstart app locally
     API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or fas>
     ```
 
-5. `make go_local`
+5. `make golang_local`
 
 After running this command, you should see:
 
