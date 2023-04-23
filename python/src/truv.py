@@ -109,31 +109,13 @@ class TruvClient:
             },
         )
 
-    def get_employment_info_by_token(self, access_token: str) -> dict:
+    def get_link_report(self, link_id: str, product_type: str) -> dict:
         logging.info(
-            "TRUV: Requesting employment report data from https://prod.truv.com/v1/links/reports/employment/"
+            f"TRUV: Requesting {product_type} report from "
+            f"https://prod.truv.com/v1/links/{link_id}/{product_type}/report",
         )
-        logging.info("TRUV: Access Token - %s", access_token)
-
-        return self.post(
-            "links/reports/employment/",
-            json={
-                "access_token": access_token,
-            },
-        )
-
-    def get_income_info_by_token(self, access_token: str) -> dict:
-        logging.info(
-            "TRUV: Requesting income report data from https://prod.truv.com/v1/links/reports/income/"
-        )
-        logging.info("TRUV: Access Token - %s", access_token)
-
-        return self.post(
-            "links/reports/income/",
-            json={
-                "access_token": access_token,
-            },
-        )
+        logging.info("TRUV: Link ID - %s", link_id)
+        return self.get(f"links/{link_id}/{product_type}/report")
 
     def create_refresh_task(self, access_token: str) -> dict:
         logging.info(
@@ -164,32 +146,6 @@ class TruvClient:
 
         return self.post(
             "link/reports/admin/",
-            json={
-                "access_token": access_token,
-            },
-        )
-
-    def get_deposit_switch_by_token(self, access_token: str) -> dict:
-        logging.info(
-            "TRUV: Requesting direct deposit switch data from https://prod.truv.com/v1//links/reports/direct_deposit/"
-        )
-        logging.info("TRUV: Access Token - %s", access_token)
-
-        return self.post(
-            "links/reports/direct_deposit/",
-            json={
-                "access_token": access_token,
-            },
-        )
-
-    def get_pll_by_token(self, access_token: str) -> dict:
-        logging.info(
-            "TRUV: Requesting pll data from https://prod.truv.com/v1/links/reports/pll/"
-        )
-        logging.info("TRUV: Access Token - %s", access_token)
-
-        return self.post(
-            "links/reports/pll/",
             json={
                 "access_token": access_token,
             },
