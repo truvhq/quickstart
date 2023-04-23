@@ -6,11 +6,7 @@ import htmlFile from './serve.js';
 import crypto from 'crypto';
 
 import {
-  getDepositSwitchByToken,
-  getPaycheckLinkedLoanByToken,
   getAccessToken,
-  getEmploymentInfoByToken,
-  getIncomeInfoByToken,
   getEmployeeDirectoryByToken,
   getPayrollById,
   requestPayrollReport,
@@ -18,6 +14,7 @@ import {
   getRefreshTask,
   createUser,
   createUserBridgeToken,
+  getLinkReport,
 } from './truv.js';
 
 const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env;
@@ -28,6 +25,8 @@ const generate_webhook_sign = (body, key) => {
 
 const app = express();
 let accessToken = null;
+let accessTokenResponse = null;
+
 
 // ensure all request bodies are parsed to JSON
 app.use(
@@ -60,15 +59,8 @@ app.get('/getBridgeToken', async (req, res) => {
 app.get('/getVerifications/:token', async (req, res) => {
   // retrieve income verification information
   try {
-    const accessTokenResponse = await getAccessToken(req.params.token);
-    accessToken = accessTokenResponse.access_token;
-    let verifications;
-    if (API_PRODUCT_TYPE === 'employment') {
-      verifications = await getEmploymentInfoByToken(accessToken);
-    } else {
-      verifications = await getIncomeInfoByToken(accessToken);
-    }
-
+    accessTokenResponse = await getAccessToken(req.params.token);
+    const verifications = await getLinkReport(accessTokenResponse.link_id, API_PRODUCT_TYPE);
     res.json(verifications);
   } catch (e) {
     console.error('error with getVerifications');
@@ -104,12 +96,11 @@ app.get('/createRefreshTask', async (req, res) => {
     console.log('TRUV: Refresh task is finished. Pulling the latest data.');
     switch (API_PRODUCT_TYPE) {
       case 'employment':
-        res.json(await getEmploymentInfoByToken(accessToken));
-        break;
       case 'income':
-        res.json(await getIncomeInfoByToken(accessToken));
+        res.json(await getLinkReport(accessTokenResponse.link_id, API_PRODUCT_TYPE));
         break;
       case 'admin':
+        const accessToken = accessTokenResponse.access_token;
         const directory = await getEmployeeDirectoryByToken(accessToken);
         // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
         const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id;
@@ -135,7 +126,6 @@ app.get('/getAdminData/:token', async (req, res) => {
 
     // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
     const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id;
-
     const payroll = await getPayrollById(reportId);
 
     const data = { directory, payroll };
@@ -151,9 +141,7 @@ app.get('/getDepositSwitchData/:token', async (req, res) => {
   // retrieve deposit switch status information
   try {
     const accessTokenResponse = await getAccessToken(req.params.token);
-    accessToken = accessTokenResponse.access_token;
-
-    const depositSwitchResult = await getDepositSwitchByToken(accessToken);
+    const depositSwitchResult = await getLinkReport(accessTokenResponse.link_id, 'direct_deposit');
 
     res.json(depositSwitchResult);
   } catch (e) {
@@ -167,9 +155,7 @@ app.get('/getPaycheckLinkedLoanData/:token', async (req, res) => {
   // retrieve paycheck linked loan information
   try {
     const accessTokenResponse = await getAccessToken(req.params.token);
-    accessToken = accessTokenResponse.access_token;
-
-    const payCheckLinkedLoadResult = await getPaycheckLinkedLoanByToken(accessToken);
+    const payCheckLinkedLoadResult = await getLinkReport(accessTokenResponse.link_id, 'pll');
 
     res.json(payCheckLinkedLoadResult);
   } catch (e) {

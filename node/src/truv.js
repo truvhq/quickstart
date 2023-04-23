@@ -36,8 +36,7 @@ const createUser = async () => {
   };
   const body = JSON.stringify(bodyObj);
 
-  const responseBody = await sendRequest('users/', { body });
-  return responseBody;
+  return await sendRequest('users/', { body });
 };
 
 /**
@@ -71,8 +70,7 @@ const createUserBridgeToken = async (user_id) => {
 
   const body = JSON.stringify(bodyObj);
 
-  const responseBody = await sendRequest(`users/${user_id}/tokens/`, { body });
-  return responseBody;
+  return await sendRequest(`users/${user_id}/tokens/`, { body });
 };
 
 /**
@@ -88,25 +86,7 @@ const getAccessToken = async (public_token) => {
   const body = JSON.stringify({
     public_token: public_token,
   });
-  const responseBody = await sendRequest('link-access-tokens/', { body });
-  return responseBody;
-};
-
-/**
- * Retrieves employment verifications from Truv
- * https://docs.truv.com/reference/employment_verification
- * @param {String} access_token The access token provided by Truv
- * @return The response from Truv
- */
-const getEmploymentInfoByToken = async (access_token) => {
-  console.log(
-    'TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/links/reports/employment/',
-  );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-  });
-  return await sendRequest('links/reports/employment/', { body });
+  return await sendRequest('link-access-tokens/', { body });
 };
 
 const createRefreshTask = async (access_token) => {
@@ -125,21 +105,24 @@ const getRefreshTask = async (task_id) => {
 };
 
 /**
- * Retrieves income verifications from Truv
+ * Retrieves a report by link_id from Truv
+ * https://docs.truv.com/reference/employment_verification
  * https://docs.truv.com/reference/income_verification
- * @param {String} access_token
- * @return The response from Truv
+ * https://docs.truv.com/reference/dds_report
+ * https://docs.truv.com/reference/pll_report
+ *
+ * @param {String} link_id
+ * @param {String} product_type
+ * @returns The response from Truv
  */
-const getIncomeInfoByToken = async (access_token) => {
+const getLinkReport = async (link_id, product_type) => {
   console.log(
-    'TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/links/reports/income/',
+    `TRUV: Requesting ${product_type} report data from https://prod.truv.com/v1/links/${link_id}/${product_type}/report`
   );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-  });
-  return await sendRequest('links/reports/income/', { body });
-};
+  console.log(`TRUV: Link ID - ${link_id}`);
+
+  return await sendRequest(`links/${link_id}/${product_type}/report`, { method: "GET" });
+}
 
 /**
  * Retrieves employee directories from Truv
@@ -192,38 +175,6 @@ const getPayrollById = async (report_id) => {
   });
 };
 
-/**
- * Retrieves deposit switch status from Truv
- * https://docs.truv.com/reference/dds_report
- * @param {String} access_token The access token provided by Truv
- * @return The response from Truv
- */
-const getDepositSwitchByToken = async (access_token) => {
-  console.log(
-    'TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/links/reports/direct_deposit/',
-  );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-  });
-  return await sendRequest('links/reports/direct_deposit/', { body });
-};
-
-/**
- * Retrieves pll status from Truv
- * https://docs.truv.com/reference/pll_report
- * @param {String} access_token
- * @return The response from Truv
- **/
-const getPaycheckLinkedLoanByToken = async (access_token) => {
-  console.log('TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/links/reports/ppl/');
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-  });
-  return await sendRequest('links/reports/ppl/', { body });
-};
-
 const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
   const headers = getHeaders();
   try {
@@ -243,11 +194,7 @@ const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
 };
 
 export {
-  getDepositSwitchByToken,
-  getPaycheckLinkedLoanByToken,
-  getEmploymentInfoByToken,
   getAccessToken,
-  getIncomeInfoByToken,
   getEmployeeDirectoryByToken,
   requestPayrollReport,
   getPayrollById,
@@ -255,4 +202,5 @@ export {
   getRefreshTask,
   createUser,
   createUserBridgeToken,
+  getLinkReport,
 };
