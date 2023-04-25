@@ -28,7 +28,7 @@ docker-compose up
 
 or run specific image
 ```shell
-make [python_docker|ruby_docker|go_docker|node_docker|csharp_docker]
+make [python_docker|ruby_docker|golang_docker|node_docker|csharp_docker]
 ```
 
 5. Check the quickstart demo for your programming language:

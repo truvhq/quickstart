@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
-	"log"
 )
 
 // PublicTokenRequest is used to define the body for requesting an
@@ -161,71 +161,48 @@ func createUserBridgeToken(userId string) (string, error) {
 
 // getAccessToken requests an access token from the Truv API
 // with the given public token
-func getAccessToken(public_token string) (string, error) {
+func getAccessToken(public_token string) (*AccessTokenResponse, error) {
 	log.Println("TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens")
 	log.Printf("TRUV: Public Token - %s\n", public_token)
 	publicToken := PublicTokenRequest{PublicToken: public_token}
-	jsonPublicToken, _ := json.Marshal(publicToken)
-	accessToken := AccessTokenResponse{}
+	jsonPublicToken, _ := json.Marshal((publicToken))
+
 	request, err := getRequest("link-access-tokens/", "POST", jsonPublicToken)
 	if err != nil {
-		return "", err
-	}
-	client := &http.Client{}
-	res, err := client.Do(request)
-	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	defer res.Body.Close()
-	err = json.NewDecoder(res.Body).Decode(&accessToken)
+	client := &http.Client{}
+	response, err := client.Do(request)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return accessToken.AccessToken, nil
+
+	defer response.Body.Close()
+	accessToken := AccessTokenResponse{}
+	err = json.NewDecoder(response.Body).Decode(&accessToken)
+	if err != nil {
+		return nil, err
+	}
+	return &accessToken, nil
 }
 
-// getEmploymentInfoByToken uses the given access token to request
-// the associated employment verification info
-func getEmploymentInfoByToken(access_token string) (string, error) {
-	log.Println("TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/links/reports/employment/")
-	log.Printf("TRUV: Access Token - %s\n", access_token)
-	accessToken := AccessTokenRequest{AccessToken: access_token}
-	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("links/reports/employment/", "POST", jsonAccessToken)
+func getLinkReport(link_id string, product_type string) (string, error) {
+	log.Printf("TRUV: Requesting %[2]s report data from https://prod.truv.com/v1/links/%[1]s/%[2]s/report", link_id, product_type)
+	log.Printf("TRUV: Link ID - %s\n", link_id)
+	request, err := getRequest(fmt.Sprintf("links/%s/%s/report", link_id, product_type), "GET", nil)
 	if err != nil {
 		return "", err
 	}
+
 	client := &http.Client{}
-	res, err := client.Do(request)
+	response, err := client.Do(request)
 	if err != nil {
 		return "", err
 	}
 
-	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
-	return string(data), nil
-}
-
-// getIncomeInfoByToken uses the given access token to request
-// the associated income verification info
-func getIncomeInfoByToken(access_token string) (string, error) {
-	log.Println("TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/links/reports/income/")
-	log.Printf("TRUV: Access Token - %s\n", access_token)
-	accessToken := AccessTokenRequest{AccessToken: access_token}
-	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("links/reports/income/", "POST", jsonAccessToken)
-	if err != nil {
-		return "", err
-	}
-	client := &http.Client{}
-	res, err := client.Do(request)
-	if err != nil {
-		return "", err
-	}
-
-	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
+	defer response.Body.Close()
+	data, _ := ioutil.ReadAll(response.Body)
 	return string(data), nil
 }
 
@@ -330,50 +307,6 @@ func getPayrollById(reportId string) (string, error) {
 	log.Println("TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}")
 	log.Printf("TRUV: Report ID - %s\n", reportId)
 	request, err := getRequest(fmt.Sprintf("administrators/payrolls/%s", reportId), "GET", nil)
-	if err != nil {
-		return "", err
-	}
-	client := &http.Client{}
-	res, err := client.Do(request)
-	if err != nil {
-		return "", err
-	}
-
-	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
-	return string(data), nil
-}
-
-// getPaycheckLinkedLoanByToken uses the given access token to request
-// the associated pll data
-func getPaycheckLinkedLoanByToken(access_token string) (string, error) {
-	log.Println("TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/links/reports/pll/")
-	log.Printf("TRUV: Access Token - %s\n", access_token)
-	accessToken := AccessTokenRequest{AccessToken: access_token}
-	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("links/reports/pll/", "POST", jsonAccessToken)
-	if err != nil {
-		return "", err
-	}
-	client := &http.Client{}
-	res, err := client.Do(request)
-	if err != nil {
-		return "", err
-	}
-
-	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
-	return string(data), nil
-}
-
-// getDepositSwitchByToken uses the given access token to request
-// the associated deposit switch info
-func getDepositSwitchByToken(access_token string) (string, error) {
-	log.Println("TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/links/reports/direct_deposit/")
-	log.Printf("TRUV: Access Token - %s\n", access_token)
-	accessToken := AccessTokenRequest{AccessToken: access_token}
-	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("links/reports/direct_deposit/", "POST", jsonAccessToken)
 	if err != nil {
 		return "", err
 	}
