@@ -20,16 +20,8 @@ namespace c_sharp.Controllers
         [HttpGet]
         public async Task<string> Get(string token)
         {
-            var accessToken = await _truv.GetAccessToken(token);
-
-            if (_productType == "employment")
-            {
-                return await _truv.GetEmploymentInfoByToken(accessToken);
-            }
-            else
-            {
-                return await _truv.GetIncomeInfoByToken(accessToken);
-            }
+            AccessTokenResponse linkToken = await _truv.GetLinkToken(token);
+            return await _truv.GetLinkReport(linkToken.LinkId, _productType);
         }
     }
 }

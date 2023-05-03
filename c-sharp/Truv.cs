@@ -6,6 +6,7 @@ namespace c_sharp
     public class Truv
     {
         private static string accessToken = null;
+        private static AccessTokenResponse linkToken = null;
         private readonly string clientId = Environment.GetEnvironmentVariable("API_CLIENT_ID");
         private readonly string clientSecret = Environment.GetEnvironmentVariable("API_SECRET");
         private readonly string productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
@@ -95,22 +96,26 @@ namespace c_sharp
             return accessTokenResponse.AccessToken;
         }
 
-        public async Task<string> GetEmploymentInfoByToken(string accessToken)
+        public async Task<AccessTokenResponse> GetLinkToken(string publicToken)
         {
-            accessToken ??= Truv.accessToken;
-            Console.WriteLine("TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/links/reports/employment/");
-            Console.WriteLine("TRUV: Access Token - {0}", accessToken);
-            var body = new AccessTokenRequest { AccessToken = accessToken };
-            return await SendRequest(HttpMethod.Post, "links/reports/employment/", body);
+            Console.WriteLine("TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens");
+            Console.WriteLine("TRUV: Public Token - {0}", publicToken);
+
+            var body = new PublicTokenRequest { PublicToken = publicToken };
+            var response = await SendRequest(HttpMethod.Post, "link-access-tokens/", body);
+
+            AccessTokenResponse accessTokenResponse = JsonSerializer.Deserialize<AccessTokenResponse>(response);
+            Truv.linkToken = accessTokenResponse;
+
+            return Truv.linkToken;
         }
 
-        public async Task<string> GetIncomeInfoByToken(string accessToken)
+        public async Task<string> GetLinkReport(string linkId, string productType)
         {
-            accessToken ??= Truv.accessToken;
-            Console.WriteLine("TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/links/reports/income/");
-            Console.WriteLine("TRUV: Access Token - {0}", accessToken);
-            var body = new AccessTokenRequest { AccessToken = accessToken };
-            return await SendRequest(HttpMethod.Post, "links/reports/income/", body);
+            linkId ??= Truv.linkToken.LinkId;
+            Console.WriteLine("TRUV: Requesting {0} report  from https://prod.truv.com/v1/links/{1}/{0}/report", productType, linkId);
+            Console.WriteLine("TRUV: Link ID - {0}", linkId);
+            return await SendRequest(HttpMethod.Get, $"links/{linkId}/{productType}/report");
         }
 
         public async Task<string> CreateRefreshTask()
@@ -156,22 +161,6 @@ namespace c_sharp
             Console.WriteLine("TRUV: Report ID - {0}", reportId);
             return await SendRequest(HttpMethod.Get, $"administrators/payrolls/{reportId}/");
         }
-
-        public async Task<string> GetDepositSwitchByToken(string accessToken)
-        {
-            Console.WriteLine("TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/links/reports/direct_deposit/");
-            Console.WriteLine("TRUV: Access Token - {0}", accessToken);
-            var body = new AccessTokenRequest { AccessToken = accessToken };
-            return await SendRequest(HttpMethod.Post, "links/reports/direct_deposit/", body);
-        }
-
-        public async Task<string> GetPaycheckLinkedLoadByToken(string accessToken)
-        {
-            Console.WriteLine("TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/links/reports/pll/");
-            Console.WriteLine("TRUV: Access Token - {0}", accessToken);
-            var body = new AccessTokenRequest { AccessToken = accessToken };
-            return await SendRequest(HttpMethod.Post, "links/reports/pll/", body);
-        }
     }
 
 
@@ -181,8 +170,14 @@ namespace c_sharp
         public string AccessToken { get; set; }
     }
 
-    public class AccessTokenResponse : AccessTokenRequest
-    { }
+    public class AccessTokenResponse
+    { 
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; }
+
+        [JsonPropertyName("link_id")]
+        public string LinkId { get; set; }
+    }
 
     public class PublicTokenRequest
     {

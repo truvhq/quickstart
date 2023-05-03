@@ -37,10 +37,10 @@ namespace c_sharp.Controllers
             switch (_productType)
             {
                 case "employment":
-                    return await _truv.GetEmploymentInfoByToken(null);
+                    return await _truv.GetLinkReport(null, _productType);
 
                 case "income":
-                    return await _truv.GetIncomeInfoByToken(null);
+                    return await _truv.GetLinkReport(null, _productType);
 
                 case "admin":
                     var directory = await _truv.GetEmployeeDirectoryByToken(null);
