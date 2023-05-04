@@ -6,7 +6,7 @@ class Truv
   class_attribute :client_id
   class_attribute :client_secret
   class_attribute :product_type
-  class_attribute :access_token
+  class_attribute :link_token
 
   def self.createUser()
     puts "TRUV: Requesting new user from https://prod.truv.com/v1/users/"
@@ -34,41 +34,26 @@ class Truv
   end
 
   def self.getAccessToken(public_token)
-    # https://docs.truv.com/?ruby#exchange-token-flow
-    puts "TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens/"
-    puts "TRUV: Public Token - #{public_token}"
     body = { "public_token" => public_token }.to_json
-    Truv.access_token = sendRequest('link-access-tokens/', body, "POST")["access_token"]
-    return Truv.access_token
+    Truv.link_token = sendRequest('link-access-tokens/', body, "POST")
+    return Truv.link_token
   end
 
-  def self.getEmploymentInfoByToken(access_token)
-    # https://docs.truv.com/?ruby#employment-verification
-    if access_token == nil 
-      access_token = Truv.access_token
+  def self.getLinkReport(link_id, product_type)
+    if link_id == nil
+      link_id = Truv.link_token["link_id"]
     end
-    puts "TRUV: Requesting employment verification data using an access_token from https://prod.truv.com/v1/links/reports/employment/"
-    puts "TRUV: Access Token - #{access_token}"
-    body = { "access_token" => access_token }.to_json
-    sendRequest('links/reports/employment/', body, "POST")
+    puts "TRUV: Requesting #{product_type} report from https://prod.truv.com/v1/links/#{link_id}/#{product_type}/report"
+    puts "TRUV: Link ID - #{link_id}"
+    sendRequest("links/#{link_id}/#{product_type}/report", nil, "GET")
   end
 
-  def self.getIncomeInfoByToken(access_token)
-    # https://docs.truv.com/?ruby#income-verification
-    if access_token == nil 
-      access_token = Truv.access_token
-    end
-    puts "TRUV: Requesting income verification data using an access_token from https://prod.truv.com/v1/links/reports/income/"
-    puts "TRUV: Access Token - #{access_token}"
-    body = { "access_token" => access_token }.to_json
-    sendRequest('links/reports/income/', body, "POST")
-  end
-
-  def self.createRefreshTask()
+  def self.createRefreshTask(product_type)
     # https://docs.truv.com/?ruby#data-refresh
+    access_token = Truv.link_token["access_token"]
     puts "TRUV: Requesting a data refresh using an access_token from https://prod.truv.com/v1/refresh/tasks/"
-    puts "TRUV: Access Token - #{Truv.access_token}"
-    body = { "access_token" => Truv.access_token }.to_json
+    puts "TRUV: Access Token - #{access_token}"
+    body = { "access_token" => access_token, "product_type" => product_type }.to_json
     sendRequest('refresh/tasks/', body, "POST")["task_id"]
   end
 
@@ -81,7 +66,7 @@ class Truv
 
   def self.getEmployeeDirectoryByToken(access_token)
     if access_token == nil 
-      access_token = Truv.access_token
+      access_token = Truv.link_token["access_token"]
     end
     puts "TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/links/reports/admin/"
     puts "TRUV: Access Token - #{access_token}"
@@ -91,7 +76,7 @@ class Truv
 
   def self.requestPayrollReport(access_token, start_date, end_date)
     if access_token == nil 
-      access_token = Truv.access_token
+      access_token = Truv.link_token["access_token"]
     end
     puts "TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls/"
     puts "TRUV: Access Token - #{access_token}"
@@ -103,21 +88,6 @@ class Truv
     puts "TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}/"
     puts "TRUV: Report ID - #{report_id}"
     sendRequest("administrators/payrolls/#{report_id}/", nil, "GET")
-  end
-
-  def self.getDepositSwitchByToken(access_token)
-    # https://docs.truv.com/?ruby#direct-deposit
-    puts "TRUV: Requesting direct deposit switch data using an access_token from https://prod.truv.com/v1/links/reports/direct_deposit/"
-    puts "TRUV: Access Token - #{access_token}"
-    body = { "access_token" => access_token }.to_json
-    sendRequest('links/reports/direct_deposit/', body, "POST")
-  end
-
-  def self.getPaycheckLinkedLoanByToken(access_token)
-    puts "TRUV: Requesting pll data using an access_token from https://prod.truv.com/v1/links/reports/pll/"
-    puts "TRUV: Access Token - #{access_token}"
-    body = { "access_token" => access_token }.to_json
-    sendRequest('links/reports/pll/', body, "POST")
   end
 
   def self.sendRequest(endpoint, body, method)

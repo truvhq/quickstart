@@ -5,6 +5,7 @@ import logging
 import os
 import time
 from pathlib import Path
+from typing import Optional
 
 import flask
 from dotenv import load_dotenv
@@ -39,18 +40,17 @@ api_client = TruvClient(
 
 logging.info("ENVIRONMENT: %s \n", json.dumps(api_client.headers, indent=4))
 
-access_token = None
 
+token = None
 
-def get_access_token():
-    global access_token
-    return access_token
+def get_token() -> Optional[dict]:
+    global token
+    return token
 
-
-def set_access_token(value):
-    global access_token
-    access_token = value
-    return access_token
+def save_token(value):
+    global token
+    token = value
+    return token
 
 
 @app.context_processor
@@ -123,15 +123,12 @@ def get_verification_info_by_token(public_token: str):
     API endpoint to retrieve employment or income verification data
     """
     # First exchange public_token to access_token
-    token = api_client.get_access_token(public_token)
-    access_token = set_access_token(token["access_token"])
+    tokenResult = api_client.get_access_token(public_token)
+    link_token = save_token(tokenResult)
 
-    # Use access_token to retrieve the data
-    if product_type == "employment":
-        return api_client.get_employment_info_by_token(access_token)
-
-    if product_type == "income":
-        return api_client.get_income_info_by_token(access_token)
+    # Use link_id to retrieve the report data
+    if product_type in ["employment", "income"]:
+        return api_client.get_link_report(link_token["link_id"], product_type)
 
     raise ValueError("Unsupported product type!")
 
@@ -141,12 +138,12 @@ def create_refresh_task_by_token():
     """
     API endpoint to create a refresh task from an existing access token
     """
-    access_token = get_access_token()
-    if not access_token:
-        raise ValueError("No access_token found")
+    link_token = get_token()
+    if not link_token:
+        raise ValueError("No link token data found")
 
     # Create a refresh task
-    task_id = api_client.create_refresh_task(access_token)["task_id"]
+    task_id = api_client.create_refresh_task(link_token["access_token"])["task_id"]
 
     # Check the status of a refresh task
     refreshTask = api_client.get_refresh_task(task_id)
@@ -171,14 +168,11 @@ def create_refresh_task_by_token():
     logging.info("TRUV: Refresh task is finished. Pulling the latest data.")
 
     # When the refresh status is complete we can get the latest info
-    if product_type == "employment":
-        return api_client.get_employment_info_by_token(access_token)
-
-    if product_type == "income":
-        return api_client.get_income_info_by_token(access_token)
+    if product_type in ["employment", "income"]:
+        return api_client.get_link_report(link_token["link_id"], product_type)
 
     if product_type == "admin":
-        return get_admin_data(access_token)
+        return get_admin_data(link_token["access_token"])
 
     raise ValueError("Unsupported product type!")
 
@@ -188,13 +182,8 @@ def get_deposit_switch_data_by_token(public_token: str):
     """
     API endpoint to retrieve direct deposit switch data
     """
-
-    # First exchange public_token to access_token
     tokenResult = api_client.get_access_token(public_token)
-    access_token = tokenResult["access_token"]
-
-    # Use access_token to retrieve the data
-    return api_client.get_deposit_switch_by_token(access_token)
+    return api_client.get_link_report(tokenResult["link_id"], "direct_deposit")
 
 
 @app.route("/getPaycheckLinkedLoanData/<public_token>", methods=["GET"])
@@ -202,13 +191,8 @@ def get_pll_data_by_token(public_token: str):
     """
     API endpoint to retrieve paycheck linked loan data
     """
-
-    # First exchange public_token to access_token
     tokenResult = api_client.get_access_token(public_token)
-    access_token = tokenResult["access_token"]
-
-    # Use access_token to retrieve the data
-    return api_client.get_pll_by_token(access_token)
+    return api_client.get_link_report(tokenResult["link_id"], "pll")
 
 
 @app.route("/getAdminData/<public_token>", methods=["GET"])

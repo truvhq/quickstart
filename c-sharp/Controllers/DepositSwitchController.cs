@@ -12,8 +12,8 @@ namespace c_sharp.Controllers
         [HttpGet]
         public async Task<string> Get(string token)
         {
-            var accessToken = await _truv.GetAccessToken(token);
-            return await _truv.GetDepositSwitchByToken(accessToken);
+            AccessTokenResponse linkToken = await _truv.GetLinkToken(token);
+            return await _truv.GetLinkReport(linkToken.LinkId, "direct_deposit");
         }
     }
 }
