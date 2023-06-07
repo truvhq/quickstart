@@ -43,9 +43,11 @@ logging.info("ENVIRONMENT: %s \n", json.dumps(api_client.headers, indent=4))
 
 token = None
 
+
 def get_token() -> Optional[dict]:
     global token
     return token
+
 
 def save_token(value):
     global token
