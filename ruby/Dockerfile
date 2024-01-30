@@ -7,7 +7,7 @@ WORKDIR /app
 COPY ruby .
 
 RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
-RUN bundle install
+RUN gem install bundler -v 2.4.22 && bundle install
 
 # Add a script to be executed every time the container starts.
 COPY ./ruby/entrypoint.sh /usr/bin/
