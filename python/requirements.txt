@@ -4,3 +4,4 @@ python-dotenv==0.21.1
 requests==2.31.0
 faker==16.6.1
 werkzeug>=3.0.1
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
