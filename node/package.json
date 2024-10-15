@@ -13,10 +13,10 @@
   "author": "Rey Riel",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^8.6.0",
-    "express": "^4.19.2",
+    "express": "^4.21.1",
     "node-fetch": "^2.6.11",
     "uuid": "^9.0.1"
   },
