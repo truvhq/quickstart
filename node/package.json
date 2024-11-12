@@ -7,7 +7,8 @@
     "lint": "eslint ./src --ext js",
     "prettier:check": "prettier --check '**/*.js'",
     "prettier:fix": "prettier --write '**/*.js'",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "start:sample-app": "node src/sample-app.js"
   },
   "keywords": [],
   "author": "Rey Riel",
@@ -17,6 +18,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.6.0",
     "express": "^4.21.1",
+    "http-proxy-middleware": "^3.0.3",
     "node-fetch": "^2.6.11",
     "uuid": "^9.0.1"
   },
