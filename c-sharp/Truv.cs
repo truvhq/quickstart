@@ -106,6 +106,7 @@ namespace c_sharp
 
             AccessTokenResponse accessTokenResponse = JsonSerializer.Deserialize<AccessTokenResponse>(response);
             Truv.linkToken = accessTokenResponse;
+            Truv.accessToken = accessTokenResponse.AccessToken;
 
             return Truv.linkToken;
         }
@@ -120,7 +121,7 @@ namespace c_sharp
 
         public async Task<string> CreateRefreshTask()
         {
-            var acessToken = Truv.accessToken;
+            var accessToken = Truv.accessToken;
             Console.WriteLine("TRUV: Requesting a data refresh using an access_token from https://prod.truv.com/v1/refresh/tasks/");
             Console.WriteLine("TRUV: Access Token - {0}", accessToken);
             var body = new AccessTokenRequest { AccessToken = accessToken };

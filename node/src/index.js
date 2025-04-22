@@ -27,6 +27,13 @@ const app = express();
 let accessToken = null;
 let accessTokenResponse = null;
 
+// Helper function to validate access token
+const validateAccessToken = () => {
+  if (!accessToken) {
+    throw new Error('No access token available. Please complete verification first.');
+  }
+  return accessToken;
+};
 
 // ensure all request bodies are parsed to JSON
 app.use(
@@ -60,18 +67,25 @@ app.get('/getVerifications/:token', async (req, res) => {
   // retrieve income verification information
   try {
     accessTokenResponse = await getAccessToken(req.params.token);
+    if (!accessTokenResponse || !accessTokenResponse.access_token) {
+      throw new Error('Failed to obtain access token');
+    }
+    accessToken = accessTokenResponse.access_token;
     const verifications = await getLinkReport(accessTokenResponse.link_id, API_PRODUCT_TYPE);
     res.json(verifications);
   } catch (e) {
-    console.error('error with getVerifications');
-    console.error(e);
-    res.status(500).json({ success: false });
+    console.error('error with getVerifications:', e.message);
+    res.status(e.message.includes('access token') ? 400 : 500).json({ 
+      success: false, 
+      error: e.message 
+    });
   }
 });
 
 app.get('/createRefreshTask', async (req, res) => {
   // create a refresh task for a payroll connection that's already been made.
   try {
+    validateAccessToken();
     const refreshTask = await createRefreshTask(accessToken);
 
     let taskStatus = await getRefreshTask(refreshTask.task_id);
@@ -182,6 +196,16 @@ function sleep(ms) {
     setTimeout(resolve, ms);
   });
 }
+
+// Global error handler middleware
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err.message);
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    success: false,
+    error: err.message || 'Internal server error'
+  });
+});
 
 app.listen(5004, () => {
   // output environment information

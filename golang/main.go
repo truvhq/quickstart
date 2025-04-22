@@ -21,7 +21,7 @@ func check(e error) {
 	}
 }
 
-var accessToken AccessTokenResponse
+var accessToken *AccessTokenResponse
 
 // homePage writes the html page for the product type
 // given in the API_PRODUCT_TYPE environment variable
@@ -30,8 +30,12 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s.html", productType))
 	check(err)
 	html := string(dat)
+	
+	// Use a fixed server URL since we're running in Docker
 	html = strings.ReplaceAll(html, "{{ server_url }}", r.URL.Host)
-	fmt.Fprintf(w, html)
+	
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Write([]byte(html))
 }
 
 // bridgeToken accepts requests for a bridge token and sends the response
@@ -58,17 +62,18 @@ func verifications(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
 	token := splitPath[2]
 
-	accessToken, err := getAccessToken(token)
+	var err error
+	accessToken, err = getAccessToken(token)
 	if err != nil {
 		log.Println("Error getting access token", err)
-		fmt.Fprint(w, `{ "success": false }`)
+		fmt.Fprintf(w, `{ "success": false, "error": "Failed to get access token" }`)
 		return
 	}
 
 	verificationResponse, err := getLinkReport(accessToken.LinkId, productType)
 	if err != nil {
 		log.Println("Error getting verification", err)
-		fmt.Fprintf(w, `{ "success": false }`)
+		fmt.Fprintf(w, `{ "success": false, "error": "Failed to get verification data" }`)
 	} else {
 		fmt.Fprintf(w, verificationResponse)
 	}
@@ -78,43 +83,109 @@ type RefreshStatusResponse struct {
 	Status string `json:"status"`
 }
 
+type RefreshTaskResponse struct {
+	TaskId string `json:"task_id"`
+}
+
 // verifications accepts requests for a verification and sends the response
 func refresh(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
 
-	taskId, err := createRefreshTask(accessToken.AccessToken)
-	if err != nil {
-		log.Println("Error creating refresh task", err)
-		fmt.Fprintf(w, `{ "success": false }`)
+	// First validate that we have a valid access token
+	if accessToken == nil || accessToken.AccessToken == "" {
+		log.Println("Error: No access token available")
+		fmt.Fprintf(w, `{ "success": false, "error": "No access token available. Please complete verification first." }`)
 		return
 	}
 
+	// Create refresh task first
+	taskResponseStr, err := createRefreshTask(accessToken.AccessToken)
+	if err != nil {
+		log.Printf("Error creating refresh task: %v\n", err)
+		fmt.Fprintf(w, `{ "success": false, "error": "Failed to create refresh task: %v" }`, err)
+		return
+	}
+
+	if taskResponseStr == "" {
+		log.Println("Error: Empty response from create refresh task")
+		fmt.Fprintf(w, `{ "success": false, "error": "Empty response from create refresh task" }`)
+		return
+	}
+
+	log.Printf("Raw task response: %s\n", taskResponseStr)
+
+	// Parse the task response
+	var taskResponse CreateRefreshTaskResponse
+	err = json.Unmarshal([]byte(taskResponseStr), &taskResponse)
+	if err != nil {
+		log.Printf("Error parsing task response: %v\nResponse was: %s\n", err, taskResponseStr)
+		fmt.Fprintf(w, `{ "success": false, "error": "Failed to parse task response" }`)
+		return
+	}
+
+	if taskResponse.TaskId == "" {
+		log.Printf("Error: No task ID received in response: %s\n", taskResponseStr)
+		fmt.Fprintf(w, `{ "success": false, "error": "No task ID received from refresh task creation" }`)
+		return
+	}
+
+	log.Printf("Task ID received: %s\n", taskResponse.TaskId)
+
+	// Now check the task status
 	finishedStatuses := []string{"done", "login_error", "mfa_error", "config_error", "account_locked", "no_data", "unavailable", "error"}
-	refreshStatus, err := getRefreshTask(taskId)
 	var refreshStatusResponse RefreshStatusResponse
-	json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
-	_, found := find(finishedStatuses, refreshStatusResponse.Status)
-	for found {
-		log.Println("TRUV: Refresh task is not finished. Waiting 2 seconds, then checking again.")
-		time.Sleep(2 * time.Second)
-		refreshStatus, err = getRefreshTask(taskId)
-		json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
-		_, found = find(finishedStatuses, refreshStatusResponse.Status)
+	isFinished := false
+
+	for !isFinished {
+		refreshStatus, err := getRefreshTask(taskResponse.TaskId)
+		if err != nil {
+			log.Printf("Error getting refresh task status: %v\n", err)
+			fmt.Fprintf(w, `{ "success": false, "error": "Failed to get refresh task status" }`)
+			return
+		}
+
+		if refreshStatus == "" {
+			log.Println("Error: Empty response from get refresh task status")
+			fmt.Fprintf(w, `{ "success": false, "error": "Empty response from get refresh task status" }`)
+			return
+		}
+
+		log.Printf("Raw refresh status: %s\n", refreshStatus)
+
+		err = json.Unmarshal([]byte(refreshStatus), &refreshStatusResponse)
+		if err != nil {
+			log.Printf("Error parsing refresh status: %v\nStatus was: %s\n", err, refreshStatus)
+			fmt.Fprintf(w, `{ "success": false, "error": "Failed to parse refresh status" }`)
+			return
+		}
+
+		if refreshStatusResponse.Status == "" {
+			log.Printf("Error: No status received in response: %s\n", refreshStatus)
+			fmt.Fprintf(w, `{ "success": false, "error": "No status received in refresh task response" }`)
+			return
+		}
+
+		_, found := find(finishedStatuses, refreshStatusResponse.Status)
+		if found {
+			isFinished = true
+		} else {
+			log.Printf("TRUV: Task %s is not finished (status: %s). Waiting 2 seconds, then checking again.", 
+				taskResponse.TaskId, refreshStatusResponse.Status)
+			time.Sleep(2 * time.Second)
+		}
 	}
 
 	log.Println("TRUV: Refresh task is finished. Pulling the latest data.")
 
 	var refreshResponse string
 
-	if productType == "employment" {
-		refreshResponse, err = getLinkReport(accessToken.LinkId, productType)
-	} else if productType == "income" {
+	if productType == "employment" || productType == "income" {
 		refreshResponse, err = getLinkReport(accessToken.LinkId, productType)
 	} else if productType == "admin" {
 		directory, err := getEmployeeDirectoryByToken(accessToken.AccessToken)
 		if err != nil {
 			log.Println("Error getting Employee Directory", err)
-			fmt.Fprintf(w, `{ "success": false }`)
+			fmt.Fprintf(w, `{ "success": false, "error": "Failed to get employee directory" }`)
 			return
 		}
 		
@@ -122,7 +193,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		report, err := requestPayrollReport(accessToken.AccessToken, "2020-01-01", "2020-02-01")
 		if err != nil {
 			log.Println("Error requesting payroll report", err)
-			fmt.Fprintf(w, `{ "success": false }`)
+			fmt.Fprintf(w, `{ "success": false, "error": "Failed to request payroll report" }`)
 			return
 		}
 
@@ -130,7 +201,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		payroll, err := getPayrollById(reportId)
 		if err != nil {
 			log.Println("Error getting payroll by id", err)
-			fmt.Fprintf(w, `{ "success": false }`)
+			fmt.Fprintf(w, `{ "success": false, "error": "Failed to get payroll by ID" }`)
 			return
 		}
 
@@ -138,7 +209,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		log.Println("Error getting refresh data", err)
-		fmt.Fprintf(w, `{ "success": false }`)
+		fmt.Fprintf(w, `{ "success": false, "error": "Failed to get refresh data" }`)
 	} else {
 		fmt.Fprintf(w, refreshResponse)
 	}

@@ -213,26 +213,38 @@ func createRefreshTask(access_token string) (string, error) {
 	log.Printf("TRUV: Access Token - %s\n", access_token)
 	accessToken := AccessTokenRequest{AccessToken: access_token}
 	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("refresh/tasks", "POST", jsonAccessToken)
+	request, err := getRequest("refresh/tasks/", "POST", jsonAccessToken)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create request: %v", err)
 	}
 	client := &http.Client{}
 	res, err := client.Do(request)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to execute request: %v", err)
 	}
-
 	defer res.Body.Close()
 
-	refreshTask := CreateRefreshTaskResponse{}
-	err = json.NewDecoder(res.Body).Decode(&refreshTask)
-
+	// Read response body
+	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to read response body: %v", err)
 	}
 
-	return refreshTask.TaskId, nil
+	// Check if response is empty
+	if len(data) == 0 {
+		return "", fmt.Errorf("received empty response from server")
+	}
+
+	// Log response status and body
+	log.Printf("TRUV: Refresh task response status: %d\n", res.StatusCode)
+	log.Printf("TRUV: Refresh task response body: %s\n", string(data))
+
+	// Check status code - accept both 200 and 201 as success
+	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
+		return "", fmt.Errorf("server returned non-success status code: %d, body: %s", res.StatusCode, string(data))
+	}
+	
+	return string(data), nil
 }
 
 // getRefreshTask requests a task refresh update
