@@ -41,8 +41,8 @@ type AccountRequest struct {
 	AccountType   string `json:"account_type"`
 	RoutingNumber string `json:"routing_number"`
 	BankName      string `json:"bank_name"`
-	DepositType   string `json:"deposit_type"`
-	DepositValue  string `json:"deposit_value"`
+	DepositType   string `json:"deposit_type,omitempty"`
+	DepositValue  string `json:"deposit_value,omitempty"`
 }
 
 type UserRequest struct {
@@ -139,7 +139,7 @@ func createUserBridgeToken(userId string) (string, error) {
 		}
 		if productType == "pll" {
 			account.DepositType = "amount"
-			account.DepositValue = "1"
+			account.DepositValue = "100"
 		}
 		bridgeTokenRequest.Account = &account
 	}
