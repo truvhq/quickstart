@@ -97,11 +97,30 @@
         color: var(--text-primary);
         margin-bottom: 8px;
       }
-
+      
+      /* Added specific title styling for screens */
+      .screen-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+        text-align: center;
+        margin-bottom: 18px; /* Adjusted margin */
+        margin-top: 0;
+      }
+      
       .subtitle {
         font-size: 16px;
         color: var(--text-secondary);
         margin-bottom: 40px;
+      }
+      
+      /* Added specific subtitle styling for screens */
+      .screen-subtitle {
+        font-size: 16px;
+        color: #888; /* Adjusted color */
+        margin-bottom: 32px;
+        text-align: center;
+        max-width: 320px; /* Added max-width */
       }
 
       .form-group {
@@ -135,10 +154,25 @@
         font-weight: 500;
         border-radius: 100px;
         cursor: pointer;
-        margin-top: auto;
+        margin-top: auto; /* Default to auto for flex positioning */
+      }
+      
+      /* Specific button style from deposit_switch */
+      .button-primary {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 32px;
+        font-size: 18px;
+        font-weight: 700;
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 16px;
+        cursor: pointer;
       }
 
-      .button:hover {
+
+      .button:hover, .button-primary:hover {
         opacity: 0.9;
       }
 
@@ -168,7 +202,7 @@
       }
 
       #payrollLending .button {
-        margin-top: auto;
+         /* Keep auto margin for this specific button if needed, otherwise handled by flex */
       }
 
       .data-section {
@@ -178,29 +212,30 @@
         margin-top: 24px;
       }
 
-      .loan-data {
-        margin: 20px 0;
+      /* Styles for the review screen data */
+      .review-data-container {
+        width: 100%;
+        max-width: 340px;
       }
 
-      .data-row {
+      .review-data-row {
         display: flex;
         justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #E0E0E0;
+        align-items: center;
+        padding: 8px 0;
+        border-top: 1px solid #F0F1F3;
+        color: #888;
+        font-size: 17px;
       }
-
-      .data-row:last-child {
-        border-bottom: none;
+      
+      .review-data-row:first-child {
+          padding-top: 16px; /* Match first row padding */
       }
-
-      .data-label {
-        color: var(--text-secondary);
-        font-weight: 500;
-      }
-
-      .data-value {
-        color: var(--text-primary);
-        font-weight: 600;
+      
+      /* No need for separate label/value classes if using spans directly */
+      .review-data-row span[data-field] {
+        font-weight: 600; /* Match previous style */
+        color: var(--text-primary); /* Match previous style */
       }
 
       pre {
@@ -219,29 +254,37 @@
 
       .screen {
         display: none;
+        flex: 1; /* Ensure screen takes available space */
       }
 
       .screen.active {
         display: flex;
         flex-direction: column;
-        flex: 1;
       }
 
-      #personalInfo.active {
-        display: flex;
-        flex-direction: column;
+      /* Align items center for screens like review */
+      .screen-center-content {
+         align-items: center;
+         margin-top: 40px; /* Keep top margin */
       }
+
 
       .loan-icon {
         width: 64px;
         height: 64px;
         margin-bottom: 24px;
       }
+      
+      .checkmark-icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 24px;
+      }
 
       #payrollLending {
-        text-align: left;
-        justify-content: center;
-        padding: 40px 0;
+        text-align: left; /* Keep specific alignment if needed */
+        justify-content: flex-start; /* Align content to start */
+        padding: 40px 0 0 0; /* Adjust padding */
       }
 
       #payrollLending .subtitle {
@@ -250,6 +293,14 @@
 
       #payrollLending .content-wrapper {
         margin-bottom: 32px;
+        flex-grow: 1; /* Allow wrapper to grow */
+      }
+      
+      /* Container for button at the bottom */
+       .button-container {
+        padding: 0 0 24px 0; /* Match padding from deposit_switch */
+        background: transparent;
+        margin-top: auto; /* Pushes button to the bottom */
       }
     </style>
   </head>
@@ -319,29 +370,29 @@
           <p class="subtitle">To process your loan application, we need to connect to your payroll provider</p>
         </div>
 
-        <button class="button" onclick="bridge.open()">
-          Continue
-        </button>
+        <div class="button-container">
+            <button class="button-primary" onclick="bridge.open()">
+              Continue
+            </button>
+        </div>
       </div>
 
-      <div id="pllComplete" class="screen">
-        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 40px;">
+      <div id="pllComplete" class="screen screen-center-content">
           <!-- Checkmark icon -->
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 24px;">
+          <svg class="checkmark-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="32" r="32" fill="#F4F8FF"/>
             <path d="M20 34L29 43L44 26" stroke="#4169E1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <h1 style="font-size: 32px; font-weight: 700; color: #1A1A1A; margin-bottom: 8px; text-align: center;">Congratulations!</h1>
-          <div style="font-size: 16px; color: #888; margin-bottom: 32px; text-align: center; max-width: 320px;">You will receive all the information to your email address.</div>
-          <div style="width: 100%; max-width: 340px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0 8px 0; border-top: 1px solid #F0F1F3; color: #888; font-size: 17px;">Account type <span data-field="account-type"></span></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid #F0F1F3; color: #888; font-size: 17px;">Account number <span data-field="account-number"></span></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid #F0F1F3; color: #888; font-size: 17px;">Routing number <span data-field="routing-number"></span></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid #F0F1F3; color: #888; font-size: 17px;">Deposit type <span data-field="deposit-type"></span></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid #F0F1F3; color: #888; font-size: 17px;">Deposit amount <span data-field="deposit-amount"></span></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid #F0F1F3; color: #888; font-size: 17px;">Initial deposit <span data-field="initial-deposit"></span></div>
+          <h1 class="screen-title">Congratulations!</h1>
+          <div class="screen-subtitle">You will receive all the information to your email address.</div>
+          <div class="review-data-container">
+            <div class="review-data-row">Account type <span id="accountType" data-field="account-type"></span></div>
+            <div class="review-data-row">Account number <span id="accountNumber" data-field="account-number"></span></div>
+            <div class="review-data-row">Routing number <span id="routingNumber" data-field="routing-number"></span></div>
+            <div class="review-data-row">Deposit type <span id="depositType" data-field="deposit-type"></span></div>
+            <div class="review-data-row">Deposit amount <span id="depositAmount" data-field="deposit-amount"></span></div>
+            <div class="review-data-row">Initial deposit <span id="initialDeposit" data-field="initial-deposit"></span></div>
           </div>
-        </div>
       </div>
     </div>
 
@@ -480,12 +531,12 @@
           return '$' + Number(val).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
 
-        document.querySelector('[data-field="account-type"]').textContent = capitalize(accountData.account_type);
-        document.querySelector('[data-field="account-number"]').textContent = maskAccountNumber(accountData.account_number);
-        document.querySelector('[data-field="routing-number"]').textContent = accountData.routing_number;
-        document.querySelector('[data-field="deposit-type"]').textContent = capitalize(accountData.deposit_type);
-        document.querySelector('[data-field="deposit-amount"]').textContent = accountData.deposit_value ? formatAmount(accountData.deposit_value) : (accountData.deposit_type === 'entire' ? 'Entire paycheck' : '');
-        document.querySelector('[data-field="initial-deposit"]').textContent = "Scheduled";
+        document.getElementById('accountType').textContent = capitalize(accountData.account_type);
+        document.getElementById('accountNumber').textContent = maskAccountNumber(accountData.account_number);
+        document.getElementById('routingNumber').textContent = accountData.routing_number;
+        document.getElementById('depositType').textContent = capitalize(accountData.deposit_type);
+        document.getElementById('depositAmount').textContent = accountData.deposit_value ? formatAmount(accountData.deposit_value) : (accountData.deposit_type === 'entire' ? 'Entire paycheck' : '');
+        document.getElementById('initialDeposit').textContent = "Scheduled";
 
         document.getElementById("payrollLending").classList.remove('active');
         document.getElementById("pllComplete").classList.add('active');

@@ -97,11 +97,28 @@
         color: var(--text-primary);
         margin-bottom: 8px;
       }
+      
+      .screen-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+        text-align: center;
+        margin-bottom: 18px;
+        margin-top: 0;
+      }
 
       .subtitle {
         font-size: 16px;
         color: var(--text-secondary);
         margin-bottom: 40px;
+      }
+      
+      .screen-subtitle {
+        font-size: 16px;
+        color: #888;
+        margin-bottom: 32px;
+        text-align: center;
+        max-width: 320px;
       }
 
       .form-group {
@@ -137,8 +154,22 @@
         cursor: pointer;
         margin-top: auto;
       }
+      
+      .button-primary {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 32px;
+        font-size: 18px;
+        font-weight: 700;
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 16px;
+        cursor: pointer;
+        height: 52px; 
+      }
 
-      .button:hover {
+      .button:hover, .button-primary:hover {
         opacity: 0.9;
       }
 
@@ -167,40 +198,44 @@
         display: none;
       }
 
-      #employmentVerification .button {
-        margin-top: auto;
+      #employmentVerification .button-container {
+        /* Inherits styles */
       }
 
-      .data-section {
-        background: var(--background-input);
-        padding: 24px;
-        border-radius: 8px;
-        margin-top: 24px;
+      /* Review screen data styles */
+       .review-data-container {
+        width: 100%;
+        max-width: 340px;
       }
 
-      .employment-data {
-        margin: 20px 0;
-      }
-
-      .data-row {
+      .review-data-row {
         display: flex;
         justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #E0E0E0;
+        align-items: center;
+        padding: 8px 0;
+        border-top: 1px solid #F0F1F3;
+        color: #888;
+        font-size: 17px;
       }
 
-      .data-row:last-child {
-        border-bottom: none;
+      .review-data-row:first-child {
+          padding-top: 16px;
       }
 
-      .data-label {
-        color: var(--text-secondary);
-        font-weight: 500;
-      }
-
-      .data-value {
-        color: var(--text-primary);
+      .review-data-row span[data-field] {
         font-weight: 600;
+        color: var(--text-primary);
+      }
+      
+      .refresh-message {
+          margin-top: 16px;
+          text-align: center;
+          font-size: 14px;
+          color: var(--text-secondary);
+      }
+      
+      .refresh-button {
+          margin-top: 24px; /* Spacing above button */
       }
 
       pre {
@@ -219,17 +254,17 @@
 
       .screen {
         display: none;
+        flex: 1;
       }
 
       .screen.active {
         display: flex;
         flex-direction: column;
-        flex: 1;
       }
-
-      #personalInfo.active {
-        display: flex;
-        flex-direction: column;
+      
+      .screen-center-content {
+         align-items: center;
+         margin-top: 40px; 
       }
 
       .employment-icon {
@@ -237,11 +272,17 @@
         height: 64px;
         margin-bottom: 24px;
       }
+      
+      .checkmark-icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 24px;
+      }
 
       #employmentVerification {
         text-align: left;
-        justify-content: center;
-        padding: 40px 0;
+        justify-content: flex-start; /* Align content to start */
+        padding: 40px 0 0 0;
       }
 
       #employmentVerification .subtitle {
@@ -249,8 +290,15 @@
       }
 
       #employmentVerification .content-wrapper {
-        margin-bottom: 32px;
+         flex-grow: 1;
       }
+      
+      .button-container {
+        padding: 0 0 24px 0; 
+        background: transparent;
+        margin-top: auto;
+      }
+      
     </style>
   </head>
   <body>
@@ -272,13 +320,13 @@
 
       <nav class="progress-nav">
         <a href="#" class="nav-item active" onclick="showScreen('personalInfo', 0); return false;">My info</a>
-        <a href="#" class="nav-item" onclick="showScreen('employmentVerification', 1); return false;">Employment</a>
-        <a href="#" class="nav-item" onclick="showScreen('employmentComplete', 2); return false;">Submit</a>
+        <a href="#" class="nav-item" onclick="showScreen('employmentVerification', 1); return false;">Verification</a>
+        <a href="#" class="nav-item" onclick="showScreen('employmentComplete', 2); return false;">Review</a>
       </nav>
 
       <div id="personalInfo" class="screen active">
         <h1 class="title">Your information</h1>
-        <p class="subtitle">Fill in your details to apply for a mortgage loan.</p>
+        <p class="subtitle">Fill in your details for employment verification.</p>
 
         <div class="form-group">
           <label class="form-label">First name</label>
@@ -306,56 +354,46 @@
       </div>
 
       <div id="employmentVerification" class="screen">
-        <div class="content-wrapper">
-          <svg class="employment-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="32" fill="#E8EDFF"/>
-            <path d="M20 24C20 22.8954 20.8954 22 22 22H42C43.1046 22 44 22.8954 44 24V32C44 39.732 37.732 46 30 46H22C20.8954 46 20 45.1046 20 44V24Z" stroke="#4169E1" stroke-width="2"/>
-            <path d="M26 22V18C26 16.8954 26.8954 16 28 16H36C37.1046 16 38 16.8954 38 18V22" stroke="#4169E1" stroke-width="2"/>
-            <circle cx="32" cy="34" r="6" stroke="#4169E1" stroke-width="2"/>
-            <path d="M29 34L31 36L35 32" stroke="#4169E1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-
-          <h1 class="title">Employment verification</h1>
-          <p class="subtitle">To proceed with your application, we need to verify your employment information</p>
+         <div class="content-wrapper">
+            <svg class="employment-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="32" r="32" fill="#E8EDFF"/>
+                <path d="M22 28C22 26.8954 22.8954 26 24 26H40C41.1046 26 42 26.8954 42 28V40C42 41.1046 41.1046 42 40 42H24C22.8954 42 22 41.1046 22 40V28Z" stroke="#4169E1" stroke-width="2"/>
+                <path d="M36 26V22C36 20.8954 35.1046 20 34 20H30C28.8954 20 28 20.8954 28 22V26" stroke="#4169E1" stroke-width="2"/>
+                <path d="M28 34H36" stroke="#4169E1" stroke-width="2" stroke-linecap="round"/>
+                <path d="M28 38H32" stroke="#4169E1" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+    
+            <h1 class="title">Employment Verification</h1>
+            <p class="subtitle">To proceed, we need to verify your employment details through your payroll provider.</p>
         </div>
-
-        <button class="button" onclick="bridge.open()">
-          Continue
-        </button>
+        <div class="button-container">
+            <button class="button-primary" onclick="bridge.open()">Connect Payroll</button>
+        </div>
       </div>
 
-      <div id="employmentComplete" class="screen">
-        <div class="data-section">
-          <h3>Please review your data</h3>
-          <div id="employmentData" class="employment-data">
-            <div class="data-row">
-              <span class="data-label">Employer:</span>
-              <span class="data-value" id="employerName"></span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">Job Title:</span>
-              <span class="data-value" id="jobTitle"></span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">Employment Status:</span>
-              <span class="data-value" id="employmentStatus"></span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">Start Date:</span>
-              <span class="data-value" id="startDate"></span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">End Date:</span>
-              <span class="data-value" id="endDate"></span>
-            </div>
+      <div id="employmentComplete" class="screen screen-center-content">
+          <svg class="checkmark-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="32" fill="#F4F8FF"/>
+            <path d="M20 34L29 43L44 26" stroke="#4169E1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h1 class="screen-title">Verification Complete</h1>
+          <div class="screen-subtitle">Please review your employment data below.</div>
+          
+          <div class="review-data-container">
+            <div class="review-data-row">Employer Name <span id="employerName" data-field="employerName"></span></div>
+            <div class="review-data-row">Job Title <span id="jobTitle" data-field="jobTitle"></span></div>
+            <div class="review-data-row">Employment Status <span id="employmentStatus" data-field="employmentStatus"></span></div>
+            <div class="review-data-row">Start Date <span id="startDate" data-field="startDate"></span></div>
+            <div class="review-data-row">End Date <span id="endDate" data-field="endDate"></span></div>
           </div>
-          <div id="refreshMessage" class="hidden">
-            Last updated: <span id="refreshTime"></span>
+          
+          <div id="refreshMessage" class="refresh-message hidden">
+             Last updated: <span id="refreshTime"></span>
           </div>
-          <button class="button" id="refreshButton" onclick="refresh()">
-            Refresh Data
+
+          <button class="button refresh-button" id="refreshButton" onclick="refresh()">
+             Refresh Data
           </button>
-        </div>
       </div>
     </div>
 
@@ -528,7 +566,7 @@
           day: 'numeric'
         });
         
-        // Format the data
+        // Format the data using getElementById
         document.getElementById("employerName").textContent = employmentData.company?.name || "N/A";
         document.getElementById("jobTitle").textContent = employmentData.job_title || "N/A";
         document.getElementById("employmentStatus").textContent = employmentData.is_active ? "Active" : "Inactive";
