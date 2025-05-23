@@ -178,7 +178,7 @@ const getPayrollById = async (report_id) => {
 const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
   const headers = getHeaders();
   try {
-    const response = await fetch(`https://prod.truv.com/v1/${endpoint}`, {
+    const response = await fetch(`https://prod-us-east-1.truv.com/v1/${endpoint}`, {
       method: method,
       body,
       headers,

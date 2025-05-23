@@ -8,7 +8,7 @@ fake = Faker()
 
 
 class TruvClient:
-    api_url = "https://prod.truv.com/v1/"
+    api_url = "https://prod-us-east-1.truv.com/v1/"
 
     def __init__(
         self, client_id: str, secret: str, product_type: str, api_url: str = None
