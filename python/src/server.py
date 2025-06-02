@@ -27,6 +27,7 @@ secret = os.environ.get("API_SECRET")
 client_id = os.environ.get("API_CLIENT_ID")
 product_type = os.environ.get("API_PRODUCT_TYPE", "employment")
 flask_port = os.environ.get("FLASK_RUN_PORT", 5001)
+is_order = os.environ.get("IS_ORDER", False)
 
 if not secret or not client_id:
     raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID'")
@@ -88,6 +89,9 @@ def create_bridge_token():
     """
     API endpoint to request a bridge token
     """
+    if is_order:
+        return api_client.create_order()
+    
     user = api_client.create_user()
     return api_client.create_user_bridge_token(user_id=user["id"])
 

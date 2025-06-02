@@ -95,6 +95,21 @@ class TruvClient:
                     }
                 )
         return self.post(f"users/{user_id}/tokens/", json=payload)
+    
+    def create_order(self: str) -> dict:
+        logging.info(
+            "TRUV: Requesting order from https://prod.truv.com/v1/orders/"
+        )
+
+        payload = {
+            "order_number": f"qs-{uuid4().hex}",
+            "first_name": fake.first_name(),
+            "last_name": fake.last_name(),
+            "email": fake.email(domain="example.com"),
+            "products": [self.product_type]
+        }
+        
+        return self.post("orders/", json=payload)
 
     def get_access_token(self, public_token: str) -> dict:
         logging.info(
