@@ -12,8 +12,17 @@ namespace c_sharp.Controllers
         [HttpGet]
         public async Task<string> Get()
         {
-            var userId = await _truv.CreateUser();
-            return await _truv.CreateUserBridgeToken(userId);
+            var isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
+            
+            if (isOrder == "true")
+            {
+                return await _truv.CreateOrder();
+            }
+            else
+            {
+                var userId = await _truv.CreateUser();
+                return await _truv.CreateUserBridgeToken(userId);
+            }
         }
     }
 }
