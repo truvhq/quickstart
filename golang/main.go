@@ -40,19 +40,31 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 // bridgeToken accepts requests for a bridge token and sends the response
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
-	userId, err := createUser()
-	if err != nil {
-		log.Println("Error creating user", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-		return
-	}
-
-	bridgeData, err := createUserBridgeToken(userId)
-	if err != nil {
-		log.Println("Error in bridgeToken\n", err)
-		fmt.Fprintf(w, `{ "success": false }`)
+	isOrder := os.Getenv("IS_ORDER")
+	
+	if isOrder == "true" {
+		orderData, err := createOrder()
+		if err != nil {
+			log.Println("Error creating order", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+		fmt.Fprintf(w, orderData)
 	} else {
-		fmt.Fprintf(w, bridgeData)
+		userId, err := createUser()
+		if err != nil {
+			log.Println("Error creating user", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+			return
+		}
+
+		bridgeData, err := createUserBridgeToken(userId)
+		if err != nil {
+			log.Println("Error in bridgeToken\n", err)
+			fmt.Fprintf(w, `{ "success": false }`)
+		} else {
+			fmt.Fprintf(w, bridgeData)
+		}
 	}
 }
 
@@ -372,6 +384,7 @@ func main() {
 	log.Println(fmt.Sprintf("API_CLIENT_ID: %s", os.Getenv("API_CLIENT_ID")))
 	log.Println(fmt.Sprintf("API_SECRET: %s", os.Getenv("API_SECRET")))
 	log.Println(fmt.Sprintf("API_PRODUCT_TYPE: %s", os.Getenv("API_PRODUCT_TYPE")))
+	log.Println(fmt.Sprintf("IS_ORDER: %s", os.Getenv("IS_ORDER")))
 	log.Println(strings.Repeat("=", 94))
 
 	handleRequests()

@@ -56,6 +56,22 @@ type UserResponse struct {
 	UserId string `json:"id"`
 }
 
+// OrderRequest defines the body of the request when creating an order
+type OrderRequest struct {
+	OrderNumber string      `json:"order_number"`
+	FirstName   string      `json:"first_name"`
+	LastName    string      `json:"last_name"`
+	Email       string      `json:"email"`
+	Products    []string    `json:"products"`
+	Employers   []Employer  `json:"employers,omitempty"`
+}
+
+// Employer defines the employer structure for orders
+type Employer struct {
+	CompanyName string          `json:"company_name"`
+	Account     *AccountRequest `json:"account,omitempty"`
+}
+
 // PayrollReportRequest defines the body of the request when requesting
 // a payroll report
 type BridgeTokenRequest struct {
@@ -148,6 +164,63 @@ func createUserBridgeToken(userId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close()
+	data, _ := ioutil.ReadAll(response.Body)
+	return (string(data)), nil
+}
+
+// createOrder creates an order from the Truv API
+func createOrder() (string, error) {
+	log.Println("TRUV: Requesting an order from https://prod.truv.com/v1/orders/")
+	productType := os.Getenv("API_PRODUCT_TYPE")
+	uniqueNumber := time.Now().UnixNano() / (1 << 22)
+	
+	orderRequest := OrderRequest{
+		OrderNumber: fmt.Sprintf("qs-%d", uniqueNumber),
+		FirstName:   "John",
+		LastName:    "Johnson",
+		Email:       "j.johnson@example.com",
+		Products:    []string{productType},
+	}
+
+	// Add employers for certain product types
+	if productType == "deposit_switch" || productType == "pll" || productType == "employment" {
+		employer := Employer{
+			CompanyName: "Home Depot",
+		}
+		
+		// Add account information for deposit_switch and pll
+		if productType == "deposit_switch" || productType == "pll" {
+			account := AccountRequest{
+				AccountNumber: "16002600",
+				AccountType:   "checking",
+				RoutingNumber: "12345678",
+				BankName:      "Truv Bank",
+			}
+			
+			if productType == "pll" {
+				account.DepositType = "amount"
+				account.DepositValue = "100"
+			}
+			
+			employer.Account = &account
+		}
+		
+		orderRequest.Employers = []Employer{employer}
+	}
+
+	orderJson, _ := json.Marshal(orderRequest)
+	request, err := getRequest("orders/", "POST", orderJson)
+	if err != nil {
+		return "", err
+	}
+	
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
