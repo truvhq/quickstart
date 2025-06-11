@@ -54,7 +54,7 @@ app.get('/', htmlFile);
 app.get('/getBridgeToken', async (req, res) => {
   // retrieve bridge token
   try {
-    if (IS_ORDER === 'true' || IS_ORDER === true) {
+    if (IS_ORDER && IS_ORDER.toLowerCase() === 'true') {
       const order = await createOrder();
       res.json(order);
     } else {
@@ -220,6 +220,7 @@ app.listen(5004, () => {
     API_CLIENT_ID,
     API_SECRET,
     API_PRODUCT_TYPE,
+    IS_ORDER,
   };
   console.log(environment);
   console.log('='.repeat(94));

@@ -42,7 +42,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
 	isOrder := os.Getenv("IS_ORDER")
 	
-	if isOrder == "true" {
+	if strings.ToLower(isOrder) == "true" {
 		orderData, err := createOrder()
 		if err != nil {
 			log.Println("Error creating order", err)

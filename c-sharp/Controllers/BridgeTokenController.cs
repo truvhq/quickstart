@@ -14,7 +14,7 @@ namespace c_sharp.Controllers
         {
             var isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
             
-            if (isOrder == "true")
+            if (!string.IsNullOrEmpty(isOrder) && isOrder.ToLower() == "true")
             {
                 return await _truv.CreateOrder();
             }
