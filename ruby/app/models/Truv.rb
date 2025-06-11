@@ -7,6 +7,7 @@ class Truv
   class_attribute :client_secret
   class_attribute :product_type
   class_attribute :link_token
+  class_attribute :is_order
 
   def self.createUser()
     puts "TRUV: Requesting new user from https://prod.truv.com/v1/users/"
@@ -31,6 +32,43 @@ class Truv
     end
     body = bodyObj.to_json
     return sendRequest("users/#{user_id}/tokens/", body, "POST")
+  end
+
+  def self.createOrder()
+    puts "TRUV: Requesting an order from https://prod.truv.com/v1/orders/"
+    uuid = SecureRandom.uuid
+    bodyObj = {
+      "order_number" => "qs-#{uuid}",
+      "first_name" => "John",
+      "last_name" => "Johnson",
+      "email" => "j.johnson@example.com",
+      "products" => [Truv.product_type]
+    }
+
+    if ["deposit_switch", "pll", "employment"].include?(product_type)
+      bodyObj["employers"] = [
+        {
+          "company_name" => "Home Depot"
+        }
+      ]
+    end
+
+    if ["deposit_switch", "pll"].include?(product_type)
+      bodyObj["employers"][0]["account"] = {
+        "account_number" => "16002600",
+        "account_type" => "checking",
+        "routing_number" => "12345678",
+        "bank_name" => "Truv Bank"
+      }
+
+      if product_type == "pll"
+        bodyObj["employers"][0]["account"]["deposit_type"] = "amount"
+        bodyObj["employers"][0]["account"]["deposit_value"] = "100"
+      end
+    end
+
+    body = bodyObj.to_json
+    return sendRequest("orders/", body, "POST")
   end
 
   def self.getAccessToken(public_token)
