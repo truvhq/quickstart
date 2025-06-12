@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -122,16 +122,15 @@ func createUser() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	client := &http.Client{}
-	res, err := client.Do(request)
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}
 
-	defer res.Body.Close()
+	defer response.Body.Close()
 
 	user := UserResponse{}
-	err = json.NewDecoder(res.Body).Decode(&user)
+	err = json.NewDecoder(response.Body).Decode(&user)
 
 	return user.UserId, nil
 }
@@ -164,15 +163,17 @@ func createUserBridgeToken(userId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	client := &http.Client{}
-	response, err := client.Do(request)
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}
 
 	defer response.Body.Close()
-	data, _ := ioutil.ReadAll(response.Body)
-	return (string(data)), nil
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 // createOrder creates an order from the Truv API
@@ -221,15 +222,18 @@ func createOrder() (string, error) {
 		return "", err
 	}
 	
-	client := &http.Client{}
-	response, err := client.Do(request)
+
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}
 
 	defer response.Body.Close()
-	data, _ := ioutil.ReadAll(response.Body)
-	return (string(data)), nil
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 // getAccessToken requests an access token from the Truv API
@@ -245,8 +249,7 @@ func getAccessToken(public_token string) (*AccessTokenResponse, error) {
 		return nil, err
 	}
 
-	client := &http.Client{}
-	response, err := client.Do(request)
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -268,14 +271,16 @@ func getLinkReport(link_id string, product_type string) (string, error) {
 		return "", err
 	}
 
-	client := &http.Client{}
-	response, err := client.Do(request)
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}
 
 	defer response.Body.Close()
-	data, _ := ioutil.ReadAll(response.Body)
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
 	return string(data), nil
 }
 
@@ -290,15 +295,15 @@ func createRefreshTask(access_token string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %v", err)
 	}
-	client := &http.Client{}
-	res, err := client.Do(request)
+
+	res, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", fmt.Errorf("failed to execute request: %v", err)
 	}
 	defer res.Body.Close()
 
 	// Read response body
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", fmt.Errorf("failed to read response body: %v", err)
 	}
@@ -328,14 +333,17 @@ func getRefreshTask(taskId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	client := &http.Client{}
-	res, err := client.Do(request)
+
+	res, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}
 
 	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
 	return string(data), nil
 }
 
@@ -350,14 +358,17 @@ func getEmployeeDirectoryByToken(access_token string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	client := &http.Client{}
-	res, err := client.Do(request)
+
+	res, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}
 
 	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
 	return string(data), nil
 }
 
@@ -373,8 +384,8 @@ func requestPayrollReport(access_token, start_date, end_date string) (*PayrollRe
 	if err != nil {
 		return nil, err
 	}
-	client := &http.Client{}
-	res, err := client.Do(request)
+
+	res, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -395,13 +406,16 @@ func getPayrollById(reportId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	client := &http.Client{}
-	res, err := client.Do(request)
+
+	res, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return "", err
 	}
 
 	defer res.Body.Close()
-	data, _ := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
 	return string(data), nil
 }

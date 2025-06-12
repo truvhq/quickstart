@@ -96,7 +96,7 @@ class TruvClient:
                 )
         return self.post(f"users/{user_id}/tokens/", json=payload)
     
-    def create_order(self: str) -> dict:
+    def create_order(self) -> dict:
         logging.info(
             "TRUV: Requesting order from https://prod.truv.com/v1/orders/"
         )

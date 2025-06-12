@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -347,7 +348,10 @@ type WebhookRequest struct {
 }
 
 func webhook(w http.ResponseWriter, r *http.Request) {
-	b, _ := ioutil.ReadAll(r.Body)
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		// handle error, e.g. return or log
+	}
 	convertedBody := string(b)
 	var parsedJson WebhookRequest
 	json.Unmarshal(b, &parsedJson)

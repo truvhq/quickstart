@@ -450,6 +450,7 @@
         const bridgeToken = await apiRequests.getBridgeToken()
 
         let orderFlag = false
+        // Order API returns ID while BridgeToken does not
         if (bridgeToken.id) orderFlag = true
 
         // Step 3 - Initialize the Truv Bridge
@@ -485,7 +486,7 @@
               }
               content.classList.add("hidden")
 
-              if (!verificationInfo.length) {
+              if (!verificationInfo?.length) {
                 return
               }
 
