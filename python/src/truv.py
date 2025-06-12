@@ -95,6 +95,44 @@ class TruvClient:
                     }
                 )
         return self.post(f"users/{user_id}/tokens/", json=payload)
+    
+    def create_order(self) -> dict:
+        logging.info(
+            "TRUV: Requesting order from https://prod.truv.com/v1/orders/"
+        )
+
+        payload = {
+            "order_number": f"qs-{uuid4().hex}",
+            "first_name": fake.first_name(),
+            "last_name": fake.last_name(),
+            "email": fake.email(domain="example.com"),
+            "products": [self.product_type]
+        }
+
+        if self.product_type in ["deposit_switch", "pll", "employment"]:
+            payload["employers"] = [
+                {
+                    "company_name": "Home Depot"
+                }
+            ]
+
+        if self.product_type in ["deposit_switch", "pll"]:
+            payload["employers"][0]["account"] = {
+                "account_number": "16002600",
+                "account_type": "checking",
+                "routing_number": "12345678",
+                "bank_name": "Truv Bank",
+            }
+
+            if self.product_type == "pll":
+                payload["employers"][0]["account"].update(
+                    {
+                        "deposit_type": "amount",
+                        "deposit_value": "100",
+                    }
+                )
+        
+        return self.post("orders/", json=payload)
 
     def get_access_token(self, public_token: str) -> dict:
         logging.info(

@@ -175,6 +175,51 @@ const getPayrollById = async (report_id) => {
   });
 };
 
+/**
+ * Create an order
+ * https://docs.truv.com/reference/orders_create
+ * @returns The response from Truv
+ */
+const createOrder = async () => {
+  console.log('TRUV: Requesting an order from https://prod.truv.com/v1/orders/');
+  const bodyObj = {
+    order_number: `qs-${uuidv4()}`,
+    first_name: 'John',
+    last_name: 'Johnson',
+    email: 'j.johnson@example.com',
+    products: [API_PRODUCT_TYPE]
+  };
+
+  if (['deposit_switch', 'pll', 'employment'].includes(API_PRODUCT_TYPE)) {
+    bodyObj.employers = [
+      {
+        company_name: 'Home Depot'
+      }
+    ];
+  }
+
+  if (['deposit_switch', 'pll'].includes(API_PRODUCT_TYPE)) {
+    bodyObj.employers[0].account = {
+      account_number: '16002600',
+      account_type: 'checking',
+      routing_number: '12345678',
+      bank_name: 'Truv Bank',
+    };
+
+    if (API_PRODUCT_TYPE === 'pll') {
+      bodyObj.employers[0].account = { 
+        ...bodyObj.employers[0].account, 
+        deposit_type: 'amount', 
+        deposit_value: '100' 
+      };
+    }
+  }
+
+  const body = JSON.stringify(bodyObj);
+
+  return await sendRequest('orders/', { body });
+};
+
 const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
   const headers = getHeaders();
   try {
@@ -203,4 +248,5 @@ export {
   createUser,
   createUserBridgeToken,
   getLinkReport,
+  createOrder,
 };

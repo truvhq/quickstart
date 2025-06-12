@@ -15,9 +15,10 @@ import {
   createUser,
   createUserBridgeToken,
   getLinkReport,
+  createOrder,
 } from './truv.js';
 
-const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env;
+const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE, IS_ORDER } = process.env;
 
 const generate_webhook_sign = (body, key) => {
   return 'v1=' + crypto.createHmac('sha256', key).update(body).digest('hex');
@@ -53,9 +54,14 @@ app.get('/', htmlFile);
 app.get('/getBridgeToken', async (req, res) => {
   // retrieve bridge token
   try {
-    const user = await createUser();
-    const bridgeToken = await createUserBridgeToken(user.id);
-    res.json(bridgeToken);
+    if (IS_ORDER && IS_ORDER.toLowerCase() === 'true') {
+      const order = await createOrder();
+      res.json(order);
+    } else {
+      const user = await createUser();
+      const bridgeToken = await createUserBridgeToken(user.id);
+      res.json(bridgeToken);
+    }
   } catch (e) {
     console.error('error with getBridgeToken');
     console.error(e);
@@ -214,6 +220,7 @@ app.listen(5004, () => {
     API_CLIENT_ID,
     API_SECRET,
     API_PRODUCT_TYPE,
+    IS_ORDER,
   };
   console.log(environment);
   console.log('='.repeat(94));

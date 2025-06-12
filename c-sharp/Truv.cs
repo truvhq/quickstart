@@ -10,6 +10,7 @@ namespace c_sharp
         private readonly string clientId = Environment.GetEnvironmentVariable("API_CLIENT_ID");
         private readonly string clientSecret = Environment.GetEnvironmentVariable("API_SECRET");
         private readonly string productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
+        private readonly string isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
 
         private readonly HttpClient client;
 
@@ -80,6 +81,52 @@ namespace c_sharp
                 }
             }
             return await SendRequest(HttpMethod.Post, $"users/{UserId}/tokens/", body);
+        }
+
+        public async Task<string> CreateOrder()
+        {
+            Console.WriteLine("TRUV: Requesting an order from https://prod.truv.com/v1/orders/");
+            string uuid = Guid.NewGuid().ToString();
+            
+            var body = new OrderRequest
+            {
+                OrderNumber = $"qs-{uuid}",
+                FirstName = "John",
+                LastName = "Johnson",
+                Email = "j.johnson@example.com",
+                Products = new[] { productType }
+            };
+
+            // Add employers for certain product types
+            if (productType == "deposit_switch" || productType == "pll" || productType == "employment")
+            {
+                var employer = new EmployerRequest
+                {
+                    CompanyName = "Home Depot"
+                };
+
+                // Add account information for deposit_switch and pll
+                if (productType == "deposit_switch" || productType == "pll")
+                {
+                    employer.Account = new AccountRequest
+                    {
+                        AccountNumber = "16002600",
+                        AccountType = "checking",
+                        RountingNumber = "12345678",
+                        BankName = "Truv Bank"
+                    };
+
+                    if (productType == "pll")
+                    {
+                        employer.Account.DepositType = "amount";
+                        employer.Account.DepositValue = "100";
+                    }
+                }
+
+                body.Employers = new[] { employer };
+            }
+
+            return await SendRequest(HttpMethod.Post, "orders/", body);
         }
 
         public async Task<string> GetAccessToken(string publicToken)
@@ -261,6 +308,44 @@ namespace c_sharp
 
         [JsonPropertyName("client_name")]
         public string ClientName { get; set; }
+
+#nullable enable
+        [JsonPropertyName("account")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public AccountRequest? Account { get; set; }
+
+#nullable disable
+    }
+
+    public class OrderRequest
+    {
+        [JsonPropertyName("order_number")]
+        public string OrderNumber { get; set; }
+
+        [JsonPropertyName("first_name")]
+        public string FirstName { get; set; }
+
+        [JsonPropertyName("last_name")]
+        public string LastName { get; set; }
+
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
+
+        [JsonPropertyName("products")]
+        public string[] Products { get; set; }
+
+#nullable enable
+        [JsonPropertyName("employers")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public EmployerRequest[]? Employers { get; set; }
+
+#nullable disable
+    }
+
+    public class EmployerRequest
+    {
+        [JsonPropertyName("company_name")]
+        public string CompanyName { get; set; }
 
 #nullable enable
         [JsonPropertyName("account")]

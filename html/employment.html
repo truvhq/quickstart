@@ -480,16 +480,48 @@
         // Step 2 - Call your back end to retrieve a bridge token from truv
         const bridgeToken = await apiRequests.getBridgeToken()
 
+        let orderFlag = false
+        if (bridgeToken.id) orderFlag = true
+
         // Step 3 - Initialize the Truv Bridge
         const bridge = TruvBridge.init({
           bridgeToken: bridgeToken.bridge_token,
+          isOrder: orderFlag,
           onLoad: function () {
             console.log("onLoad callback called")
             successClosing = null
           },
-          onEvent: function (eventType, payload) {
+          onEvent: async function (eventType, payload) {
             console.log(`onEvent callback called. Event Type: ${eventType}`)
             if (payload) console.log("onEvent payload:", payload)
+
+            if (eventType === "SUCCESS") {
+              successClosing = true
+
+              const content = document.querySelector(".spinner-container")
+              content.classList.remove("hidden")
+
+              // Add 2 second delay before making the request
+              await new Promise(resolve => setTimeout(resolve, 2000));
+
+              let verificationInfo
+              try {
+                verificationInfo = await apiRequests.getVerificationInfoByToken(
+                  payload.public_token
+                )
+              } catch (e) {
+                console.error(e)
+                content.classList.add("hidden")
+                return
+              }
+              content.classList.add("hidden")
+
+              if (!verificationInfo?.length) {
+                return
+              }
+
+              renderEmploymentData(verificationInfo)
+            }
           },
           onSuccess: async function (public_token, meta) {
             console.log(
@@ -497,31 +529,12 @@
             )
             console.log("onSuccess meta: ", meta)
 
-            successClosing = true
-
-            const content = document.querySelector(".spinner-container")
-            content.classList.remove("hidden")
-
-            // Add 2 second delay before making the request
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            let verificationInfo
-            try {
-              verificationInfo = await apiRequests.getVerificationInfoByToken(
-                public_token
-              )
-            } catch (e) {
-              console.error(e)
-              content.classList.add("hidden")
-              return
+            // Check if public_token is provided, return early if not
+            if (!public_token) {
+              console.log("No public_token received in onSuccess callback");
+              return;
             }
-            content.classList.add("hidden")
-
-            if (!verificationInfo.length) {
-              return
-            }
-
-            renderEmploymentData(verificationInfo)
+            
           },
           onClose: function () {
             console.log("onClose callback called.")

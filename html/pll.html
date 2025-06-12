@@ -466,16 +466,39 @@
         // Step 2 - Call your back end to retrieve a bridge token from truv
         const bridgeToken = await apiRequests.getBridgeToken()
 
+        let orderFlag = false
+        if (bridgeToken.id) orderFlag = true
+
         // Step 3 - Initialize the Truv Bridge
         const bridge = TruvBridge.init({
           bridgeToken: bridgeToken.bridge_token,
+          isOrder: orderFlag,
           onLoad: function () {
             console.log("onLoad callback called")
             successClosing = null
           },
-          onEvent: function (eventType, payload) {
+          onEvent: async function (eventType, payload) {
             console.log(`onEvent callback called. Event Type: ${eventType}`)
             if (payload) console.log("onEvent payload:", payload)
+
+            if (eventType === "SUCCESS") {
+              successClosing = true
+
+              const content = document.querySelector(".spinner-container")
+              content.classList.remove("hidden")
+              let pllData
+              try {
+                console.log("PLL has begun with user login. Exchanging public_token for access_token")
+                pllData = await apiRequests.getPaycheckLinkedLoanData(payload.public_token)
+              } catch (e) {
+                console.error(e)
+                content.classList.add("hidden")
+                return
+              }
+              content.classList.add("hidden")
+
+              renderAccountData(pllData)
+            }
           },
           onSuccess: async function (public_token, meta) {
             console.log(
@@ -483,23 +506,12 @@
             )
             console.log("onSuccess meta: ", meta)
 
-            successClosing = true
-
-            const content = document.querySelector(".spinner-container")
-            content.classList.remove("hidden")
-            let pllData
-            try {
-              console.log("PLL has begun with user login. Exchanging public_token for access_token")
-              pllData = await apiRequests.getPaycheckLinkedLoanData(public_token)
-            } catch (e) {
-              console.error(e)
-              content.classList.add("hidden")
-              return
+            // Check if public_token is provided, return early if not
+            if (!public_token) {
+              console.log("No public_token received in onSuccess callback");
+              return;
             }
-            content.classList.add("hidden")
-
-            renderAccountData(pllData)
-
+            
           },
           onClose: function () {
             console.log("onClose callback called.")
