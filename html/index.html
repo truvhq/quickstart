@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Truv Quickstart — Multi-Workflow Demo</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <script src="https://cdn.truv.com/bridge.js"></script>
+  <style>
+    :root {
+      --primary: #4169E1;
+      --primary-light: #E8EDFF;
+      --primary-hover: #3458c7;
+      --text: #1A1A1A;
+      --text-secondary: #666;
+      --text-muted: #999;
+      --bg: #F5F5F5;
+      --bg-white: #fff;
+      --bg-input: #F8F9FA;
+      --border: #E5E7EB;
+      --border-light: #F0F1F3;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --error: #dc2626;
+      --error-bg: #fef2f2;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+    }
+    .header {
+      background: var(--bg-white); border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 56px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; }
+    .header-title { font-size: 16px; font-weight: 600; }
+    .header-nav { display: flex; gap: 4px; }
+    .header-nav button {
+      background: none; border: none; padding: 8px 12px; font-size: 13px;
+      font-weight: 500; color: var(--text-secondary); cursor: pointer;
+      border-radius: 6px; font-family: inherit;
+    }
+    .header-nav button:hover { background: var(--bg-input); }
+    .header-nav button.active { color: var(--primary); background: var(--primary-light); }
+    .main-layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
+    .app-panel {
+      flex: 1; overflow-y: auto; padding: 24px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .api-panel {
+      width: 420px; min-width: 420px; border-left: 1px solid var(--border);
+      background: var(--bg-white); display: flex; flex-direction: column; overflow: hidden;
+    }
+    .step-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 24px; width: 100%; max-width: 560px; }
+    .step-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .step-item.active { color: var(--primary); }
+    .step-item.done { color: var(--success); }
+    .step-number {
+      width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border); color: var(--text-muted);
+    }
+    .step-item.active .step-number { border-color: var(--primary); background: var(--primary); color: white; }
+    .step-item.done .step-number { border-color: var(--success); background: var(--success); color: white; }
+    .step-arrow { color: var(--border); font-size: 16px; margin: 0 4px; }
+    .home-container { max-width: 720px; width: 100%; padding-top: 40px; }
+    .home-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .home-subtitle { font-size: 15px; color: var(--text-secondary); margin-bottom: 32px; }
+    .workflow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .workflow-card {
+      background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px; cursor: pointer; transition: all 0.15s;
+    }
+    .workflow-card:hover { border-color: var(--primary); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+    .workflow-icon {
+      width: 40px; height: 40px; background: var(--primary-light); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 20px;
+    }
+    .workflow-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .workflow-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .screen-container { width: 100%; max-width: 480px; }
+    .screen-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); padding: 32px; }
+    .screen-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .screen-card .desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    .form-input {
+      width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); background: var(--bg-white); font-family: inherit; outline: none;
+    }
+    .form-input:focus { border-color: var(--primary); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .product-option { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px; cursor: pointer; text-align: center; }
+    .product-option:hover { border-color: var(--primary); }
+    .product-option.selected { border-color: var(--primary); background: var(--primary-light); }
+    .product-option .product-name { font-size: 13px; font-weight: 600; }
+    .product-option .product-desc { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px;
+      font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer;
+      font-family: inherit; transition: all 0.15s; gap: 8px;
+    }
+    .btn-primary { background: var(--primary); color: white; width: 100%; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: var(--bg-input); color: var(--text); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .bridge-wrapper {
+      width: 100%; height: 700px; border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; position: relative; background: #fff;
+    }
+    .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
+    .bridge-loading {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      text-align: center; color: var(--text-secondary); font-size: 14px;
+    }
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .review-table { width: 100%; }
+    .review-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+    .review-label { color: var(--text-secondary); }
+    .review-value { font-weight: 600; text-align: right; }
+    .share-url-box {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+    }
+    .share-url-box input {
+      flex: 1; border: none; background: transparent; font-size: 13px;
+      font-family: monospace; outline: none; color: var(--text);
+    }
+    .share-url-box .copy-btn {
+      background: var(--primary); color: white; border: none; padding: 6px 12px;
+      border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit;
+    }
+    .monitor-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .pulse-dot {
+      width: 10px; height: 10px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .webhook-feed { max-height: 300px; overflow-y: auto; }
+    .webhook-entry {
+      padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+      margin-bottom: 8px; font-size: 13px;
+    }
+    .webhook-entry .we-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .webhook-entry .we-time { color: var(--text-muted); font-size: 11px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .badge-get { background: #dbeafe; color: #1d4ed8; }
+    .badge-post { background: #dcfce7; color: #166534; }
+    .badge-webhook { background: #fef3c7; color: #92400e; }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-error { background: var(--error-bg); color: var(--error); }
+    .badge-pending { background: var(--warning-bg); color: var(--warning); }
+    .api-panel-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .api-panel-tabs button {
+      flex: 1; padding: 12px 8px; font-size: 12px; font-weight: 600;
+      color: var(--text-secondary); background: none; border: none;
+      border-bottom: 2px solid transparent; cursor: pointer; font-family: inherit;
+    }
+    .api-panel-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .api-tab-content { flex: 1; overflow-y: auto; padding: 16px; }
+    .guide-step { margin-bottom: 16px; }
+    .guide-step h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .guide-step p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .api-log-entry {
+      border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+      margin-bottom: 8px; font-size: 13px; overflow: hidden;
+    }
+    .api-log-header {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+      cursor: pointer; background: var(--bg-input);
+    }
+    .api-log-header:hover { background: var(--border-light); }
+    .api-log-endpoint {
+      flex: 1; font-family: monospace; font-size: 12px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .api-log-meta { display: flex; gap: 8px; font-size: 11px; color: var(--text-muted); }
+    .api-log-body { padding: 10px; border-top: 1px solid var(--border-light); display: none; }
+    .api-log-body.open { display: block; }
+    .api-log-body pre {
+      font-size: 11px; font-family: monospace; background: var(--bg-input);
+      padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap;
+      word-break: break-all; max-height: 200px; overflow-y: auto;
+    }
+    .api-log-body h5 {
+      font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .api-log-body h5 + pre { margin-bottom: 10px; }
+    .bridge-event {
+      padding: 8px 10px; border-left: 3px solid var(--primary); margin-bottom: 6px;
+      background: var(--bg-input); border-radius: 0 6px 6px 0; font-size: 12px;
+    }
+    .bridge-event .be-type { font-weight: 600; color: var(--primary); }
+    .bridge-event .be-time { float: right; color: var(--text-muted); font-size: 11px; }
+    .bridge-event .be-data { margin-top: 4px; color: var(--text-secondary); font-family: monospace; font-size: 11px; }
+    .refresh-section { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light); }
+    @media (max-width: 900px) {
+      .api-panel { display: none; }
+      .workflow-grid { grid-template-columns: 1fr; }
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo"></div>
+    <div class="header-title">Truv Quickstart</div>
+  </div>
+  <div class="header-nav" id="headerNav"></div>
+</div>
+
+<div class="main-layout">
+  <div class="app-panel" id="appPanel"></div>
+  <div class="api-panel" id="apiPanel">
+    <div class="api-panel-tabs" id="apiPanelTabs"></div>
+    <div class="api-tab-content" id="apiTabContent"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// State
+// ============================================================
+const API_BASE = window.location.origin;
+let state = {
+  workflow: null,
+  step: 0,
+  orderId: null,
+  truvOrderId: null,
+  bridgeToken: null,
+  shareUrl: null,
+  productType: 'employment',
+  formData: {},
+  bridgeEvents: [],
+  apiLogs: [],
+  webhooks: [],
+  orderData: null,
+  eventSource: null,
+};
+
+// ============================================================
+// Workflow definitions
+// ============================================================
+const WORKFLOWS = {
+  'embedded-orders': {
+    title: 'Embedded Orders',
+    subtitle: 'Create an order, complete verification inline via Bridge, and review results.',
+    icon: '\u25A2',
+    steps: [
+      { title: 'Applicant Info', screen: 'form', guide: 'Fill in applicant details. The backend will call POST /v1/orders/ to create an order and return a bridge_token.' },
+      { title: 'Verify', screen: 'bridge-inline', guide: 'The Bridge widget opens inline. Complete verification using sandbox credentials: goodlogin / goodpassword. Watch the Bridge Events tab for callbacks.' },
+      { title: 'Review', screen: 'review', guide: 'The backend calls GET /v1/orders/{id}/ to fetch results. Review the verification data and order status.' },
+    ],
+  },
+  'bridge-widget': {
+    title: 'Bridge Widget',
+    subtitle: 'Classic Users API flow: select a product, open Bridge popup, exchange token, get report.',
+    icon: '\u2699',
+    steps: [
+      { title: 'Select Product', screen: 'product-select', guide: 'Choose a product type. The backend will call POST /v1/users/ then POST /v1/users/{id}/tokens/ to get a bridge_token.' },
+      { title: 'Connect', screen: 'bridge-popup', guide: 'Click "Connect Payroll" to open the Bridge popup. Use sandbox credentials: goodlogin / goodpassword.' },
+      { title: 'Review', screen: 'review-bridge', guide: 'The backend exchanges the public_token for an access_token, then fetches the report via GET /v1/links/{id}/{type}/report.' },
+    ],
+  },
+  'hosted-orders': {
+    title: 'Hosted Orders',
+    subtitle: 'Create a hosted order with email/phone delivery \u2014 no frontend widget needed.',
+    icon: '\u2709',
+    steps: [
+      { title: 'Applicant Info', screen: 'form', guide: 'Fill in applicant details including email and phone. The backend calls POST /v1/orders/ and receives a share_url.' },
+      { title: 'Share Link', screen: 'send-link', guide: 'The share URL is generated. The applicant receives it via email/SMS and completes verification in their own browser.' },
+      { title: 'Monitor', screen: 'monitor', guide: 'Watch for incoming webhooks in real-time via Server-Sent Events.' },
+      { title: 'Review', screen: 'review', guide: 'Once complete, fetch the order data via GET /v1/orders/{id}/ to see verification results.' },
+    ],
+  },
+  'data-refresh': {
+    title: 'Data Refresh',
+    subtitle: 'Refresh an existing order to pull updated verification data.',
+    icon: '\u21BB',
+    steps: [
+      { title: 'Select Order', screen: 'refresh-select', guide: 'Enter an existing order ID or create a new order first.' },
+      { title: 'Refresh', screen: 'refresh-action', guide: 'The backend calls POST /v1/orders/{id}/refresh/ to trigger a data refresh.' },
+      { title: 'Review', screen: 'review', guide: 'Compare the refreshed data with the original results.' },
+    ],
+  },
+};
+
+// ============================================================
+// Safe DOM helpers
+// ============================================================
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  if (attrs) {
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'className') node.className = v;
+      else if (k === 'onclick') node.addEventListener('click', v);
+      else if (k === 'style' && typeof v === 'object') Object.assign(node.style, v);
+      else if (k === 'style' && typeof v === 'string') node.setAttribute('style', v);
+      else if (k === 'disabled') node.disabled = v;
+      else if (k === 'readOnly') node.readOnly = v;
+      else if (k === 'type') node.type = v;
+      else if (k === 'value') node.value = v;
+      else if (k === 'placeholder') node.placeholder = v;
+      else if (k === 'id') node.id = v;
+      else if (k === 'htmlFor') node.htmlFor = v;
+      else if (k === 'selected') node.selected = v;
+      else node.setAttribute(k, v);
+    }
+  }
+  if (children !== undefined && children !== null) {
+    if (Array.isArray(children)) {
+      for (const c of children) {
+        if (c === null || c === undefined) continue;
+        if (typeof c === 'string') node.appendChild(document.createTextNode(c));
+        else node.appendChild(c);
+      }
+    } else if (typeof children === 'string') {
+      node.textContent = children;
+    } else {
+      node.appendChild(children);
+    }
+  }
+  return node;
+}
+
+function clearAndAppend(parentId, child) {
+  const parent = document.getElementById(parentId);
+  parent.replaceChildren();
+  if (child) parent.appendChild(child);
+}
+
+// ============================================================
+// Header Nav
+// ============================================================
+function buildHeaderNav() {
+  const nav = document.getElementById('headerNav');
+  nav.replaceChildren();
+
+  const homeBtn = el('button', { className: 'active', onclick: goHome }, 'Home');
+  nav.appendChild(homeBtn);
+
+  for (const [id, wf] of Object.entries(WORKFLOWS)) {
+    const btn = el('button', { onclick: () => startWorkflow(id) }, wf.title);
+    nav.appendChild(btn);
+  }
+}
+
+function updateHeaderNav(activeId) {
+  const buttons = document.querySelectorAll('#headerNav button');
+  buttons.forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (i === 0 && !activeId) btn.classList.add('active');
+  });
+  if (activeId) {
+    const idx = Object.keys(WORKFLOWS).indexOf(activeId);
+    if (idx >= 0 && buttons[idx + 1]) buttons[idx + 1].classList.add('active');
+  }
+}
+
+// ============================================================
+// Navigation
+// ============================================================
+function goHome() {
+  if (state.eventSource) { state.eventSource.close(); state.eventSource = null; }
+  state = { ...state, workflow: null, step: 0, orderId: null, truvOrderId: null,
+    bridgeToken: null, shareUrl: null, formData: {}, bridgeEvents: [],
+    apiLogs: [], webhooks: [], orderData: null };
+  updateHeaderNav(null);
+  renderHome();
+  renderApiPanel();
+}
+
+function startWorkflow(id) {
+  if (state.eventSource) { state.eventSource.close(); state.eventSource = null; }
+  state.workflow = id;
+  state.step = 0;
+  state.orderId = null; state.truvOrderId = null;
+  state.bridgeToken = null; state.shareUrl = null;
+  state.formData = {}; state.bridgeEvents = [];
+  state.apiLogs = []; state.webhooks = [];
+  state.orderData = null;
+  updateHeaderNav(id);
+  renderCurrentStep();
+  renderApiPanel();
+}
+
+function nextStep() {
+  const wf = WORKFLOWS[state.workflow];
+  if (state.step < wf.steps.length - 1) {
+    state.step++;
+    renderCurrentStep();
+    renderApiPanel();
+  }
+}
+
+// ============================================================
+// Render: Home
+// ============================================================
+function renderHome() {
+  const container = el('div', { className: 'home-container' }, [
+    el('h1', { className: 'home-title' }, 'Truv API Quickstart'),
+    el('p', { className: 'home-subtitle' }, 'Explore 4 integration patterns for verifying employment, income, and managing direct deposits.'),
+  ]);
+
+  const grid = el('div', { className: 'workflow-grid' });
+  for (const [id, wf] of Object.entries(WORKFLOWS)) {
+    const card = el('div', { className: 'workflow-card', onclick: () => startWorkflow(id) }, [
+      el('div', { className: 'workflow-icon' }, wf.icon),
+      el('h3', {}, wf.title),
+      el('p', {}, wf.subtitle),
+    ]);
+    grid.appendChild(card);
+  }
+  container.appendChild(grid);
+  clearAndAppend('appPanel', container);
+}
+
+// ============================================================
+// Render: Step Nav
+// ============================================================
+function buildStepNav() {
+  const wf = WORKFLOWS[state.workflow];
+  const nav = el('div', { className: 'step-nav' });
+  wf.steps.forEach((s, i) => {
+    if (i > 0) nav.appendChild(el('span', { className: 'step-arrow' }, '\u2192'));
+    const cls = i === state.step ? 'active' : (i < state.step ? 'done' : '');
+    const numText = i < state.step ? '\u2713' : String(i + 1);
+    const item = el('div', { className: 'step-item ' + cls }, [
+      el('div', { className: 'step-number' }, numText),
+      el('span', {}, s.title),
+    ]);
+    nav.appendChild(item);
+  });
+  return nav;
+}
+
+function renderCurrentStep() {
+  const wf = WORKFLOWS[state.workflow];
+  const step = wf.steps[state.step];
+  const panel = document.getElementById('appPanel');
+  panel.replaceChildren();
+
+  panel.appendChild(buildStepNav());
+
+  const sc = el('div', { className: 'screen-container' });
+
+  switch (step.screen) {
+    case 'form': sc.appendChild(buildFormScreen()); break;
+    case 'product-select': sc.appendChild(buildProductSelectScreen()); break;
+    case 'bridge-inline': sc.appendChild(buildBridgeInlineScreen()); break;
+    case 'bridge-popup': sc.appendChild(buildBridgePopupScreen()); break;
+    case 'review': sc.appendChild(buildReviewScreen()); break;
+    case 'review-bridge': sc.appendChild(buildReviewBridgeScreen()); break;
+    case 'send-link': sc.appendChild(buildSendLinkScreen()); break;
+    case 'monitor': sc.appendChild(buildMonitorScreen()); break;
+    case 'refresh-select': sc.appendChild(buildRefreshSelectScreen()); break;
+    case 'refresh-action': sc.appendChild(buildRefreshActionScreen()); break;
+    default: sc.appendChild(el('div', { className: 'screen-card' }, el('p', {}, 'Unknown screen')));
+  }
+
+  panel.appendChild(sc);
+}
+
+// ============================================================
+// Form Screen
+// ============================================================
+function buildFormScreen() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Applicant Information'));
+  card.appendChild(el('p', { className: 'desc' }, 'Enter the applicant details. These will be sent with the order creation request.'));
+
+  const row1 = el('div', { className: 'form-row' }, [
+    el('div', { className: 'form-group' }, [
+      el('label', { className: 'form-label' }, 'First name'),
+      el('input', { className: 'form-input', id: 'firstName', value: state.formData.first_name || '', placeholder: 'John' }),
+    ]),
+    el('div', { className: 'form-group' }, [
+      el('label', { className: 'form-label' }, 'Last name'),
+      el('input', { className: 'form-input', id: 'lastName', value: state.formData.last_name || '', placeholder: 'Doe' }),
+    ]),
+  ]);
+  card.appendChild(row1);
+
+  card.appendChild(el('div', { className: 'form-group' }, [
+    el('label', { className: 'form-label' }, 'Email'),
+    el('input', { className: 'form-input', id: 'email', type: 'email', value: state.formData.email || '', placeholder: 'john@example.com' }),
+  ]));
+
+  card.appendChild(el('div', { className: 'form-group' }, [
+    el('label', { className: 'form-label' }, 'Phone'),
+    el('input', { className: 'form-input', id: 'phone', type: 'tel', value: state.formData.phone || '', placeholder: '+15551234567' }),
+  ]));
+
+  // SSN + Product type
+  const options = [
+    { val: 'employment', text: 'Employment' },
+    { val: 'income', text: 'Income' },
+    { val: 'deposit_switch', text: 'Direct Deposit Switch' },
+    { val: 'pll', text: 'Paycheck Linked Loan' },
+  ];
+  const select = el('select', { className: 'form-input', id: 'productSelect' });
+  for (const o of options) {
+    select.appendChild(el('option', { value: o.val, selected: state.productType === o.val }, o.text));
+  }
+
+  const row2 = el('div', { className: 'form-row' }, [
+    el('div', { className: 'form-group' }, [
+      el('label', { className: 'form-label' }, 'SSN'),
+      el('input', { className: 'form-input', id: 'ssn', value: state.formData.ssn || '', placeholder: '991-91-9991' }),
+    ]),
+    el('div', { className: 'form-group' }, [
+      el('label', { className: 'form-label' }, 'Product'),
+      select,
+    ]),
+  ]);
+  card.appendChild(row2);
+
+  const btn = el('button', { className: 'btn btn-primary', id: 'submitFormBtn', onclick: handleFormSubmit }, 'Create Order');
+  card.appendChild(btn);
+
+  return card;
+}
+
+async function handleFormSubmit() {
+  const btn = document.getElementById('submitFormBtn');
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+
+  state.formData = {
+    first_name: document.getElementById('firstName').value || undefined,
+    last_name: document.getElementById('lastName').value || undefined,
+    email: document.getElementById('email').value || undefined,
+    phone: document.getElementById('phone').value || undefined,
+    ssn: document.getElementById('ssn').value || undefined,
+  };
+  state.productType = document.getElementById('productSelect').value;
+
+  try {
+    const resp = await fetch(API_BASE + '/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...state.formData,
+        product_type: state.productType,
+        demo_id: state.workflow,
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      console.error('Order creation failed:', data);
+      btn.disabled = false;
+      btn.textContent = 'Create Order';
+      alert('Order creation failed: ' + (data.error || 'Unknown error'));
+      return;
+    }
+    state.orderId = data.order_id;
+    state.truvOrderId = data.truv_order_id;
+    state.bridgeToken = data.bridge_token;
+    state.shareUrl = data.share_url;
+    connectSSE(state.orderId);
+    await fetchLogs();
+    renderApiPanel();
+    nextStep();
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Create Order';
+  }
+}
+
+// ============================================================
+// Product Select Screen
+// ============================================================
+function buildProductSelectScreen() {
+  const products = [
+    { id: 'employment', name: 'Employment', desc: 'Verify employment history' },
+    { id: 'income', name: 'Income', desc: 'Verify income & pay stubs' },
+    { id: 'deposit_switch', name: 'Direct Deposit', desc: 'Switch direct deposit' },
+    { id: 'pll', name: 'Payroll Lending', desc: 'Paycheck linked loans' },
+  ];
+
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Select Product'));
+  card.appendChild(el('p', { className: 'desc' }, 'Choose the verification product type, then we\'ll create a user and bridge token.'));
+
+  const grid = el('div', { className: 'product-grid' });
+  for (const p of products) {
+    const opt = el('div', {
+      className: 'product-option' + (state.productType === p.id ? ' selected' : ''),
+      onclick: (e) => {
+        state.productType = p.id;
+        grid.querySelectorAll('.product-option').forEach(o => o.classList.remove('selected'));
+        e.currentTarget.classList.add('selected');
+      },
+    }, [
+      el('div', { className: 'product-name' }, p.name),
+      el('div', { className: 'product-desc' }, p.desc),
+    ]);
+    grid.appendChild(opt);
+  }
+  card.appendChild(grid);
+
+  const btn = el('button', { className: 'btn btn-primary', id: 'productNextBtn', onclick: handleProductNext }, 'Get Bridge Token');
+  card.appendChild(btn);
+  return card;
+}
+
+async function handleProductNext() {
+  const btn = document.getElementById('productNextBtn');
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+  try {
+    const resp = await fetch(API_BASE + '/api/bridge-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_type: state.productType }),
+    });
+    const data = await resp.json();
+    state.bridgeToken = data.bridge_token;
+    nextStep();
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Get Bridge Token';
+  }
+}
+
+// ============================================================
+// Bridge Screens
+// ============================================================
+function buildBridgeInlineScreen() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Complete Verification'));
+  card.appendChild(el('p', { className: 'desc' }, 'Use sandbox credentials: goodlogin / goodpassword'));
+
+  const wrapper = el('div', { className: 'bridge-wrapper', id: 'bridgeContainer' });
+  const loading = el('div', { className: 'bridge-loading' }, [
+    el('div', { className: 'spinner' }),
+    el('span', {}, 'Loading Bridge...'),
+  ]);
+  wrapper.appendChild(loading);
+  card.appendChild(wrapper);
+
+  setTimeout(() => initBridge(true), 100);
+  return card;
+}
+
+function buildBridgePopupScreen() {
+  const card = el('div', { className: 'screen-card', style: 'text-align:center;padding:48px 32px;' });
+  card.appendChild(el('div', { style: 'font-size:48px;margin-bottom:16px;' }, '\uD83D\uDD12'));
+  card.appendChild(el('h2', {}, 'Connect Your Payroll'));
+  const desc = el('p', { className: 'desc' });
+  desc.appendChild(document.createTextNode('Click below to open the Truv Bridge popup and log in to your payroll provider.'));
+  desc.appendChild(el('br'));
+  desc.appendChild(document.createTextNode('Sandbox: goodlogin / goodpassword'));
+  card.appendChild(desc);
+
+  const btn = el('button', {
+    className: 'btn btn-primary',
+    style: 'max-width:280px;margin:0 auto;',
+    id: 'openBridgeBtn',
+    onclick: openBridgePopup,
+  }, 'Connect Payroll');
+  card.appendChild(btn);
+  return card;
+}
+
+let bridgeInstance = null;
+
+function initBridge(isInline) {
+  if (!state.bridgeToken) return;
+  const isOrder = !!state.truvOrderId;
+
+  const config = {
+    bridgeToken: state.bridgeToken,
+    isOrder: isOrder,
+    onLoad: function() {
+      addBridgeEvent('onLoad', null);
+      if (isInline) {
+        const loadingEl = document.querySelector('.bridge-loading');
+        if (loadingEl) loadingEl.style.display = 'none';
+      }
+    },
+    onEvent: function(eventType, payload) {
+      addBridgeEvent('onEvent', { eventType: eventType });
+      if (eventType === 'SUCCESS' && payload) {
+        handleBridgeSuccess(payload.public_token, isOrder);
+      }
+    },
+    onSuccess: function(publicToken, meta) {
+      addBridgeEvent('onSuccess', { publicToken: publicToken });
+    },
+    onClose: function() {
+      addBridgeEvent('onClose', null);
+    },
+  };
+
+  if (isInline) {
+    config.position = {
+      type: 'inline',
+      container: document.getElementById('bridgeContainer'),
+    };
+  }
+
+  bridgeInstance = TruvBridge.init(config);
+  if (isInline && bridgeInstance) bridgeInstance.open();
+}
+
+function openBridgePopup() {
+  if (!state.bridgeToken) return;
+  initBridge(false);
+  if (bridgeInstance) bridgeInstance.open();
+}
+
+function addBridgeEvent(type, data) {
+  state.bridgeEvents.push({ type: type, data: data, timestamp: new Date().toISOString() });
+  renderApiPanel();
+}
+
+async function handleBridgeSuccess(publicToken, isOrder) {
+  if (!publicToken && !isOrder) return;
+
+  if (state.workflow === 'embedded-orders') {
+    await new Promise(function(r) { setTimeout(r, 2000); });
+    await fetchLogs();
+    nextStep();
+    return;
+  }
+
+  if (state.workflow === 'bridge-widget' && publicToken) {
+    try {
+      const reportType = state.productType === 'deposit_switch' ? 'direct_deposit' : state.productType;
+      const resp = await fetch(API_BASE + '/api/link-report/' + encodeURIComponent(publicToken) + '/' + encodeURIComponent(reportType));
+      state.orderData = await resp.json();
+      nextStep();
+    } catch (err) {
+      console.error('Error fetching report:', err);
+    }
+  }
+}
+
+// ============================================================
+// Review Screens
+// ============================================================
+function buildReviewScreen() {
+  if (state.orderId && !state.orderData) {
+    setTimeout(fetchOrderData, 100);
+    const card = el('div', { className: 'screen-card', style: 'text-align:center;padding:48px;' }, [
+      el('div', { className: 'spinner' }),
+      el('p', {}, 'Fetching order data...'),
+    ]);
+    return card;
+  }
+
+  const data = state.orderData || {};
+  const raw = data.raw_response || {};
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Verification Complete'));
+  card.appendChild(el('p', { className: 'desc' }, 'Order data has been retrieved from Truv.'));
+
+  const table = el('div', { className: 'review-table' });
+  addReviewRow(table, 'Order ID', data.truv_order_id || state.truvOrderId || '-');
+
+  const statusBadge = el('span', {
+    className: 'badge ' + (data.status === 'completed' ? 'badge-success' : 'badge-pending'),
+  }, data.status || '-');
+  const statusRow = el('div', { className: 'review-row' }, [
+    el('span', { className: 'review-label' }, 'Status'),
+    el('span', { className: 'review-value' }, statusBadge),
+  ]);
+  table.appendChild(statusRow);
+
+  addOrderDetailsToTable(table, raw);
+  card.appendChild(table);
+
+  const refreshSection = el('div', { className: 'refresh-section' });
+  refreshSection.appendChild(el('button', { className: 'btn btn-outline', onclick: refreshOrderData }, '\u21BB Refresh Data'));
+  card.appendChild(refreshSection);
+
+  return card;
+}
+
+function addReviewRow(table, label, value) {
+  table.appendChild(el('div', { className: 'review-row' }, [
+    el('span', { className: 'review-label' }, label),
+    el('span', { className: 'review-value' }, String(value)),
+  ]));
+}
+
+function addOrderDetailsToTable(table, raw) {
+  if (!raw || !raw.results) return;
+  for (const r of raw.results) {
+    const emps = r.employments || [];
+    for (const emp of emps) {
+      addReviewRow(table, 'Employer', emp.company && emp.company.name ? emp.company.name : '-');
+      addReviewRow(table, 'Job Title', emp.job_title || '-');
+      addReviewRow(table, 'Status', emp.is_active ? 'Active' : 'Inactive');
+      addReviewRow(table, 'Start Date', emp.start_date || '-');
+      if (emp.income) {
+        addReviewRow(table, 'Income', '$' + Number(emp.income).toLocaleString());
+      }
+    }
+  }
+}
+
+function buildReviewBridgeScreen() {
+  const data = state.orderData;
+  if (!data) {
+    return el('div', { className: 'screen-card', style: 'text-align:center;padding:48px;' }, [
+      el('div', { className: 'spinner' }),
+      el('p', {}, 'Fetching report...'),
+    ]);
+  }
+
+  const employments = data.employments || [];
+  const emp = employments[0] || {};
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Verification Complete'));
+  card.appendChild(el('p', { className: 'desc' }, 'Report data retrieved via the Users API / Link Reports.'));
+
+  const table = el('div', { className: 'review-table' });
+  addReviewRow(table, 'Employer', emp.company && emp.company.name ? emp.company.name : '-');
+  addReviewRow(table, 'Job Title', emp.job_title || '-');
+  addReviewRow(table, 'Status', emp.is_active ? 'Active' : 'Inactive');
+  addReviewRow(table, 'Start Date', emp.start_date || '-');
+  addReviewRow(table, 'End Date', emp.end_date || '-');
+  if (emp.income) {
+    addReviewRow(table, 'Income', '$' + Number(emp.income).toLocaleString() + ' ' + (emp.income_unit || ''));
+  }
+
+  if (data.deposit_details) {
+    const dd = data.deposit_details;
+    addReviewRow(table, 'Account Type', dd.account_type || '-');
+    addReviewRow(table, 'Routing Number', dd.routing_number || '-');
+    addReviewRow(table, 'Deposit Type', dd.deposit_type || '-');
+  }
+
+  card.appendChild(table);
+  return card;
+}
+
+async function fetchOrderData() {
+  if (!state.orderId) return;
+  try {
+    const resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId));
+    state.orderData = await resp.json();
+    await fetchLogs();
+    renderCurrentStep();
+    renderApiPanel();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function refreshOrderData() {
+  if (!state.orderId) return;
+  state.orderData = null;
+  renderCurrentStep();
+  try {
+    await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/refresh', { method: 'POST' });
+    await new Promise(function(r) { setTimeout(r, 1000); });
+    await fetchOrderData();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// ============================================================
+// Send Link Screen
+// ============================================================
+function buildSendLinkScreen() {
+  const url = state.shareUrl || 'No share URL available';
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Share Verification Link'));
+  card.appendChild(el('p', { className: 'desc' }, 'The applicant can complete verification by visiting this link. In production, this would be sent via email or SMS.'));
+
+  const urlInput = el('input', { type: 'text', id: 'shareUrlInput', value: url, readOnly: true });
+  const copyBtn = el('button', { className: 'copy-btn', onclick: function() { copyShareUrl(copyBtn); } }, 'Copy');
+  card.appendChild(el('div', { className: 'share-url-box' }, [urlInput, copyBtn]));
+
+  card.appendChild(el('p', { style: 'font-size:12px;color:var(--text-muted);margin-bottom:16px;' },
+    'Order ID: ' + (state.orderId || '-') + ' | Truv Order: ' + (state.truvOrderId || '-')));
+
+  const btnRow = el('div', { style: 'display:flex;gap:8px;' });
+  btnRow.appendChild(el('button', { className: 'btn btn-outline', style: 'flex:1', onclick: function() { window.open(url, '_blank'); } }, 'Open Link'));
+  btnRow.appendChild(el('button', { className: 'btn btn-primary', style: 'flex:1', onclick: nextStep }, 'Monitor Webhooks'));
+  card.appendChild(btnRow);
+
+  return card;
+}
+
+function copyShareUrl(btn) {
+  const input = document.getElementById('shareUrlInput');
+  if (input) {
+    navigator.clipboard.writeText(input.value);
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+  }
+}
+
+// ============================================================
+// Monitor Screen
+// ============================================================
+function buildMonitorScreen() {
+  const webhooks = state.webhooks;
+  const card = el('div', { className: 'screen-card' });
+
+  const header = el('div', { className: 'monitor-header' }, [
+    el('div', { className: 'pulse-dot' }),
+    el('h2', { style: 'font-size:18px;' }, 'Monitoring Webhooks'),
+  ]);
+  card.appendChild(header);
+
+  const desc = el('p', { className: 'desc' });
+  desc.appendChild(document.createTextNode('Listening for webhook events for order '));
+  desc.appendChild(el('b', {}, state.orderId || '-'));
+  desc.appendChild(document.createTextNode('. Complete the verification via the share link in another tab.'));
+  card.appendChild(desc);
+
+  const feed = el('div', { className: 'webhook-feed', id: 'webhookFeed' });
+  if (webhooks.length === 0) {
+    feed.appendChild(el('div', { className: 'empty-state' }, 'Waiting for webhook events...'));
+  } else {
+    for (const w of webhooks) {
+      const entry = el('div', { className: 'webhook-entry' });
+      const entryHeader = el('div', { className: 'we-header' }, [
+        el('span', { className: 'badge badge-webhook' }, 'WEBHOOK'),
+        el('span', { className: 'badge ' + (w.status === 'completed' ? 'badge-success' : 'badge-pending') }, w.status || '-'),
+        el('span', { style: 'font-weight:600' }, w.event_type || '-'),
+      ]);
+      entry.appendChild(entryHeader);
+      entry.appendChild(el('div', { className: 'we-time' }, w.received_at || '-'));
+      feed.appendChild(entry);
+    }
+  }
+  card.appendChild(feed);
+
+  card.appendChild(el('div', { style: 'margin-top:16px;' },
+    el('button', { className: 'btn btn-primary', onclick: nextStep, disabled: webhooks.length === 0 }, 'View Results')
+  ));
+  return card;
+}
+
+// ============================================================
+// Refresh Screens
+// ============================================================
+function buildRefreshSelectScreen() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Data Refresh'));
+  card.appendChild(el('p', { className: 'desc' }, 'Enter an existing order ID to refresh, or create a new order first.'));
+  card.appendChild(el('div', { className: 'form-group' }, [
+    el('label', { className: 'form-label' }, 'Order ID (local)'),
+    el('input', { className: 'form-input', id: 'refreshOrderId', placeholder: 'e.g., a1b2c3d4e5f6' }),
+  ]));
+
+  const btnRow = el('div', { style: 'display:flex;gap:8px;' });
+  btnRow.appendChild(el('button', { className: 'btn btn-primary', style: 'flex:1', onclick: handleRefreshSelect }, 'Load Order'));
+  btnRow.appendChild(el('button', { className: 'btn btn-outline', style: 'flex:1', onclick: function() { startWorkflow('embedded-orders'); } }, 'Create New'));
+  card.appendChild(btnRow);
+  return card;
+}
+
+async function handleRefreshSelect() {
+  const input = document.getElementById('refreshOrderId');
+  const orderId = input ? input.value.trim() : '';
+  if (!orderId) return;
+
+  state.orderId = orderId;
+  connectSSE(orderId);
+
+  try {
+    const resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(orderId));
+    if (!resp.ok) throw new Error('Order not found');
+    state.orderData = await resp.json();
+    state.truvOrderId = state.orderData.truv_order_id;
+    await fetchLogs();
+    nextStep();
+  } catch (err) {
+    console.error(err);
+    alert('Order not found. Check the ID and try again.');
+  }
+}
+
+function buildRefreshActionScreen() {
+  const data = state.orderData || {};
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Refresh Order Data'));
+
+  const statusDesc = el('p', { className: 'desc' });
+  statusDesc.appendChild(document.createTextNode('Current status: '));
+  statusDesc.appendChild(el('span', { className: 'badge ' + (data.status === 'completed' ? 'badge-success' : 'badge-pending') }, data.status || '-'));
+  card.appendChild(statusDesc);
+
+  const table = el('div', { className: 'review-table' });
+  addReviewRow(table, 'Order ID', state.orderId);
+  addReviewRow(table, 'Truv Order', state.truvOrderId || '-');
+  card.appendChild(table);
+
+  card.appendChild(el('div', { style: 'margin-top:24px;' },
+    el('button', { className: 'btn btn-primary', id: 'refreshBtn', onclick: handleRefreshOrder }, 'Refresh Data')
+  ));
+  return card;
+}
+
+async function handleRefreshOrder() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.textContent = 'Refreshing...';
+  try {
+    await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/refresh', { method: 'POST' });
+    await new Promise(function(r) { setTimeout(r, 2000); });
+    await fetchOrderData();
+    await fetchLogs();
+    nextStep();
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Refresh Data';
+  }
+}
+
+// ============================================================
+// SSE
+// ============================================================
+function connectSSE(orderId) {
+  if (state.eventSource) state.eventSource.close();
+
+  var es = new EventSource(API_BASE + '/api/events/stream?order_id=' + encodeURIComponent(orderId));
+
+  es.addEventListener('api_call', function(e) {
+    var data = JSON.parse(e.data);
+    state.apiLogs.push(data);
+    renderApiPanel();
+  });
+
+  es.addEventListener('webhook', function(e) {
+    var data = JSON.parse(e.data);
+    state.webhooks.push(data);
+    renderApiPanel();
+    var wf = WORKFLOWS[state.workflow];
+    if (wf && wf.steps[state.step] && wf.steps[state.step].screen === 'monitor') {
+      renderCurrentStep();
+    }
+  });
+
+  es.addEventListener('ping', function() {});
+  state.eventSource = es;
+}
+
+async function fetchLogs() {
+  if (!state.orderId) return;
+  try {
+    var responses = await Promise.all([
+      fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/logs'),
+      fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/webhooks'),
+    ]);
+    state.apiLogs = await responses[0].json();
+    state.webhooks = await responses[1].json();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// ============================================================
+// API Panel
+// ============================================================
+let activeApiTab = 'guide';
+
+function buildApiPanelTabs() {
+  const tabs = document.getElementById('apiPanelTabs');
+  tabs.replaceChildren();
+  const tabNames = ['guide', 'api', 'bridge', 'webhooks'];
+  const tabLabels = ['Guide', 'API Logs', 'Bridge Events', 'Webhooks'];
+  for (let i = 0; i < tabNames.length; i++) {
+    const btn = el('button', {
+      className: activeApiTab === tabNames[i] ? 'active' : '',
+      onclick: (function(name) { return function() { switchApiTab(name); }; })(tabNames[i]),
+    }, tabLabels[i]);
+    tabs.appendChild(btn);
+  }
+}
+
+function switchApiTab(tab) {
+  activeApiTab = tab;
+  buildApiPanelTabs();
+  renderApiPanel();
+}
+
+function renderApiPanel() {
+  buildApiPanelTabs();
+  const content = document.getElementById('apiTabContent');
+  content.replaceChildren();
+
+  if (!state.workflow) {
+    content.appendChild(el('div', { className: 'empty-state' }, 'Select a workflow to get started.'));
+    return;
+  }
+
+  switch (activeApiTab) {
+    case 'guide': content.appendChild(buildGuideTab()); break;
+    case 'api': content.appendChild(buildApiLogsTab()); break;
+    case 'bridge': content.appendChild(buildBridgeEventsTab()); break;
+    case 'webhooks': content.appendChild(buildWebhooksTab()); break;
+  }
+}
+
+function buildGuideTab() {
+  const wf = WORKFLOWS[state.workflow];
+  const frag = document.createDocumentFragment();
+  wf.steps.forEach(function(s, i) {
+    var step = el('div', { className: 'guide-step', style: i === state.step ? 'opacity:1;' : 'opacity:0.5;' }, [
+      el('h4', {}, (i === state.step ? '\u25B6 ' : '') + 'Step ' + (i + 1) + ': ' + s.title),
+      el('p', {}, s.guide),
+    ]);
+    frag.appendChild(step);
+    if (i < wf.steps.length - 1) {
+      var hr = document.createElement('hr');
+      hr.style.cssText = 'border:none;border-top:1px solid var(--border-light);margin:12px 0;';
+      frag.appendChild(hr);
+    }
+  });
+  var container = el('div');
+  container.appendChild(frag);
+  return container;
+}
+
+function buildApiLogsTab() {
+  if (state.apiLogs.length === 0) {
+    return el('div', { className: 'empty-state' }, 'No API calls yet.');
+  }
+  var container = el('div');
+  state.apiLogs.forEach(function(log, i) {
+    var methodClass = (log.method || 'GET').toUpperCase() === 'POST' ? 'badge-post' : 'badge-get';
+
+    var bodyDiv = el('div', { className: 'api-log-body', id: 'logBody' + i });
+
+    if (log.request_body) {
+      bodyDiv.appendChild(el('h5', {}, 'Request'));
+      var pre1 = el('pre');
+      pre1.textContent = formatJsonStr(log.request_body);
+      bodyDiv.appendChild(pre1);
+    }
+    if (log.response_body) {
+      bodyDiv.appendChild(el('h5', {}, 'Response'));
+      var pre2 = el('pre');
+      pre2.textContent = formatJsonStr(log.response_body);
+      bodyDiv.appendChild(pre2);
+    }
+
+    var header = el('div', { className: 'api-log-header', onclick: (function(idx) { return function() { toggleLogBody(idx); }; })(i) }, [
+      el('span', { className: 'badge ' + methodClass }, log.method || 'GET'),
+      el('span', { className: 'api-log-endpoint' }, log.endpoint || ''),
+      el('div', { className: 'api-log-meta' }, [
+        el('span', {}, String(log.status_code || '')),
+        el('span', {}, log.duration_ms ? log.duration_ms + 'ms' : ''),
+      ]),
+    ]);
+
+    var entry = el('div', { className: 'api-log-entry' }, [header, bodyDiv]);
+    container.appendChild(entry);
+  });
+  return container;
+}
+
+function toggleLogBody(i) {
+  var bodyEl = document.getElementById('logBody' + i);
+  if (bodyEl) bodyEl.classList.toggle('open');
+}
+
+function formatJsonStr(str) {
+  if (!str) return '';
+  try {
+    var parsed = typeof str === 'string' ? JSON.parse(str) : str;
+    return JSON.stringify(parsed, null, 2);
+  } catch (e) {
+    return String(str);
+  }
+}
+
+function buildBridgeEventsTab() {
+  if (state.bridgeEvents.length === 0) {
+    return el('div', { className: 'empty-state' }, 'No Bridge events yet. Open Bridge to see callbacks.');
+  }
+  var container = el('div');
+  for (var i = 0; i < state.bridgeEvents.length; i++) {
+    var e = state.bridgeEvents[i];
+    var eventEl = el('div', { className: 'bridge-event' }, [
+      el('span', { className: 'be-type' }, e.type),
+      el('span', { className: 'be-time' }, new Date(e.timestamp).toLocaleTimeString()),
+    ]);
+    if (e.data) {
+      var dataEl = el('div', { className: 'be-data' });
+      dataEl.textContent = JSON.stringify(e.data, null, 2).substring(0, 200);
+      eventEl.appendChild(dataEl);
+    }
+    container.appendChild(eventEl);
+  }
+  return container;
+}
+
+function buildWebhooksTab() {
+  if (state.webhooks.length === 0) {
+    return el('div', { className: 'empty-state' }, 'No webhooks received yet.');
+  }
+  var container = el('div');
+  for (var i = 0; i < state.webhooks.length; i++) {
+    var w = state.webhooks[i];
+    var entry = el('div', { className: 'webhook-entry' }, [
+      el('div', { className: 'we-header' }, [
+        el('span', { className: 'badge badge-webhook' }, 'WEBHOOK'),
+        el('span', { className: 'badge ' + (w.status === 'completed' ? 'badge-success' : 'badge-pending') }, w.status || '-'),
+        el('span', { style: 'font-weight:600' }, w.event_type || '-'),
+      ]),
+      el('div', { className: 'we-time' }, w.received_at || '-'),
+    ]);
+    container.appendChild(entry);
+  }
+  return container;
+}
+
+// ============================================================
+// Init
+// ============================================================
+buildHeaderNav();
+renderHome();
+renderApiPanel();
+</script>
+</body>
+</html>

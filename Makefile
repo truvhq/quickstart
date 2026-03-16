@@ -1,9 +1,21 @@
 SHELL := /bin/bash
 
-.PHONY: env python_docker python_local
+.PHONY: env install embedded bridge hosted python_docker python_local
 
 env:
 	test -f .env || cp .env.example .env
+
+install:
+	npm install
+
+embedded: install
+	node embedded-orders/server.js
+
+bridge: install
+	node bridge-widget/server.js
+
+hosted: install
+	node hosted-orders/server.js
 
 python_docker:
 	docker-compose up --build python
