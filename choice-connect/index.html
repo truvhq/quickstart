@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Truv Quickstart — Choice Connect</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <script src="https://cdn.truv.com/bridge.js"></script>
+  <style>
+    :root {
+      --primary: #4169E1; --primary-light: #E8EDFF; --primary-hover: #3458c7;
+      --text: #1A1A1A; --text-secondary: #666; --text-muted: #999;
+      --bg: #F5F5F5; --bg-white: #fff; --bg-input: #F8F9FA;
+      --border: #E5E7EB; --border-light: #F0F1F3;
+      --success: #16a34a; --success-bg: #f0fdf4;
+      --warning: #d97706; --warning-bg: #fffbeb;
+      --error: #dc2626; --error-bg: #fef2f2;
+      --radius: 12px; --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .header { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; }
+    .header-title { font-size: 16px; font-weight: 600; }
+    .header-badge { font-size: 12px; color: var(--text-secondary); background: var(--bg-input); padding: 4px 10px; border-radius: 12px; }
+    .main-layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
+    .app-panel { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: center; }
+    .api-panel { flex: 1; border-left: 1px solid var(--border); background: var(--bg-white); display: flex; flex-direction: column; overflow: hidden; }
+    .step-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 24px; width: 100%; max-width: 560px; }
+    .step-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .step-item.active { color: var(--primary); }
+    .step-item.done { color: var(--success); }
+    .step-number { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border); color: var(--text-muted); }
+    .step-item.active .step-number { border-color: var(--primary); background: var(--primary); color: white; }
+    .step-item.done .step-number { border-color: var(--success); background: var(--success); color: white; }
+    .step-arrow { color: var(--border); font-size: 16px; margin: 0 4px; }
+    .screen-container { width: 100%; max-width: 480px; }
+    .screen-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); padding: 32px; }
+    .screen-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .screen-card .desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; gap: 8px; }
+    .btn-primary { background: var(--primary); color: white; width: 100%; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .product-option { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px; cursor: pointer; text-align: center; }
+    .product-option:hover { border-color: var(--primary); }
+    .product-option.selected { border-color: var(--primary); background: var(--primary-light); }
+    .product-option .product-name { font-size: 13px; font-weight: 600; }
+    .product-option .product-desc { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+    .review-table { width: 100%; }
+    .review-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+    .review-label { color: var(--text-secondary); }
+    .review-value { font-weight: 600; text-align: right; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-get { background: #dbeafe; color: #1d4ed8; }
+    .badge-post { background: #dcfce7; color: #166534; }
+    .badge-webhook { background: #fef3c7; color: #92400e; }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-pending { background: var(--warning-bg); color: var(--warning); }
+    .api-panel-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .api-panel-tabs button { flex: 1; padding: 12px 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: inherit; }
+    .api-panel-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .api-tab-content { flex: 1; overflow-y: auto; padding: 16px; }
+    .guide-step { margin-bottom: 16px; }
+    .guide-step h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .guide-step p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .api-log-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; overflow: hidden; }
+    .api-log-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; background: var(--bg-input); }
+    .api-log-header:hover { background: var(--border-light); }
+    .api-log-endpoint { flex: 1; font-family: monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .api-log-meta { display: flex; gap: 8px; font-size: 11px; color: var(--text-muted); }
+    .api-log-body { padding: 10px; border-top: 1px solid var(--border-light); display: none; }
+    .api-log-body.open { display: block; }
+    .api-log-body pre { font-size: 11px; font-family: monospace; background: var(--bg-input); padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
+    .api-log-body h5 { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .api-log-body h5 + pre { margin-bottom: 10px; }
+    .bridge-event { padding: 8px 10px; border-left: 3px solid var(--primary); margin-bottom: 6px; background: var(--bg-input); border-radius: 0 6px 6px 0; font-size: 12px; }
+    .bridge-event .be-type { font-weight: 600; color: var(--primary); }
+    .bridge-event .be-time { float: right; color: var(--text-muted); font-size: 11px; }
+    .bridge-event .be-data { margin-top: 4px; color: var(--text-secondary); font-family: monospace; font-size: 11px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) { .api-panel { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo"></div>
+    <div class="header-title">Truv Quickstart</div>
+    <div class="header-badge">Choice Connect</div>
+  </div>
+</div>
+
+<div class="main-layout">
+  <div class="app-panel" id="appPanel"></div>
+  <div class="api-panel" id="apiPanel">
+    <div class="api-panel-tabs" id="apiPanelTabs"></div>
+    <div class="api-tab-content" id="apiTabContent"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+const STEPS = [
+  { title: 'Select Product', guide: 'Choose a product type. The backend will call POST /v1/users/ then POST /v1/users/{id}/tokens/ to get a bridge_token.' },
+  { title: 'Connect', guide: 'Click "Connect Payroll" to open the Bridge popup. Use sandbox credentials: goodlogin / goodpassword.' },
+  { title: 'Review', guide: 'The backend exchanges the public_token for an access_token, then fetches the report via GET /v1/links/{id}/{type}/report.' },
+];
+
+let state = {
+  step: 0, bridgeToken: null, productType: 'income',
+  bridgeEvents: [], apiLogs: [], orderData: null, orderId: null,
+};
+
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'className') node.className = v;
+    else if (k === 'onclick') node.addEventListener('click', v);
+    else if (k === 'style' && typeof v === 'string') node.setAttribute('style', v);
+    else if (k === 'disabled') node.disabled = v;
+    else if (k === 'id') node.id = v;
+    else node.setAttribute(k, v);
+  }
+  if (children != null) {
+    if (Array.isArray(children)) children.forEach(c => { if (c != null) node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    else if (typeof children === 'string') node.textContent = children;
+    else node.appendChild(children);
+  }
+  return node;
+}
+
+function nextStep() { if (state.step < STEPS.length - 1) { state.step++; render(); } }
+
+function buildStepNav() {
+  const nav = el('div', { className: 'step-nav' });
+  STEPS.forEach((s, i) => {
+    if (i > 0) nav.appendChild(el('span', { className: 'step-arrow' }, '\u2192'));
+    const cls = i === state.step ? 'active' : (i < state.step ? 'done' : '');
+    nav.appendChild(el('div', { className: 'step-item ' + cls }, [
+      el('div', { className: 'step-number' }, i < state.step ? '\u2713' : String(i + 1)),
+      el('span', {}, s.title),
+    ]));
+  });
+  return nav;
+}
+
+function render() {
+  const panel = document.getElementById('appPanel');
+  panel.replaceChildren();
+  panel.appendChild(buildStepNav());
+  const sc = el('div', { className: 'screen-container' });
+
+  if (state.step === 0) sc.appendChild(buildProductScreen());
+  else if (state.step === 1) sc.appendChild(buildConnectScreen());
+  else sc.appendChild(buildReviewScreen());
+
+  panel.appendChild(sc);
+  renderApiPanel();
+}
+
+// --- Product Select ---
+function buildProductScreen() {
+  const products = [
+    { id: 'employment', name: 'Employment', desc: 'Verify employment history' },
+    { id: 'income', name: 'Income', desc: 'Verify income & pay stubs' },
+    { id: 'deposit_switch', name: 'Direct Deposit', desc: 'Switch direct deposit' },
+    { id: 'pll', name: 'Payroll Lending', desc: 'Paycheck linked loans' },
+  ];
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Select Product'));
+  card.appendChild(el('p', { className: 'desc' }, 'Choose the verification product type, then we\'ll create a user and bridge token.'));
+
+  const grid = el('div', { className: 'product-grid' });
+  products.forEach(p => {
+    grid.appendChild(el('div', {
+      className: 'product-option' + (state.productType === p.id ? ' selected' : ''),
+      onclick: function(e) {
+        state.productType = p.id;
+        grid.querySelectorAll('.product-option').forEach(o => o.classList.remove('selected'));
+        e.currentTarget.classList.add('selected');
+      },
+    }, [el('div', { className: 'product-name' }, p.name), el('div', { className: 'product-desc' }, p.desc)]));
+  });
+  card.appendChild(grid);
+  card.appendChild(el('button', { className: 'btn btn-primary', id: 'tokenBtn', onclick: handleGetToken }, 'Get Bridge Token'));
+  return card;
+}
+
+async function handleGetToken() {
+  const btn = document.getElementById('tokenBtn');
+  btn.disabled = true; btn.textContent = 'Creating...';
+  try {
+    const resp = await fetch(API_BASE + '/api/bridge-token', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_type: state.productType }),
+    });
+    const data = await resp.json();
+    state.bridgeToken = data.bridge_token;
+    nextStep();
+  } catch (e) { console.error(e); btn.disabled = false; btn.textContent = 'Get Bridge Token'; }
+}
+
+// --- Connect ---
+let bridgeInstance = null;
+
+function buildConnectScreen() {
+  const card = el('div', { className: 'screen-card', style: 'text-align:center;padding:48px 32px;' });
+  card.appendChild(el('h2', {}, 'Connect Your Payroll'));
+  card.appendChild(el('p', { className: 'desc' }, 'Click below to open the Bridge popup. Sandbox: goodlogin / goodpassword'));
+  card.appendChild(el('button', { className: 'btn btn-primary', style: 'max-width:280px;margin:0 auto;', id: 'openBridgeBtn', onclick: openBridge }, 'Connect Payroll'));
+  return card;
+}
+
+function openBridge() {
+  if (!state.bridgeToken) return;
+  bridgeInstance = TruvBridge.init({
+    bridgeToken: state.bridgeToken,
+    isOrder: false,
+    onLoad: function() { addBridgeEvent('onLoad', null); },
+    onEvent: function(eventType, payload) {
+      addBridgeEvent('onEvent', { eventType });
+    },
+    onSuccess: function(publicToken) {
+      addBridgeEvent('onSuccess', { publicToken });
+      if (publicToken) handleBridgeSuccess(publicToken);
+    },
+    onClose: function() { addBridgeEvent('onClose', null); },
+  });
+  if (bridgeInstance) bridgeInstance.open();
+}
+
+function addBridgeEvent(type, data) { state.bridgeEvents.push({ type, data, timestamp: new Date().toISOString() }); renderApiPanel(); }
+
+async function handleBridgeSuccess(publicToken) {
+  try {
+    const reportType = state.productType === 'deposit_switch' ? 'direct_deposit' : state.productType;
+    const resp = await fetch(API_BASE + '/api/link-report/' + encodeURIComponent(publicToken) + '/' + encodeURIComponent(reportType));
+    state.orderData = await resp.json();
+    nextStep();
+  } catch (e) { console.error('Error fetching report:', e); }
+}
+
+// --- Review ---
+function buildReviewScreen() {
+  const data = state.orderData;
+  if (!data) return el('div', { className: 'screen-card', style: 'text-align:center;padding:48px;' }, [el('div', { className: 'spinner' }), el('p', {}, 'Fetching report...')]);
+
+  const employments = data.employments || [];
+  const emp = employments[0] || {};
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Verification Complete'));
+  card.appendChild(el('p', { className: 'desc' }, 'Report data retrieved via the Users API / Link Reports.'));
+
+  const table = el('div', { className: 'review-table' });
+  addRow(table, 'Employer', emp.company && emp.company.name ? emp.company.name : '-');
+  addRow(table, 'Job Title', emp.job_title || '-');
+  addRow(table, 'Status', emp.is_active ? 'Active' : 'Inactive');
+  addRow(table, 'Start Date', emp.start_date || '-');
+  addRow(table, 'End Date', emp.end_date || '-');
+  if (emp.income) addRow(table, 'Income', '$' + Number(emp.income).toLocaleString() + ' ' + (emp.income_unit || ''));
+  if (data.deposit_details) {
+    const dd = data.deposit_details;
+    addRow(table, 'Account Type', dd.account_type || '-');
+    addRow(table, 'Routing Number', dd.routing_number || '-');
+    addRow(table, 'Deposit Type', dd.deposit_type || '-');
+  }
+  card.appendChild(table);
+  return card;
+}
+
+function addRow(table, label, value) {
+  table.appendChild(el('div', { className: 'review-row' }, [el('span', { className: 'review-label' }, label), el('span', { className: 'review-value' }, String(value))]));
+}
+
+// --- API Panel ---
+let activeTab = 'guide';
+
+function renderApiPanel() {
+  const tabs = document.getElementById('apiPanelTabs');
+  tabs.replaceChildren();
+  ['guide', 'api', 'bridge'].forEach((name, i) => {
+    const label = ['Guide', 'API Logs', 'Events'][i];
+    tabs.appendChild(el('button', { className: activeTab === name ? 'active' : '', onclick: () => { activeTab = name; renderApiPanel(); } }, label));
+  });
+
+  const content = document.getElementById('apiTabContent');
+  content.replaceChildren();
+
+  if (activeTab === 'guide') {
+    STEPS.forEach((s, i) => {
+      const step = el('div', { className: 'guide-step' });
+      step.appendChild(el('h4', {}, (i + 1) + '. ' + s.title));
+      step.appendChild(el('p', {}, s.guide));
+      content.appendChild(step);
+    });
+  } else if (activeTab === 'api') {
+    if (state.apiLogs.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, 'No API calls yet')); return; }
+    state.apiLogs.forEach(log => {
+      const entry = el('div', { className: 'api-log-entry' });
+      const badge = el('span', { className: 'badge ' + (log.method === 'GET' ? 'badge-get' : 'badge-post') }, log.method);
+      const body = el('div', { className: 'api-log-body' });
+      if (log.request_body) { body.appendChild(el('h5', {}, 'Request')); body.appendChild(el('pre', {}, tryFormat(log.request_body))); }
+      if (log.response_body) { body.appendChild(el('h5', {}, 'Response')); body.appendChild(el('pre', {}, tryFormat(log.response_body))); }
+      entry.appendChild(el('div', { className: 'api-log-header', onclick: () => body.classList.toggle('open') }, [
+        badge, el('span', { className: 'api-log-endpoint' }, log.endpoint),
+        el('span', { className: 'api-log-meta' }, [el('span', {}, log.status_code ? String(log.status_code) : ''), el('span', {}, log.duration_ms ? log.duration_ms + 'ms' : '')]),
+      ]));
+      entry.appendChild(body);
+      content.appendChild(entry);
+    });
+  } else {
+    if (state.bridgeEvents.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, 'No Bridge events yet')); return; }
+    state.bridgeEvents.forEach(ev => {
+      const item = el('div', { className: 'bridge-event' });
+      item.appendChild(el('span', { className: 'be-type' }, ev.type));
+      item.appendChild(el('span', { className: 'be-time' }, ev.timestamp ? ev.timestamp.split('T')[1].split('.')[0] : ''));
+      if (ev.data) item.appendChild(el('div', { className: 'be-data' }, JSON.stringify(ev.data)));
+      content.appendChild(item);
+    });
+  }
+}
+
+function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return String(s); } }
+
+fetch('/api/config').then(r => r.json()).then(d => { state.productType = d.product_type; render(); }).catch(() => {});
+render();
+</script>
+</body>
+</html>

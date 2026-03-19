@@ -42,3 +42,29 @@ make [python_docker|ruby_docker|golang_docker|node_docker|csharp_docker]
 * http://localhost:5003 Go
 * http://localhost:5004 Node.Js
 * http://localhost:5005 C#
+
+## Testing webhooks with ngrok
+
+To receive Truv webhooks on your local machine, use [ngrok](https://ngrok.com) to create a public tunnel.
+
+1. Install ngrok:
+```shell
+brew install ngrok
+```
+
+2. Sign up at [ngrok.com](https://ngrok.com) and add your authtoken:
+```shell
+ngrok config add-authtoken <your-token>
+```
+
+3. Start a tunnel to your app's port (e.g. 3001 for the Node.js quickstart):
+```shell
+ngrok http 3001
+```
+
+4. Copy the `Forwarding` URL (e.g. `https://xxxx-xxxx-xxxx.ngrok-free.app`) and set it in your `.env` file:
+```
+NGROK_URL=https://xxxx-xxxx-xxxx.ngrok-free.app
+```
+
+5. Restart the app. It will automatically register a sandbox webhook with Truv pointing to your ngrok URL and clean it up on exit.

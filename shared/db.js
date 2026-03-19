@@ -54,6 +54,15 @@ export function initDb() {
       received_at TEXT DEFAULT (datetime('now')),
       FOREIGN KEY (order_id) REFERENCES orders(id)
     );
+
+    CREATE TABLE IF NOT EXISTS document_collections (
+      id TEXT PRIMARY KEY,
+      truv_collection_id TEXT,
+      demo_id TEXT,
+      status TEXT DEFAULT 'created',
+      raw_response TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 }
 
@@ -117,4 +126,48 @@ export function insertWebhookEvent({ orderId, webhookId, eventType, status, payl
 
 export function getWebhookEvents(orderId) {
   return getDb().prepare('SELECT * FROM webhook_events WHERE order_id = ? ORDER BY id ASC').all(orderId);
+}
+
+export function getAllWebhookEvents() {
+  return getDb().prepare('SELECT * FROM webhook_events ORDER BY id ASC').all();
+}
+
+// --- Orders: list queries ---
+
+export function getOrdersByDemoId(demoId) {
+  return getDb().prepare('SELECT * FROM orders WHERE demo_id = ? ORDER BY created_at DESC').all(demoId);
+}
+
+export function getAllOrders() {
+  return getDb().prepare('SELECT * FROM orders ORDER BY created_at DESC').all();
+}
+
+// --- Document Collections ---
+
+export function createDocCollection({ collectionId, truvCollectionId, demoId, status = 'created', rawResponse }) {
+  const conn = getDb();
+  conn.prepare(
+    'INSERT INTO document_collections (id, truv_collection_id, demo_id, status, raw_response) VALUES (?, ?, ?, ?, ?)'
+  ).run(collectionId, truvCollectionId || null, demoId || null, status, rawResponse ? JSON.stringify(rawResponse) : null);
+  return conn.prepare('SELECT * FROM document_collections WHERE id = ?').get(collectionId);
+}
+
+export function getDocCollection(collectionId) {
+  return getDb().prepare('SELECT * FROM document_collections WHERE id = ?').get(collectionId) || null;
+}
+
+export function updateDocCollection(collectionId, fields) {
+  const keys = Object.keys(fields);
+  if (keys.length === 0) return;
+  const sets = keys.map(k => `${k} = ?`).join(', ');
+  const vals = keys.map(k => {
+    const v = fields[k];
+    return typeof v === 'object' && v !== null ? JSON.stringify(v) : v;
+  });
+  vals.push(collectionId);
+  getDb().prepare(`UPDATE document_collections SET ${sets} WHERE id = ?`).run(...vals);
+}
+
+export function getAllDocCollections() {
+  return getDb().prepare('SELECT * FROM document_collections ORDER BY created_at DESC').all();
 }

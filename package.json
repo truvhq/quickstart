@@ -2,18 +2,20 @@
   "name": "truv-quickstart",
   "version": "1.0.0",
   "type": "module",
-  "description": "Truv API Quickstart — 3 standalone demo apps",
+  "description": "Truv API Quickstart — 5 standalone demo apps",
   "scripts": {
-    "embedded": "node embedded-orders/server.js",
-    "bridge": "node bridge-widget/server.js",
-    "hosted": "node hosted-orders/server.js"
+    "application": "node application/server.js",
+    "follow-up": "node follow-up/server.js",
+    "employee-portal": "node employee-portal/server.js",
+    "upload-documents": "node upload-documents/server.js",
+    "choice-connect": "node choice-connect/server.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
-"node-fetch": "^3.3.2",
+    "node-fetch": "^3.3.2",
     "uuid": "^9.0.1"
   }
 }

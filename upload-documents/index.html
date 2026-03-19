@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Truv Quickstart — Upload Documents</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <style>
+    :root {
+      --primary: #4169E1; --primary-light: #E8EDFF; --primary-hover: #3458c7;
+      --text: #1A1A1A; --text-secondary: #666; --text-muted: #999;
+      --bg: #F5F5F5; --bg-white: #fff; --bg-input: #F8F9FA;
+      --border: #E5E7EB; --border-light: #F0F1F3;
+      --success: #16a34a; --success-bg: #f0fdf4;
+      --warning: #d97706; --warning-bg: #fffbeb;
+      --error: #dc2626; --error-bg: #fef2f2;
+      --radius: 12px; --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .header { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; }
+    .header-title { font-size: 16px; font-weight: 600; }
+    .header-badge { font-size: 12px; color: var(--text-secondary); background: var(--bg-input); padding: 4px 10px; border-radius: 12px; }
+    .main-layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
+    .app-panel { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: center; }
+    .api-panel { flex: 1; border-left: 1px solid var(--border); background: var(--bg-white); display: flex; flex-direction: column; overflow: hidden; }
+    .step-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 24px; width: 100%; max-width: 560px; }
+    .step-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .step-item.active { color: var(--primary); }
+    .step-item.done { color: var(--success); }
+    .step-number { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border); color: var(--text-muted); }
+    .step-item.active .step-number { border-color: var(--primary); background: var(--primary); color: white; }
+    .step-item.done .step-number { border-color: var(--success); background: var(--success); color: white; }
+    .step-arrow { color: var(--border); font-size: 16px; margin: 0 4px; }
+    .screen-container { width: 100%; max-width: 560px; }
+    .screen-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); padding: 32px; }
+    .screen-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .screen-card .desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; gap: 8px; }
+    .btn-primary { background: var(--primary); color: white; width: 100%; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .drop-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background: var(--primary-light); }
+    .drop-zone-icon { font-size: 36px; margin-bottom: 12px; }
+    .drop-zone-text { font-size: 14px; color: var(--text-secondary); }
+    .drop-zone-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+    .file-list { margin-top: 16px; }
+    .file-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; }
+    .file-icon { font-size: 20px; }
+    .file-info { flex: 1; }
+    .file-name { font-size: 13px; font-weight: 500; }
+    .file-size { font-size: 11px; color: var(--text-muted); }
+    .file-remove { background: none; border: none; color: var(--error); cursor: pointer; font-size: 16px; padding: 4px; }
+    .doc-card { border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 10px; }
+    .doc-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .doc-field { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; }
+    .doc-field-label { color: var(--text-secondary); }
+    .doc-field-value { font-weight: 500; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-get { background: #dbeafe; color: #1d4ed8; }
+    .badge-post { background: #dcfce7; color: #166534; }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-pending { background: var(--warning-bg); color: var(--warning); }
+    .badge-error { background: var(--error-bg); color: var(--error); }
+    .review-table { width: 100%; }
+    .review-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+    .review-label { color: var(--text-secondary); }
+    .review-value { font-weight: 600; text-align: right; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .api-panel-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .api-panel-tabs button { flex: 1; padding: 12px 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: inherit; }
+    .api-panel-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .api-tab-content { flex: 1; overflow-y: auto; padding: 16px; }
+    .guide-step { margin-bottom: 16px; }
+    .guide-step h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .guide-step p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .api-log-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; overflow: hidden; }
+    .api-log-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; background: var(--bg-input); }
+    .api-log-header:hover { background: var(--border-light); }
+    .api-log-endpoint { flex: 1; font-family: monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .api-log-meta { display: flex; gap: 8px; font-size: 11px; color: var(--text-muted); }
+    .api-log-body { padding: 10px; border-top: 1px solid var(--border-light); display: none; }
+    .api-log-body.open { display: block; }
+    .api-log-body pre { font-size: 11px; font-family: monospace; background: var(--bg-input); padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
+    .api-log-body h5 { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .api-log-body h5 + pre { margin-bottom: 10px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) { .api-panel { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo"></div>
+    <div class="header-title">Truv Quickstart</div>
+    <div class="header-badge">Upload Documents</div>
+  </div>
+</div>
+
+<div class="main-layout">
+  <div class="app-panel" id="appPanel"></div>
+  <div class="api-panel" id="apiPanel">
+    <div class="api-panel-tabs" id="apiPanelTabs"></div>
+    <div class="api-tab-content" id="apiTabContent"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+const STEPS = [
+  { title: 'Upload', guide: 'Select document files (PDF, JPEG, PNG, etc.). Files are read as base64 and sent to the Truv Document Collections API via POST /v1/documents/collections/.' },
+  { title: 'Processing', guide: 'The collection is being processed. Poll GET /v1/documents/collections/{id}/ to check file validation and status.' },
+  { title: 'Finalize', guide: 'Trigger finalization via POST /v1/documents/collections/{id}/finalize/. This extracts structured data from the documents.' },
+  { title: 'Review', guide: 'Fetch results via GET /v1/documents/collections/{id}/finalize/ to see parsed document data.' },
+];
+
+let state = {
+  step: 0,
+  files: [],         // { name, size, type, base64 }
+  collectionId: null,
+  truvCollectionId: null,
+  collectionData: null,
+  resultsData: null,
+  apiLogs: [],
+  pollTimer: null,
+};
+
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'className') node.className = v;
+    else if (k === 'onclick') node.addEventListener('click', v);
+    else if (k === 'style' && typeof v === 'string') node.setAttribute('style', v);
+    else if (k === 'disabled') node.disabled = v;
+    else if (k === 'id') node.id = v;
+    else node.setAttribute(k, v);
+  }
+  if (children != null) {
+    if (Array.isArray(children)) children.forEach(c => { if (c != null) node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    else if (typeof children === 'string') node.textContent = children;
+    else node.appendChild(children);
+  }
+  return node;
+}
+
+function nextStep() { if (state.step < STEPS.length - 1) { state.step++; render(); } }
+
+function buildStepNav() {
+  const nav = el('div', { className: 'step-nav' });
+  STEPS.forEach((s, i) => {
+    if (i > 0) nav.appendChild(el('span', { className: 'step-arrow' }, '\u2192'));
+    const cls = i === state.step ? 'active' : (i < state.step ? 'done' : '');
+    nav.appendChild(el('div', { className: 'step-item ' + cls }, [
+      el('div', { className: 'step-number' }, i < state.step ? '\u2713' : String(i + 1)),
+      el('span', {}, s.title),
+    ]));
+  });
+  return nav;
+}
+
+function render() {
+  const panel = document.getElementById('appPanel');
+  panel.replaceChildren();
+  panel.appendChild(buildStepNav());
+  const sc = el('div', { className: 'screen-container' });
+
+  if (state.step === 0) sc.appendChild(buildUploadScreen());
+  else if (state.step === 1) sc.appendChild(buildProcessingScreen());
+  else if (state.step === 2) sc.appendChild(buildFinalizeScreen());
+  else sc.appendChild(buildReviewScreen());
+
+  panel.appendChild(sc);
+  renderApiPanel();
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// --- Upload ---
+function buildUploadScreen() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Upload Documents'));
+  card.appendChild(el('p', { className: 'desc' }, 'Upload pay stubs, W-2s, tax documents, or other income verification files. Supported: PDF, JPEG, PNG, TIFF, WebP, BMP, HEIC. Max 10 files, 10MB each.'));
+
+  const fileInput = el('input', { type: 'file', id: 'fileInput', style: 'display:none;' });
+  fileInput.multiple = true;
+  fileInput.accept = '.pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp,.bmp,.heic,.heif';
+  fileInput.addEventListener('change', handleFiles);
+
+  const zone = el('div', { className: 'drop-zone', id: 'dropZone', onclick: () => fileInput.click() });
+  zone.appendChild(el('div', { className: 'drop-zone-icon' }, '\uD83D\uDCC1'));
+  zone.appendChild(el('div', { className: 'drop-zone-text' }, 'Drop files here or click to browse'));
+  zone.appendChild(el('div', { className: 'drop-zone-hint' }, 'PDF, JPEG, PNG, TIFF, WebP, BMP, HEIC/HEIF'));
+  card.appendChild(fileInput);
+  card.appendChild(zone);
+
+  // File list
+  if (state.files.length > 0) {
+    const list = el('div', { className: 'file-list' });
+    state.files.forEach((f, i) => {
+      list.appendChild(el('div', { className: 'file-item' }, [
+        el('span', { className: 'file-icon' }, '\uD83D\uDCC4'),
+        el('div', { className: 'file-info' }, [
+          el('div', { className: 'file-name' }, f.name),
+          el('div', { className: 'file-size' }, formatSize(f.size)),
+        ]),
+        el('button', { className: 'file-remove', onclick: () => { state.files.splice(i, 1); render(); } }, '\u2715'),
+      ]));
+    });
+    card.appendChild(list);
+  }
+
+  card.appendChild(el('button', {
+    className: 'btn btn-primary',
+    id: 'uploadBtn',
+    disabled: state.files.length === 0,
+    style: 'margin-top:16px;',
+    onclick: handleUpload,
+  }, 'Upload & Process'));
+
+  // Drag-and-drop
+  setTimeout(() => {
+    const dz = document.getElementById('dropZone');
+    if (!dz) return;
+    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      addFiles(e.dataTransfer.files);
+    });
+  }, 0);
+
+  return card;
+}
+
+function handleFiles(e) {
+  addFiles(e.target.files);
+}
+
+function addFiles(fileList) {
+  const promises = [];
+  for (const file of fileList) {
+    if (state.files.length >= 10) break;
+    if (file.size > 10 * 1024 * 1024) { alert(file.name + ' exceeds 10MB limit'); continue; }
+    promises.push(readFileAsBase64(file));
+  }
+  Promise.all(promises).then(results => {
+    state.files.push(...results);
+    render();
+  });
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      resolve({ name: file.name, size: file.size, type: file.type, base64 });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleUpload() {
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true; btn.textContent = 'Uploading...';
+
+  const documents = state.files.map(f => ({
+    content: f.base64,
+    filename: f.name,
+  }));
+
+  try {
+    const resp = await fetch(API_BASE + '/api/collections', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ documents }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); btn.disabled = false; btn.textContent = 'Upload & Process'; return; }
+
+    state.collectionId = data.collection_id;
+    state.truvCollectionId = data.truv_collection_id;
+    await fetchLogs();
+    nextStep();
+    startPolling();
+  } catch (e) { console.error(e); btn.disabled = false; btn.textContent = 'Upload & Process'; }
+}
+
+// --- Processing ---
+function buildProcessingScreen() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Processing Documents'));
+  card.appendChild(el('p', { className: 'desc' }, 'The collection is being validated and processed. This may take a few moments.'));
+
+  const data = state.collectionData;
+  if (!data) {
+    card.appendChild(el('div', { style: 'text-align:center;padding:24px;' }, [el('div', { className: 'spinner' }), el('p', {}, 'Waiting for status...')]));
+    return card;
+  }
+
+  const raw = data.raw_response || {};
+  const table = el('div', { className: 'review-table' });
+  addRow(table, 'Collection ID', data.truv_collection_id || '-');
+
+  const statusClass = raw.status === 'completed' ? 'badge-success' : (raw.status === 'error' ? 'badge-error' : 'badge-pending');
+  table.appendChild(el('div', { className: 'review-row' }, [
+    el('span', { className: 'review-label' }, 'Status'),
+    el('span', { className: 'review-value' }, el('span', { className: 'badge ' + statusClass }, raw.status || data.status || '-')),
+  ]));
+
+  // Show documents info
+  if (raw.documents && Array.isArray(raw.documents)) {
+    raw.documents.forEach((doc, i) => {
+      const docCard = el('div', { className: 'doc-card' });
+      docCard.appendChild(el('h4', {}, 'Document ' + (i + 1) + (doc.filename ? ': ' + doc.filename : '')));
+      if (doc.is_valid !== undefined) addDocField(docCard, 'Valid', doc.is_valid ? 'Yes' : 'No');
+      if (doc.is_readable !== undefined) addDocField(docCard, 'Readable', doc.is_readable ? 'Yes' : 'No');
+      if (doc.document_type) addDocField(docCard, 'Type', doc.document_type);
+      card.appendChild(docCard);
+    });
+  }
+  card.appendChild(table);
+
+  const ready = raw.status === 'completed' || raw.status === 'processed';
+  card.appendChild(el('button', {
+    className: 'btn btn-primary',
+    style: 'margin-top:16px;',
+    disabled: !ready,
+    onclick: () => { stopPolling(); nextStep(); },
+  }, ready ? 'Continue to Finalize' : 'Processing...'));
+
+  return card;
+}
+
+function addDocField(parent, label, value) {
+  parent.appendChild(el('div', { className: 'doc-field' }, [
+    el('span', { className: 'doc-field-label' }, label),
+    el('span', { className: 'doc-field-value' }, String(value)),
+  ]));
+}
+
+function startPolling() {
+  stopPolling();
+  pollCollection();
+  state.pollTimer = setInterval(pollCollection, 3000);
+}
+
+function stopPolling() {
+  if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+}
+
+async function pollCollection() {
+  if (!state.collectionId) return;
+  try {
+    const resp = await fetch(API_BASE + '/api/collections/' + encodeURIComponent(state.collectionId));
+    state.collectionData = await resp.json();
+    await fetchLogs();
+    render();
+    const status = state.collectionData.raw_response?.status || state.collectionData.status;
+    if (status === 'completed' || status === 'processed' || status === 'error') {
+      stopPolling();
+    }
+  } catch (e) { console.error(e); }
+}
+
+// --- Finalize ---
+function buildFinalizeScreen() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Finalize Collection'));
+  card.appendChild(el('p', { className: 'desc' }, 'Documents have been processed. Click below to extract structured data from the documents.'));
+
+  card.appendChild(el('button', {
+    className: 'btn btn-primary',
+    id: 'finalizeBtn',
+    onclick: handleFinalize,
+  }, 'Finalize & Extract Data'));
+  return card;
+}
+
+async function handleFinalize() {
+  const btn = document.getElementById('finalizeBtn');
+  btn.disabled = true; btn.textContent = 'Finalizing...';
+
+  try {
+    await fetch(API_BASE + '/api/collections/' + encodeURIComponent(state.collectionId) + '/finalize', { method: 'POST' });
+
+    // Poll for results
+    let attempts = 0;
+    const poll = async () => {
+      attempts++;
+      const resp = await fetch(API_BASE + '/api/collections/' + encodeURIComponent(state.collectionId) + '/results');
+      const data = await resp.json();
+      state.resultsData = data;
+      await fetchLogs();
+
+      if (data.status === 'completed' || data.status === 'finalized' || attempts > 20) {
+        nextStep();
+      } else {
+        setTimeout(poll, 3000);
+      }
+    };
+    setTimeout(poll, 2000);
+  } catch (e) { console.error(e); btn.disabled = false; btn.textContent = 'Finalize & Extract Data'; }
+}
+
+// --- Review ---
+function buildReviewScreen() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', {}, 'Document Results'));
+  card.appendChild(el('p', { className: 'desc' }, 'Structured data extracted from your documents.'));
+
+  const data = state.resultsData;
+  if (!data) {
+    card.appendChild(el('div', { style: 'text-align:center;padding:24px;' }, [el('div', { className: 'spinner' }), el('p', {}, 'Loading results...')]));
+    return card;
+  }
+
+  // Show parsed documents
+  const documents = data.documents || data.results || [];
+  if (Array.isArray(documents) && documents.length > 0) {
+    documents.forEach((doc, i) => {
+      const docCard = el('div', { className: 'doc-card' });
+      const docType = doc.document_type || doc.type || 'Document';
+      docCard.appendChild(el('h4', {}, docType + (doc.filename ? ' - ' + doc.filename : '')));
+
+      if (doc.employee_name || doc.name) addDocField(docCard, 'Name', doc.employee_name || doc.name);
+      if (doc.employer_name || doc.company) addDocField(docCard, 'Employer', doc.employer_name || doc.company);
+      if (doc.gross_pay) addDocField(docCard, 'Gross Pay', '$' + Number(doc.gross_pay).toLocaleString());
+      if (doc.net_pay) addDocField(docCard, 'Net Pay', '$' + Number(doc.net_pay).toLocaleString());
+      if (doc.pay_period_start) addDocField(docCard, 'Period Start', doc.pay_period_start);
+      if (doc.pay_period_end) addDocField(docCard, 'Period End', doc.pay_period_end);
+      if (doc.tax_year) addDocField(docCard, 'Tax Year', doc.tax_year);
+      if (doc.wages) addDocField(docCard, 'Wages', '$' + Number(doc.wages).toLocaleString());
+      if (doc.is_valid !== undefined) addDocField(docCard, 'Valid', doc.is_valid ? 'Yes' : 'No');
+
+      card.appendChild(docCard);
+    });
+  } else {
+    // Show raw response
+    card.appendChild(el('pre', { style: 'font-size:12px;font-family:monospace;background:var(--bg-input);padding:16px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:400px;overflow-y:auto;' },
+      JSON.stringify(data, null, 2)
+    ));
+  }
+
+  return card;
+}
+
+function addRow(table, label, value) {
+  table.appendChild(el('div', { className: 'review-row' }, [el('span', { className: 'review-label' }, label), el('span', { className: 'review-value' }, String(value))]));
+}
+
+async function fetchLogs() {
+  if (!state.collectionId) return;
+  try {
+    const resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.collectionId) + '/logs');
+    state.apiLogs = await resp.json();
+  } catch (e) { console.error(e); }
+}
+
+// --- API Panel ---
+let activeTab = 'guide';
+
+function renderApiPanel() {
+  const tabs = document.getElementById('apiPanelTabs');
+  tabs.replaceChildren();
+  ['guide', 'api'].forEach((name, i) => {
+    const label = ['Guide', 'API Logs'][i];
+    tabs.appendChild(el('button', { className: activeTab === name ? 'active' : '', onclick: () => { activeTab = name; renderApiPanel(); } }, label));
+  });
+
+  const content = document.getElementById('apiTabContent');
+  content.replaceChildren();
+
+  if (activeTab === 'guide') {
+    STEPS.forEach((s, i) => {
+      const step = el('div', { className: 'guide-step' });
+      step.appendChild(el('h4', {}, (i + 1) + '. ' + s.title));
+      step.appendChild(el('p', {}, s.guide));
+      content.appendChild(step);
+    });
+  } else {
+    if (state.apiLogs.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, 'No API calls yet')); return; }
+    state.apiLogs.forEach(log => {
+      const entry = el('div', { className: 'api-log-entry' });
+      const badge = el('span', { className: 'badge ' + (log.method === 'GET' ? 'badge-get' : 'badge-post') }, log.method);
+      const body = el('div', { className: 'api-log-body' });
+      if (log.request_body) { body.appendChild(el('h5', {}, 'Request')); body.appendChild(el('pre', {}, tryFormat(log.request_body))); }
+      if (log.response_body) { body.appendChild(el('h5', {}, 'Response')); body.appendChild(el('pre', {}, tryFormat(log.response_body))); }
+      entry.appendChild(el('div', { className: 'api-log-header', onclick: () => body.classList.toggle('open') }, [
+        badge, el('span', { className: 'api-log-endpoint' }, log.endpoint),
+        el('span', { className: 'api-log-meta' }, [el('span', {}, log.status_code ? String(log.status_code) : ''), el('span', {}, log.duration_ms ? log.duration_ms + 'ms' : '')]),
+      ]));
+      entry.appendChild(body);
+      content.appendChild(entry);
+    });
+  }
+}
+
+function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return String(s); } }
+
+render();
+</script>
+</body>
+</html>

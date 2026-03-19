@@ -12,7 +12,7 @@ class TruvClient:
     api_url = "https://prod.truv.com/v1/"
 
     def __init__(
-        self, client_id: str, secret: str, product_type: str = "employment", api_url: str = None
+        self, client_id: str, secret: str, product_type: str = "income", api_url: str = None
     ):
         self.client_id = client_id
         self.secret = secret

@@ -26,7 +26,7 @@ CORS(app)
 
 secret = os.environ.get("API_SECRET")
 client_id = os.environ.get("API_CLIENT_ID")
-product_type = os.environ.get("API_PRODUCT_TYPE", "employment")
+product_type = os.environ.get("API_PRODUCT_TYPE", "income")
 flask_port = os.environ.get("FLASK_RUN_PORT", 5001)
 # Legacy flag — still supported for backward compat
 is_order = os.environ.get("IS_ORDER", "false").lower() == "true"

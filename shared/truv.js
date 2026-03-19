@@ -75,7 +75,7 @@ export class TruvClient {
   // --- Orders API ---
 
   async createOrder(params = {}) {
-    const productType = params.product_type || 'employment';
+    const productType = params.product_type || 'income';
     const payload = {
       order_number: `qs-${uuidv4()}`,
       first_name: params.first_name || 'John',
@@ -87,7 +87,7 @@ export class TruvClient {
     if (params.phone) payload.phone = params.phone;
     if (params.ssn) payload.social_security_number = params.ssn;
 
-    if (['deposit_switch', 'pll', 'employment', 'income'].includes(productType)) {
+    if (['deposit_switch', 'pll', 'employment', 'income', 'assets'].includes(productType)) {
       payload.employers = [{ company_name: 'Home Depot' }];
     }
 
@@ -127,5 +127,31 @@ export class TruvClient {
 
   async getLinkReport(linkId, productType) {
     return this._request('GET', `links/${linkId}/${productType}/report`);
+  }
+
+  // --- Document Collections API ---
+
+  async createDocumentCollection(documents, users) {
+    return this._request('POST', 'documents/collections/', {
+      json: { documents, ...(users ? { users } : {}) },
+    });
+  }
+
+  async getDocumentCollection(collectionId) {
+    return this._request('GET', `documents/collections/${collectionId}/`);
+  }
+
+  async uploadToCollection(collectionId, documents) {
+    return this._request('POST', `documents/collections/${collectionId}/upload/`, {
+      json: { documents },
+    });
+  }
+
+  async finalizeCollection(collectionId) {
+    return this._request('POST', `documents/collections/${collectionId}/finalize/`);
+  }
+
+  async getFinalizationResults(collectionId) {
+    return this._request('GET', `documents/collections/${collectionId}/finalize/`);
   }
 }

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Truv Quickstart — Employee Portal</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <style>
+    :root {
+      --primary: #4169E1; --primary-light: #E8EDFF; --primary-hover: #3458c7;
+      --text: #1A1A1A; --text-secondary: #666; --text-muted: #999;
+      --bg: #F5F5F5; --bg-white: #fff; --bg-input: #F8F9FA;
+      --border: #E5E7EB; --border-light: #F0F1F3;
+      --success: #16a34a; --success-bg: #f0fdf4;
+      --warning: #d97706; --warning-bg: #fffbeb;
+      --error: #dc2626; --error-bg: #fef2f2;
+      --radius: 12px; --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .header { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; }
+    .header-title { font-size: 16px; font-weight: 600; }
+    .header-badge { font-size: 12px; color: var(--text-secondary); background: var(--bg-input); padding: 4px 10px; border-radius: 12px; }
+    .main-layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
+    .app-panel { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: center; }
+    .api-panel { flex: 1; border-left: 1px solid var(--border); background: var(--bg-white); display: flex; flex-direction: column; overflow: hidden; }
+    .screen-container { width: 100%; max-width: 720px; }
+    .screen-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); padding: 32px; }
+    .screen-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .screen-card .desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    .form-input { width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-white); font-family: inherit; outline: none; }
+    .form-input:focus { border-color: var(--primary); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; gap: 8px; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .order-table { width: 100%; border-collapse: collapse; }
+    .order-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    .order-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 13px; }
+    .order-table tr:hover { background: var(--bg-input); cursor: pointer; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-pending { background: var(--warning-bg); color: var(--warning); }
+    .badge-error { background: var(--error-bg); color: var(--error); }
+    .badge-get { background: #dbeafe; color: #1d4ed8; }
+    .badge-post { background: #dcfce7; color: #166534; }
+    .badge-source { background: var(--bg-input); color: var(--text-secondary); font-size: 10px; }
+    .review-table { width: 100%; }
+    .review-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+    .review-label { color: var(--text-secondary); }
+    .review-value { font-weight: 600; text-align: right; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; margin-bottom: 16px; }
+    .back-link:hover { color: var(--primary); }
+    .share-url-box { background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .share-url-box input { flex: 1; border: none; background: transparent; font-size: 13px; font-family: monospace; outline: none; color: var(--text); }
+    .share-url-box .copy-btn { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .api-panel-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .api-panel-tabs button { flex: 1; padding: 12px 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: inherit; }
+    .api-panel-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .api-tab-content { flex: 1; overflow-y: auto; padding: 16px; }
+    .api-log-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; overflow: hidden; }
+    .api-log-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; background: var(--bg-input); }
+    .api-log-header:hover { background: var(--border-light); }
+    .api-log-endpoint { flex: 1; font-family: monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .api-log-meta { display: flex; gap: 8px; font-size: 11px; color: var(--text-muted); }
+    .api-log-body { padding: 10px; border-top: 1px solid var(--border-light); display: none; }
+    .api-log-body.open { display: block; }
+    .api-log-body pre { font-size: 11px; font-family: monospace; background: var(--bg-input); padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
+    .api-log-body h5 { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .api-log-body h5 + pre { margin-bottom: 10px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) { .api-panel { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo"></div>
+    <div class="header-title">Truv Quickstart</div>
+    <div class="header-badge">Employee Portal</div>
+  </div>
+</div>
+
+<div class="main-layout">
+  <div class="app-panel" id="appPanel"></div>
+  <div class="api-panel" id="apiPanel">
+    <div class="api-panel-tabs" id="apiPanelTabs"></div>
+    <div class="api-tab-content" id="apiTabContent"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+
+let state = {
+  screen: 'dashboard', // 'dashboard', 'create', 'detail'
+  orders: [],
+  selectedOrder: null,
+  orderData: null,
+  formData: {},
+  productType: 'income',
+  apiLogs: [], webhooks: [],
+  eventSource: null, tunnelUrl: null,
+};
+
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'className') node.className = v;
+    else if (k === 'onclick') node.addEventListener('click', v);
+    else if (k === 'style' && typeof v === 'string') node.setAttribute('style', v);
+    else if (k === 'disabled') node.disabled = v;
+    else if (k === 'readOnly') node.readOnly = v;
+    else if (k === 'type') node.type = v;
+    else if (k === 'value') node.value = v;
+    else if (k === 'placeholder') node.placeholder = v;
+    else if (k === 'id') node.id = v;
+    else if (k === 'selected') node.selected = v;
+    else node.setAttribute(k, v);
+  }
+  if (children != null) {
+    if (Array.isArray(children)) children.forEach(c => { if (c != null) node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    else if (typeof children === 'string') node.textContent = children;
+    else node.appendChild(children);
+  }
+  return node;
+}
+
+function render() {
+  const panel = document.getElementById('appPanel');
+  panel.replaceChildren();
+  const sc = el('div', { className: 'screen-container' });
+
+  if (state.screen === 'dashboard') sc.appendChild(buildDashboard());
+  else if (state.screen === 'create') sc.appendChild(buildCreateForm());
+  else sc.appendChild(buildDetailView());
+
+  panel.appendChild(sc);
+  renderApiPanel();
+}
+
+// --- Dashboard ---
+function buildDashboard() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('div', { className: 'toolbar' }, [
+    el('h2', {}, 'All Applications'),
+    el('button', { className: 'btn btn-primary', onclick: () => { state.screen = 'create'; render(); } }, 'Create Order'),
+  ]));
+  card.appendChild(el('p', { className: 'desc' }, 'Admin dashboard showing all orders across the system.'));
+
+  if (state.orders.length === 0) {
+    card.appendChild(el('div', { className: 'empty-state' }, 'No orders yet. Create one or run another quickstart app first.'));
+    return card;
+  }
+
+  const table = el('table', { className: 'order-table' });
+  const thead = el('thead');
+  thead.appendChild(el('tr', {}, [
+    el('th', {}, 'Order ID'),
+    el('th', {}, 'Source'),
+    el('th', {}, 'Status'),
+    el('th', {}, 'Created'),
+  ]));
+  table.appendChild(thead);
+
+  const tbody = el('tbody');
+  state.orders.forEach(order => {
+    const statusClass = order.status === 'completed' ? 'badge-success' : (order.status === 'error' ? 'badge-error' : 'badge-pending');
+    const dateStr = order.created_at ? new Date(order.created_at + 'Z').toLocaleString() : '-';
+    tbody.appendChild(el('tr', { onclick: () => viewOrder(order.order_id) }, [
+      el('td', { style: 'font-family:monospace;font-size:12px;' }, order.order_id),
+      el('td', {}, el('span', { className: 'badge badge-source' }, order.demo_id || '-')),
+      el('td', {}, el('span', { className: 'badge ' + statusClass }, order.status || '-')),
+      el('td', { style: 'color:var(--text-muted);font-size:12px;' }, dateStr),
+    ]));
+  });
+  table.appendChild(tbody);
+  card.appendChild(table);
+  return card;
+}
+
+async function loadOrders() {
+  try {
+    const resp = await fetch(API_BASE + '/api/orders');
+    state.orders = await resp.json();
+    render();
+  } catch (e) { console.error(e); }
+}
+
+async function viewOrder(orderId) {
+  state.selectedOrder = orderId;
+  state.orderData = null;
+  state.screen = 'detail';
+  render();
+
+  try {
+    const resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(orderId));
+    state.orderData = await resp.json();
+    connectSSE(orderId);
+    await fetchLogs(orderId);
+    render();
+  } catch (e) { console.error(e); }
+}
+
+// --- Create Form ---
+function buildCreateForm() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('div', { className: 'back-link', onclick: () => { state.screen = 'dashboard'; render(); } }, [
+    el('span', {}, '\u2190'), el('span', {}, 'Back to dashboard'),
+  ]));
+  card.appendChild(el('h2', {}, 'Create New Order'));
+  card.appendChild(el('p', { className: 'desc' }, 'Enter applicant details. Email and phone are recommended for hosted order flow.'));
+
+  card.appendChild(el('div', { className: 'form-row' }, [
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'First name'), el('input', { className: 'form-input', id: 'firstName', placeholder: 'John' })]),
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Last name'), el('input', { className: 'form-input', id: 'lastName', placeholder: 'Johnson' })]),
+  ]));
+  card.appendChild(el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Email'), el('input', { className: 'form-input', id: 'email', type: 'email', placeholder: 'j.johnson@example.com' })]));
+  card.appendChild(el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Phone'), el('input', { className: 'form-input', id: 'phone', type: 'tel', placeholder: '+15551234567' })]));
+
+  const select = el('select', { className: 'form-input', id: 'productSelect' });
+  [['employment','Employment'],['income','Income'],['deposit_switch','Direct Deposit Switch'],['pll','Paycheck Linked Loan']].forEach(([v,t]) => select.appendChild(el('option', { value: v }, t)));
+
+  card.appendChild(el('div', { className: 'form-row' }, [
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'SSN'), el('input', { className: 'form-input', id: 'ssn', placeholder: '991-91-9991' })]),
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Product'), select]),
+  ]));
+
+  card.appendChild(el('button', { className: 'btn btn-primary', id: 'createBtn', style: 'width:100%;', onclick: handleCreate }, 'Create Order'));
+  return card;
+}
+
+async function handleCreate() {
+  const btn = document.getElementById('createBtn');
+  btn.disabled = true; btn.textContent = 'Creating...';
+
+  const body = {
+    first_name: document.getElementById('firstName').value || undefined,
+    last_name: document.getElementById('lastName').value || undefined,
+    email: document.getElementById('email').value || undefined,
+    phone: document.getElementById('phone').value || undefined,
+    ssn: document.getElementById('ssn').value || undefined,
+    product_type: document.getElementById('productSelect').value,
+  };
+
+  try {
+    const resp = await fetch(API_BASE + '/api/orders', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await resp.json();
+    if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); btn.disabled = false; btn.textContent = 'Create Order'; return; }
+    await viewOrder(data.order_id);
+  } catch (e) { console.error(e); btn.disabled = false; btn.textContent = 'Create Order'; }
+}
+
+// --- Detail View ---
+function buildDetailView() {
+  const card = el('div', { className: 'screen-card' });
+  card.appendChild(el('div', { className: 'back-link', onclick: () => { state.screen = 'dashboard'; loadOrders(); } }, [
+    el('span', {}, '\u2190'), el('span', {}, 'Back to dashboard'),
+  ]));
+
+  if (!state.orderData) {
+    card.appendChild(el('div', { style: 'text-align:center;padding:48px;' }, [el('div', { className: 'spinner' }), el('p', {}, 'Loading order...')]));
+    return card;
+  }
+
+  const data = state.orderData;
+  const raw = data.raw_response || {};
+  card.appendChild(el('h2', {}, 'Order Detail'));
+
+  const table = el('div', { className: 'review-table' });
+  addRow(table, 'Order ID', data.order_id || '-');
+  addRow(table, 'Truv Order ID', data.truv_order_id || '-');
+
+  const statusClass = data.status === 'completed' ? 'badge-success' : 'badge-pending';
+  table.appendChild(el('div', { className: 'review-row' }, [
+    el('span', { className: 'review-label' }, 'Status'),
+    el('span', { className: 'review-value' }, el('span', { className: 'badge ' + statusClass }, data.status || '-')),
+  ]));
+
+  if (data.share_url) {
+    const urlInput = el('input', { type: 'text', value: data.share_url, readOnly: true });
+    const copyBtn = el('button', { className: 'copy-btn', onclick: function() {
+      navigator.clipboard.writeText(urlInput.value);
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+    } }, 'Copy');
+    card.appendChild(table);
+    card.appendChild(el('div', { style: 'margin-top:16px;' }, [
+      el('label', { className: 'form-label' }, 'Share URL'),
+      el('div', { className: 'share-url-box' }, [urlInput, copyBtn]),
+    ]));
+  } else {
+    card.appendChild(table);
+  }
+
+  // Employment results
+  if (raw.results) {
+    const resultsSection = el('div', { style: 'margin-top:24px;padding-top:16px;border-top:1px solid var(--border-light);' });
+    resultsSection.appendChild(el('h3', { style: 'font-size:16px;font-weight:600;margin-bottom:12px;' }, 'Results'));
+    for (const r of raw.results) for (const emp of (r.employments || [])) {
+      const empTable = el('div', { className: 'review-table' });
+      addRow(empTable, 'Employer', emp.company && emp.company.name ? emp.company.name : '-');
+      addRow(empTable, 'Job Title', emp.job_title || '-');
+      addRow(empTable, 'Status', emp.is_active ? 'Active' : 'Inactive');
+      addRow(empTable, 'Start Date', emp.start_date || '-');
+      if (emp.income) addRow(empTable, 'Income', '$' + Number(emp.income).toLocaleString());
+      resultsSection.appendChild(empTable);
+    }
+    card.appendChild(resultsSection);
+  }
+
+  return card;
+}
+
+function addRow(table, label, value) {
+  table.appendChild(el('div', { className: 'review-row' }, [el('span', { className: 'review-label' }, label), el('span', { className: 'review-value' }, String(value))]));
+}
+
+// --- SSE ---
+function connectSSE(orderId) {
+  if (state.eventSource) state.eventSource.close();
+  const es = new EventSource(API_BASE + '/api/events/stream?order_id=' + encodeURIComponent(orderId));
+  es.addEventListener('api_call', function(e) { state.apiLogs.push(JSON.parse(e.data)); renderApiPanel(); });
+  es.addEventListener('webhook', function(e) { state.webhooks.push(JSON.parse(e.data)); renderApiPanel(); });
+  es.addEventListener('ping', function() {});
+  state.eventSource = es;
+}
+
+async function fetchLogs(orderId) {
+  try {
+    const [l, w] = await Promise.all([
+      fetch(API_BASE + '/api/orders/' + encodeURIComponent(orderId) + '/logs').then(r => r.json()),
+      fetch(API_BASE + '/api/orders/' + encodeURIComponent(orderId) + '/webhooks').then(r => r.json()),
+    ]);
+    state.apiLogs = l; state.webhooks = w;
+  } catch (e) { console.error(e); }
+}
+
+// --- API Panel ---
+let activeTab = 'api';
+
+function renderApiPanel() {
+  const tabs = document.getElementById('apiPanelTabs');
+  tabs.replaceChildren();
+  ['api', 'webhooks'].forEach((name, i) => {
+    const label = ['API Logs', 'Webhooks'][i];
+    tabs.appendChild(el('button', { className: activeTab === name ? 'active' : '', onclick: () => { activeTab = name; renderApiPanel(); } }, label));
+  });
+
+  const content = document.getElementById('apiTabContent');
+  content.replaceChildren();
+
+  if (activeTab === 'api') {
+    if (state.apiLogs.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, 'No API calls yet. Select an order to see its logs.')); return; }
+    state.apiLogs.forEach(log => {
+      const entry = el('div', { className: 'api-log-entry' });
+      const badge = el('span', { className: 'badge ' + (log.method === 'GET' ? 'badge-get' : 'badge-post') }, log.method);
+      const body = el('div', { className: 'api-log-body' });
+      if (log.request_body) { body.appendChild(el('h5', {}, 'Request')); body.appendChild(el('pre', {}, tryFormat(log.request_body))); }
+      if (log.response_body) { body.appendChild(el('h5', {}, 'Response')); body.appendChild(el('pre', {}, tryFormat(log.response_body))); }
+      entry.appendChild(el('div', { className: 'api-log-header', onclick: () => body.classList.toggle('open') }, [
+        badge, el('span', { className: 'api-log-endpoint' }, log.endpoint),
+        el('span', { className: 'api-log-meta' }, [el('span', {}, log.status_code ? String(log.status_code) : ''), el('span', {}, log.duration_ms ? log.duration_ms + 'ms' : '')]),
+      ]));
+      entry.appendChild(body);
+      content.appendChild(entry);
+    });
+  } else {
+    if (state.tunnelUrl) {
+      var tunnelBox = el('div', { style: 'padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;margin-bottom:12px;font-size:12px;' });
+      tunnelBox.appendChild(el('span', { style: 'color:#1e40af;font-weight:600;' }, 'Webhook URL: '));
+      tunnelBox.appendChild(el('a', { href: state.tunnelUrl, target: '_blank', style: 'color:#2563eb;word-break:break-all;' }, state.tunnelUrl));
+      content.appendChild(tunnelBox);
+    }
+    if (state.webhooks.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, 'No webhooks yet')); return; }
+    state.webhooks.forEach(w => {
+      const payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+      const eventType = payload.event_type || w.event_type || 'unknown';
+      const status = payload.status || w.status || '';
+      const ts = payload.event_created_at || payload.updated_at || '';
+      const timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
+      const statusColors = { pending: '#f59e0b', sent: '#3b82f6', completed: '#10b981', done: '#10b981', failed: '#ef4444', error: '#ef4444' };
+      const statusColor = statusColors[status] || '#6b7280';
+
+      const card = el('div', { style: 'border:1px solid var(--border-light);border-radius:8px;margin-bottom:10px;overflow:hidden;' });
+      const header = el('div', { style: 'display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-input);cursor:pointer;', onclick: function() { var p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'block' : 'none'; } });
+      header.appendChild(el('span', { style: 'font-size:12px;font-weight:600;' }, eventType));
+      if (status) header.appendChild(el('span', { style: 'font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;background:' + statusColor + '18;color:' + statusColor + ';' }, status));
+      header.appendChild(el('span', { style: 'margin-left:auto;font-size:11px;color:var(--text-muted);' }, timeStr));
+      card.appendChild(header);
+      card.appendChild(el('pre', { style: 'display:none;font-size:11px;font-family:monospace;padding:10px 12px;margin:0;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;border-top:1px solid var(--border-light);' }, JSON.stringify(payload, null, 2)));
+      content.appendChild(card);
+    });
+  }
+}
+
+function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return String(s); } }
+
+// --- Init ---
+fetch(API_BASE + '/api/config').then(r => r.json()).then(d => { state.productType = d.product_type; render(); }).catch(() => {});
+fetch(API_BASE + '/api/tunnel-url').then(r => r.json()).then(d => { state.tunnelUrl = d.url; }).catch(() => {});
+loadOrders();
+</script>
+</body>
+</html>

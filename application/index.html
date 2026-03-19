@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acme — Quickstart</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <script src="https://cdn.truv.com/bridge.js"></script>
+  <style>
+    :root {
+      --accent: #1a56db;
+      --accent-hover: #1648b8;
+      --accent-subtle: #eff6ff;
+      --gold: #1a56db;
+      --gold-light: #eff6ff;
+      --gold-border: #bfdbfe;
+      --text: #1a1a1a;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --bg: #ffffff;
+      --white: #ffffff;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --success: #059669;
+      --success-bg: #ecfdf5;
+      --success-border: #a7f3d0;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --error: #dc2626;
+      --error-bg: #fef2f2;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+
+    /* Layout */
+    .main-layout { display: flex; height: 100vh; overflow: hidden; }
+    .app-panel { flex: 2; overflow-y: auto; display: flex; justify-content: center; padding: 40px 32px; }
+    .app-panel.no-pad { padding: 0; }
+    .app-content { width: 100%; max-width: 520px; transition: max-width 0.2s; }
+    .app-content.full-width { max-width: 100%; }
+
+    /* API Panel */
+    .api-panel { flex: 1; min-width: 0; border-left: 1px solid var(--border); background: var(--white); display: flex; flex-direction: column; overflow: hidden; }
+    .api-panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 2px; }
+    .api-tab { padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--text-muted); background: none; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .api-tab:hover { color: var(--text-secondary); background: var(--border-light); }
+    .api-tab.active { color: var(--accent); background: var(--accent-subtle); }
+    .api-tab-content { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+    /* Card */
+    .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 36px; }
+
+    /* Headings */
+    .app-content h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
+    .app-content .subtitle { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 28px; }
+
+    /* Form */
+    .form-row { display: grid; gap: 16px; margin-bottom: 16px; }
+    .form-row-2 { grid-template-columns: 1fr 1fr; }
+    .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .form-input, .form-select { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); font-family: inherit; outline: none; color: var(--text); transition: border-color 0.15s; }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,219,0.1); }
+    .form-input::placeholder { color: var(--text-muted); }
+
+    /* Checkbox */
+    .checkbox-row { display: flex; align-items: center; gap: 10px; margin: 24px 0; }
+    .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+    .checkbox-row label { font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+    .checkbox-row label a { color: var(--accent); text-decoration: underline; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; gap: 8px; }
+    .btn-primary { background: var(--accent); color: #fff; width: 100%; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Bridge */
+    .bridge-wrapper { width: 100%; height: 100vh; border: none; border-radius: 0; overflow: hidden; position: relative; background: #fff; }
+    .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
+
+    /* Waiting state */
+    .waiting-card { text-align: center; padding: 60px 36px; }
+    .waiting-icon { width: 64px; height: 64px; margin: 0 auto 24px; position: relative; }
+    .waiting-ring { width: 64px; height: 64px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1.2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .waiting-card h2 { margin-bottom: 8px; }
+    .waiting-card .subtitle { margin-bottom: 32px; }
+    .webhook-feed { text-align: left; max-width: 400px; margin: 0 auto; }
+    .webhook-pill { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f3f4f6; border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; animation: fadeIn 0.3s ease; }
+    .webhook-pill .wp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .webhook-pill .wp-dot.green { background: var(--success); }
+    .webhook-pill .wp-dot.yellow { background: var(--warning); }
+    .webhook-pill .wp-dot.blue { background: #3b82f6; }
+    .webhook-pill .wp-text { flex: 1; font-weight: 500; }
+    .webhook-pill .wp-time { font-size: 11px; color: var(--text-muted); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Results */
+    .results-grid { display: grid; gap: 0; margin-bottom: 20px; }
+    .result-row { display: grid; grid-template-columns: 180px 1fr; border-bottom: 1px solid var(--border-light); }
+    .result-label { padding: 12px 0; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+    .result-value { padding: 12px 0; font-size: 13px; font-weight: 600; }
+    .result-section { margin-bottom: 24px; }
+    .result-section h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .result-section h3 .icon { font-size: 16px; }
+    .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-completed { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+    .status-pending { background: var(--warning-bg); color: var(--warning); }
+
+    /* API log entries */
+    .log-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+    .log-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; transition: background 0.1s; }
+    .log-header:hover { background: var(--border-light); }
+    .log-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .log-badge-get { background: #dbeafe; color: #1d4ed8; }
+    .log-badge-post { background: #dcfce7; color: #166534; }
+    .log-badge-webhook { background: var(--gold-light); color: #92400e; }
+    .log-endpoint { flex: 1; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .log-meta { font-size: 11px; color: var(--text-muted); }
+    .log-body { border-top: 1px solid var(--border-light); display: none; }
+    .log-body.open { display: block; }
+    .log-body-section { padding: 10px 12px; }
+    .log-body-section h5 { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .log-body-section pre { font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; background: var(--border-light); padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; line-height: 1.5; }
+
+    /* Bridge events */
+    .bridge-ev { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-left: 3px solid var(--accent); margin-bottom: 6px; background: var(--accent-subtle); border-radius: 0 6px 6px 0; font-size: 12px; }
+    .bridge-ev-type { font-weight: 600; color: var(--accent); }
+    .bridge-ev-time { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+    .bridge-ev-data { margin-top: 4px; color: var(--text-secondary); font-family: monospace; font-size: 11px; }
+
+    /* Webhook panel entries */
+    .wh-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+    .wh-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; background: var(--border-light); }
+    .wh-header:hover { background: #eee; }
+    .wh-type { font-size: 12px; font-weight: 600; }
+    .wh-status { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; }
+    .wh-time { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+    .wh-body { display: none; border-top: 1px solid var(--border-light); padding: 10px 12px; }
+    .wh-body pre { font-size: 11px; font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
+
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
+    .empty-state .empty-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+
+    .guide-block { margin-bottom: 20px; padding: 16px; background: var(--border-light); border-radius: var(--radius-sm); }
+    .guide-block h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .guide-block p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+
+    .tunnel-info { padding: 10px 14px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; margin-bottom: 16px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+    .tunnel-info span { color: #1e40af; font-weight: 600; }
+    .tunnel-info a { color: #2563eb; word-break: break-all; }
+
+    .api-panel.hidden { display: none; }
+    @media (max-width: 1000px) { .api-panel { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="main-layout">
+  <div class="app-panel">
+    <div class="app-content" id="appPanel"></div>
+  </div>
+  <div class="api-panel">
+    <div class="api-panel-header" id="apiPanelTabs"></div>
+    <div class="api-tab-content" id="apiTabContent"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+const STEPS = [
+  { title: 'Tell us about yourself', guide: 'Collect applicant info. The backend calls POST /v1/orders/ to create a verification order and get a bridge_token.' },
+  { title: 'Complete verification', guide: 'The Truv Bridge widget opens inline. Complete verification with sandbox credentials: goodlogin / goodpassword.' },
+  { title: 'Processing', guide: 'Waiting for Truv to process the verification. The server receives real-time webhook events as the order progresses.' },
+  { title: 'Results', guide: 'The backend calls GET /v1/orders/{id}/ to retrieve verified data. Review income, employment, and identity details.' },
+];
+
+let state = {
+  step: 0, orderId: null, truvOrderId: null, bridgeToken: null,
+  productType: 'income', formData: {}, bridgeEvents: [],
+  apiLogs: [], webhooks: [], orderData: null, eventSource: null, tunnelUrl: null,
+  agreed: true,
+};
+
+// --- DOM helpers ---
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'className') node.className = v;
+    else if (k === 'onclick') node.addEventListener('click', v);
+    else if (k === 'onchange') node.addEventListener('change', v);
+    else if (k === 'style' && typeof v === 'string') node.setAttribute('style', v);
+    else if (k === 'disabled') node.disabled = v;
+    else if (k === 'readOnly') node.readOnly = v;
+    else if (k === 'checked') node.checked = v;
+    else if (k === 'type') node.type = v;
+    else if (k === 'value') node.value = v;
+    else if (k === 'placeholder') node.placeholder = v;
+    else if (k === 'id') node.id = v;
+    else if (k === 'selected') node.selected = v;
+    else if (k === 'href') node.href = v;
+    else if (k === 'target') node.target = v;
+    else if (k === 'for') node.htmlFor = v;
+    else node.setAttribute(k, v);
+  }
+  if (children != null) {
+    if (Array.isArray(children)) children.forEach(c => { if (c != null) node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    else if (typeof children === 'string') node.textContent = children;
+    else node.appendChild(children);
+  }
+  return node;
+}
+
+function goStep(n) { state.step = n; render(); }
+
+// --- Render ---
+function render() {
+  const appPanel = document.querySelector('.app-panel');
+  appPanel.className = state.step === 1 ? 'app-panel no-pad' : 'app-panel';
+  const apiPanel = document.querySelector('.api-panel');
+  apiPanel.className = state.step === 1 ? 'api-panel hidden' : 'api-panel';
+  const panel = document.getElementById('appPanel');
+  panel.replaceChildren();
+  panel.className = state.step === 0 ? 'app-content' : 'app-content full-width';
+
+  if (state.step === 0) panel.appendChild(buildFormScreen());
+  else if (state.step === 1) panel.appendChild(buildBridgeScreen());
+  else if (state.step === 2) panel.appendChild(buildWaitingScreen());
+  else panel.appendChild(buildResultsScreen());
+
+  renderApiPanel();
+}
+
+// --- Step 1: Form ---
+function buildFormScreen() {
+  const card = el('div');
+  card.appendChild(el('h2', {}, 'Tell us about yourself'));
+  card.appendChild(el('p', { className: 'subtitle' }, 'We need a few details to verify your identity and employment. This information is transmitted securely.'));
+
+  card.appendChild(el('div', { className: 'form-row form-row-2' }, [
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'First name'), el('input', { className: 'form-input', id: 'firstName', value: state.formData.first_name || '', placeholder: 'Joe' })]),
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Last name'), el('input', { className: 'form-input', id: 'lastName', value: state.formData.last_name || '', placeholder: 'Doe' })]),
+  ]));
+
+  card.appendChild(el('div', { className: 'form-row' }, [
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Email address'), el('input', { className: 'form-input', id: 'email', type: 'email', value: state.formData.email || '', placeholder: 'joe@example.com' })]),
+  ]));
+
+  card.appendChild(el('div', { className: 'form-row form-row-2' }, [
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Phone number'), el('input', { className: 'form-input', id: 'phone', type: 'tel', value: state.formData.phone || '', placeholder: '123456789' })]),
+    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'SSN (last 4)'), el('input', { className: 'form-input', id: 'ssn', value: state.formData.ssn || '', placeholder: '6789' })]),
+  ]));
+
+  // TOS
+  const cb = el('input', { type: 'checkbox', id: 'agree', checked: state.agreed, onchange: function() { state.agreed = this.checked; } });
+  card.appendChild(el('div', { className: 'checkbox-row' }, [
+    cb,
+    el('label', { 'for': 'agree' }, [
+      document.createTextNode('I agree to the '),
+      el('a', { href: '#' }, 'Acme Terms of Service'),
+    ]),
+  ]));
+
+  card.appendChild(el('button', { className: 'btn btn-primary', id: 'submitBtn', onclick: handleSubmit }, 'Continue'));
+  return card;
+}
+
+async function handleSubmit() {
+  if (!state.agreed) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.replaceChildren(el('span', { className: 'spinner-sm' }), document.createTextNode(' Creating order...'));
+
+  state.formData = {
+    first_name: document.getElementById('firstName').value || undefined,
+    last_name: document.getElementById('lastName').value || undefined,
+    email: document.getElementById('email').value || undefined,
+    phone: document.getElementById('phone').value || undefined,
+    ssn: document.getElementById('ssn').value || undefined,
+  };
+  try {
+    const resp = await fetch(API_BASE + '/api/orders', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...state.formData, product_type: state.productType }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); btn.disabled = false; btn.textContent = 'Continue'; return; }
+    state.orderId = data.order_id;
+    state.truvOrderId = data.truv_order_id;
+    state.bridgeToken = data.bridge_token;
+    connectSSE(state.orderId);
+    await fetchLogs();
+    goStep(1);
+  } catch (e) { console.error(e); btn.disabled = false; btn.textContent = 'Continue'; }
+}
+
+// --- Step 2: Bridge ---
+let bridgeInstance = null;
+
+function buildBridgeScreen() {
+  const wrapper = el('div', { className: 'bridge-wrapper', id: 'bridgeContainer' });
+  setTimeout(initBridge, 100);
+  return wrapper;
+}
+
+function initBridge() {
+  if (!state.bridgeToken) return;
+  bridgeInstance = TruvBridge.init({
+    bridgeToken: state.bridgeToken,
+    isOrder: true,
+    position: { type: 'inline', container: document.getElementById('bridgeContainer') },
+    onLoad: function() {
+      addBridgeEvent('onLoad', null);
+      const l = document.querySelector('.bridge-loading');
+      if (l) l.style.display = 'none';
+    },
+    onEvent: function(eventType, payload, source) {
+      addBridgeEvent('onEvent', { eventType, source });
+      if (source === 'order' && eventType === 'COMPLETED') {
+        setTimeout(async function() { await fetchLogs(); goStep(2); }, 1500);
+      }
+    },
+    onSuccess: function() { addBridgeEvent('onSuccess', null); },
+    onClose: function() { addBridgeEvent('onClose', null); },
+  });
+  if (bridgeInstance) bridgeInstance.open();
+}
+
+function addBridgeEvent(type, data) { state.bridgeEvents.push({ type, data, timestamp: new Date().toISOString() }); renderApiPanel(); }
+
+// --- Step 3: Waiting ---
+let waitingStartedAt = null;
+const WAITING_MIN_MS = 10000;
+
+function buildWaitingScreen() {
+  if (!waitingStartedAt) waitingStartedAt = Date.now();
+
+  const root = el('div', { style: 'display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;' });
+
+  const icon = el('div', { style: 'width:72px;height:72px;margin-bottom:28px;position:relative;' });
+  icon.appendChild(el('div', { className: 'waiting-ring', style: 'width:72px;height:72px;' }));
+  root.appendChild(icon);
+
+  root.appendChild(el('h2', { style: 'margin-bottom:8px;' }, 'Waiting for webhooks'));
+  root.appendChild(el('p', { style: 'font-size:14px;color:var(--text-secondary);line-height:1.6;max-width:400px;margin-bottom:36px;' }, 'Truv sends webhook events as the verification progresses. Watch them arrive in real time.'));
+
+  if (state.webhooks.length > 0) {
+    const feed = el('div', { style: 'text-align:left;width:100%;max-width:420px;' });
+    state.webhooks.forEach(w => {
+      const payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+      const eventType = payload.event_type || w.event_type || 'unknown';
+      const status = payload.status || w.status || '';
+      const ts = payload.event_created_at || payload.updated_at || w.received_at || '';
+      const timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
+      const dotColor = status === 'completed' || status === 'done' ? 'green' : status === 'pending' ? 'yellow' : 'blue';
+
+      feed.appendChild(el('div', { className: 'webhook-pill' }, [
+        el('div', { className: 'wp-dot ' + dotColor }),
+        el('span', { className: 'wp-text' }, eventType.replace(/-/g, ' ')),
+        el('span', { className: 'wp-time' }, timeStr),
+      ]));
+    });
+    root.appendChild(feed);
+  } else {
+    root.appendChild(el('p', { style: 'font-size:13px;color:var(--text-muted);' }, 'No webhooks received yet...'));
+  }
+
+  // Auto-advance after min wait time + order completed
+  const elapsed = Date.now() - waitingStartedAt;
+  const isCompleted = state.webhooks.some(w => {
+    const p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+    return p.event_type === 'order-status-updated' && p.status === 'completed';
+  });
+  if (isCompleted && elapsed >= WAITING_MIN_MS) {
+    setTimeout(() => { waitingStartedAt = null; goStep(3); }, 1000);
+  } else if (isCompleted) {
+    setTimeout(() => { waitingStartedAt = null; goStep(3); }, WAITING_MIN_MS - elapsed + 1000);
+  }
+
+  return root;
+}
+
+// --- Step 4: Results ---
+function $(amount) { return '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function freq(f) { return { BW: 'Biweekly', W: 'Weekly', M: 'Monthly', SM: 'Semi-Monthly', A: 'Annual' }[f] || f; }
+
+function buildResultsScreen() {
+  if (state.orderId && !state.orderData) {
+    setTimeout(fetchOrderData, 100);
+    const wrap = el('div', { style: 'text-align:center;padding:60px;' });
+    wrap.appendChild(el('div', { className: 'waiting-ring', style: 'width:40px;height:40px;margin:0 auto 12px;' }));
+    wrap.appendChild(el('p', { style: 'font-size:14px;color:var(--text-secondary);' }, 'Loading results...'));
+    return wrap;
+  }
+
+  const data = state.orderData || {};
+  const raw = data.raw_response || {};
+  const root = el('div');
+
+  root.appendChild(el('h2', {}, 'Verification Results'));
+  root.appendChild(el('p', { className: 'subtitle' }, 'Order ' + (data.truv_order_id || state.truvOrderId || '') + ' \u2022 ' + (raw.verification_type || state.productType || '') + ' \u2022 ' + (data.status || '')));
+
+  // Iterate employers
+  const employers = raw.employers || [];
+  for (const emp of employers) {
+    const employment = (emp.employments && emp.employments[0]) || {};
+    const profile = employment.profile || {};
+    const company = employment.company || {};
+    const stmts = employment.statements || [];
+    const annualSummary = employment.annual_income_summary || [];
+    const bankAccounts = employment.bank_accounts || [];
+    const w2s = employment.w2s || [];
+
+    // Employer header
+    const empHeader = el('div', { style: 'display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px 0;border-bottom:2px solid var(--border);' });
+    if (emp.company_logo) {
+      empHeader.appendChild(el('img', { style: 'width:40px;height:40px;border-radius:8px;object-fit:contain;border:1px solid var(--border);', src: emp.company_logo }));
+    } else if (emp.provider && emp.provider.logo_url) {
+      empHeader.appendChild(el('img', { style: 'width:40px;height:40px;border-radius:8px;object-fit:contain;', src: emp.provider.logo_url }));
+    }
+    const empInfo = el('div');
+    empInfo.appendChild(el('div', { style: 'font-size:18px;font-weight:700;' }, emp.company_name || company.name || 'Employer'));
+    const meta = [emp.provider ? 'via ' + emp.provider.name : '', emp.data_source || ''].filter(Boolean).join(' \u2022 ');
+    if (meta) empInfo.appendChild(el('div', { style: 'font-size:13px;color:var(--text-secondary);margin-top:2px;' }, meta));
+    empHeader.appendChild(empInfo);
+    const empStatus = el('span', { className: 'status-badge ' + (emp.status === 'completed' ? 'status-completed' : 'status-pending'), style: 'margin-left:auto;' }, emp.status || '-');
+    empHeader.appendChild(empStatus);
+    root.appendChild(empHeader);
+
+    // Profile section
+    if (profile.first_name) {
+      const sec = el('div', { className: 'result-section' });
+      sec.appendChild(el('h3', {}, 'Profile'));
+      const g = el('div', { className: 'results-grid' });
+      addResultRow(g, 'Full Name', profile.full_name || (profile.first_name + ' ' + profile.last_name));
+      if (profile.email) addResultRow(g, 'Email', profile.email);
+      if (profile.date_of_birth) addResultRow(g, 'Date of Birth', profile.date_of_birth);
+      if (profile.ssn) addResultRow(g, 'SSN', profile.ssn.replace(/^(\d{3})(\d{2})(\d{4})$/, '$1-$2-$3'));
+      if (profile.home_address) {
+        const a = profile.home_address;
+        addResultRow(g, 'Address', [a.street, a.city, a.state, a.zip].filter(Boolean).join(', '));
+      }
+      sec.appendChild(g);
+      root.appendChild(sec);
+    }
+
+    // Employment section
+    if (employment.job_title) {
+      const sec = el('div', { className: 'result-section' });
+      sec.appendChild(el('h3', {}, 'Employment'));
+      const g = el('div', { className: 'results-grid' });
+      addResultRow(g, 'Job Title', employment.job_title);
+      addResultRow(g, 'Job Type', employment.job_type === 'F' ? 'Full-time' : employment.job_type === 'P' ? 'Part-time' : employment.job_type || '-');
+      addResultRow(g, 'Status', employment.is_active ? 'Active' : 'Inactive');
+      addResultRow(g, 'Start Date', employment.start_date || '-');
+      if (employment.end_date) addResultRow(g, 'End Date', employment.end_date);
+      if (employment.original_hire_date) addResultRow(g, 'Original Hire Date', employment.original_hire_date);
+      if (employment.employed_in_role) addResultRow(g, 'Tenure', employment.employed_in_role);
+      if (employment.manager_name) addResultRow(g, 'Manager', employment.manager_name);
+      if (employment.income) addResultRow(g, 'Annual Income', $(employment.income));
+      if (employment.pay_rate) addResultRow(g, 'Pay Rate', $(employment.pay_rate) + ' ' + freq(employment.pay_frequency));
+      if (company.phone) addResultRow(g, 'Company Phone', company.phone);
+      if (company.address) {
+        const a = company.address;
+        addResultRow(g, 'Company Address', [a.street, a.city, a.state, a.zip].filter(Boolean).join(', '));
+      }
+      sec.appendChild(g);
+      root.appendChild(sec);
+    }
+
+    // Annual Income Summary
+    if (annualSummary.length > 0) {
+      const sec = el('div', { className: 'result-section' });
+      sec.appendChild(el('h3', {}, 'Annual Income Summary'));
+      const table = el('table', { style: 'width:100%;border-collapse:collapse;font-size:13px;' });
+      const thead = el('tr', { style: 'border-bottom:2px solid var(--border);' });
+      ['Year', 'Gross Pay', 'Net Pay', 'Regular', 'Overtime', 'Other'].forEach(h => {
+        thead.appendChild(el('th', { style: 'text-align:left;padding:8px 12px;font-weight:600;color:var(--text-secondary);' }, h));
+      });
+      table.appendChild(thead);
+      annualSummary.forEach(yr => {
+        const tr = el('tr', { style: 'border-bottom:1px solid var(--border-light);' });
+        [yr.year, $(yr.gross_pay), $(yr.net_pay), yr.regular ? $(yr.regular) : '-', yr.overtime ? $(yr.overtime) : '-', yr.other_pay ? $(yr.other_pay) : '-'].forEach((v, i) => {
+          tr.appendChild(el('td', { style: 'padding:8px 12px;' + (i === 0 ? 'font-weight:600;' : '') }, String(v)));
+        });
+        table.appendChild(tr);
+      });
+      sec.appendChild(table);
+      root.appendChild(sec);
+    }
+
+    // Recent Pay Statements (latest 3)
+    if (stmts.length > 0) {
+      const sec = el('div', { className: 'result-section' });
+      sec.appendChild(el('h3', {}, 'Pay Statements (' + stmts.length + ' total)'));
+      const recent = stmts.slice(0, 3);
+      recent.forEach(st => {
+        const stCard = el('div', { style: 'border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;overflow:hidden;' });
+        const stHeader = el('div', { style: 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--border-light);cursor:pointer;', onclick: function() { const body = this.nextElementSibling; body.style.display = body.style.display === 'none' ? 'block' : 'none'; } });
+        stHeader.appendChild(el('div', { style: 'font-weight:600;font-size:13px;' }, 'Pay Date: ' + st.pay_date));
+        stHeader.appendChild(el('div', { style: 'display:flex;gap:16px;font-size:13px;' }, [
+          el('span', { style: 'color:var(--text-secondary);' }, 'Gross: '),
+          el('span', { style: 'font-weight:600;' }, $(st.gross_pay)),
+          el('span', { style: 'color:var(--text-secondary);margin-left:8px;' }, 'Net: '),
+          el('span', { style: 'font-weight:600;color:var(--success);' }, $(st.net_pay)),
+        ]));
+        stCard.appendChild(stHeader);
+        const stBody = el('div', { style: 'display:none;padding:12px 16px;' });
+        const stGrid = el('div', { className: 'results-grid', style: 'margin-bottom:12px;' });
+        addResultRow(stGrid, 'Period', (st.period_start || '') + ' to ' + (st.period_end || ''));
+        addResultRow(stGrid, 'Hours', st.hours || '-');
+        addResultRow(stGrid, 'Regular', st.regular ? $(st.regular) : '-');
+        addResultRow(stGrid, 'Overtime', st.overtime ? $(st.overtime) : '-');
+        stBody.appendChild(stGrid);
+        // Earnings
+        if (st.earnings && st.earnings.length) {
+          stBody.appendChild(el('div', { style: 'font-size:12px;font-weight:600;color:var(--text-secondary);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.5px;' }, 'Earnings'));
+          const et = el('table', { style: 'width:100%;font-size:12px;border-collapse:collapse;' });
+          st.earnings.forEach(e => {
+            const tr = el('tr', { style: 'border-bottom:1px solid var(--border-light);' });
+            tr.appendChild(el('td', { style: 'padding:4px 8px;' }, e.name));
+            tr.appendChild(el('td', { style: 'padding:4px 8px;text-align:right;font-weight:500;' }, $(e.amount)));
+            et.appendChild(tr);
+          });
+          stBody.appendChild(et);
+        }
+        // Deductions
+        if (st.deductions && st.deductions.length) {
+          stBody.appendChild(el('div', { style: 'font-size:12px;font-weight:600;color:var(--text-secondary);margin:12px 0 4px;text-transform:uppercase;letter-spacing:0.5px;' }, 'Deductions'));
+          const dt = el('table', { style: 'width:100%;font-size:12px;border-collapse:collapse;' });
+          st.deductions.forEach(d => {
+            const tr = el('tr', { style: 'border-bottom:1px solid var(--border-light);' });
+            tr.appendChild(el('td', { style: 'padding:4px 8px;' }, d.name));
+            tr.appendChild(el('td', { style: 'padding:4px 8px;text-align:right;font-weight:500;color:var(--error);' }, '-' + $(d.amount)));
+            dt.appendChild(tr);
+          });
+          stBody.appendChild(dt);
+        }
+        if (st.file) {
+          stBody.appendChild(el('a', { href: st.file, target: '_blank', style: 'display:inline-block;margin-top:10px;font-size:12px;color:var(--accent);font-weight:500;' }, 'Download PDF'));
+        }
+        stCard.appendChild(stBody);
+        sec.appendChild(stCard);
+      });
+      if (stmts.length > 3) {
+        sec.appendChild(el('p', { style: 'font-size:12px;color:var(--text-muted);' }, '+ ' + (stmts.length - 3) + ' more statements available in API response'));
+      }
+      root.appendChild(sec);
+    }
+
+    // W-2s
+    if (w2s.length > 0) {
+      const sec = el('div', { className: 'result-section' });
+      sec.appendChild(el('h3', {}, 'W-2 Forms'));
+      const table = el('table', { style: 'width:100%;border-collapse:collapse;font-size:13px;' });
+      const thead = el('tr', { style: 'border-bottom:2px solid var(--border);' });
+      ['Year', 'Wages', 'Federal Tax', 'SS Tax', 'Medicare Tax', ''].forEach(h => {
+        thead.appendChild(el('th', { style: 'text-align:left;padding:8px 12px;font-weight:600;color:var(--text-secondary);' }, h));
+      });
+      table.appendChild(thead);
+      w2s.forEach(w => {
+        const tr = el('tr', { style: 'border-bottom:1px solid var(--border-light);' });
+        tr.appendChild(el('td', { style: 'padding:8px 12px;font-weight:600;' }, String(w.year)));
+        tr.appendChild(el('td', { style: 'padding:8px 12px;' }, w.wages ? $(w.wages) : '-'));
+        tr.appendChild(el('td', { style: 'padding:8px 12px;' }, w.federal_tax ? $(w.federal_tax) : '-'));
+        tr.appendChild(el('td', { style: 'padding:8px 12px;' }, w.social_security_tax ? $(w.social_security_tax) : '-'));
+        tr.appendChild(el('td', { style: 'padding:8px 12px;' }, w.medicare_tax ? $(w.medicare_tax) : '-'));
+        const dl = el('td', { style: 'padding:8px 12px;' });
+        if (w.file) dl.appendChild(el('a', { href: w.file, target: '_blank', style: 'color:var(--accent);font-weight:500;font-size:12px;' }, 'PDF'));
+        tr.appendChild(dl);
+        table.appendChild(tr);
+      });
+      sec.appendChild(table);
+      root.appendChild(sec);
+    }
+
+    // Bank Accounts
+    if (bankAccounts.length > 0) {
+      const sec = el('div', { className: 'result-section' });
+      sec.appendChild(el('h3', {}, 'Bank Accounts'));
+      const g = el('div', { className: 'results-grid' });
+      bankAccounts.forEach((ba, i) => {
+        addResultRow(g, 'Account ' + (i + 1), (ba.bank_name || '') + ' \u2022 ' + (ba.account_type === 'C' ? 'Checking' : 'Savings') + ' \u2022 ...' + (ba.account_number || '').slice(-4));
+        addResultRow(g, 'Deposit', (ba.deposit_type === 'A' ? 'Amount: ' : 'Percent: ') + $(ba.deposit_value));
+      });
+      sec.appendChild(g);
+      root.appendChild(sec);
+    }
+  }
+
+  // If no employers found, show basic order info
+  if (employers.length === 0) {
+    const sec = el('div', { className: 'result-section' });
+    sec.appendChild(el('h3', {}, 'Order Details'));
+    const g = el('div', { className: 'results-grid' });
+    addResultRow(g, 'Order ID', data.truv_order_id || state.truvOrderId || '-');
+    addResultRow(g, 'Status', data.status || '-');
+    addResultRow(g, 'Product', raw.verification_type || state.productType || '-');
+    sec.appendChild(g);
+    root.appendChild(sec);
+  }
+
+  // Actions
+  const actions = el('div', { style: 'display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);' });
+  actions.appendChild(el('button', { className: 'btn btn-outline', onclick: refreshOrder }, 'Refresh Data'));
+  actions.appendChild(el('button', { className: 'btn btn-outline', onclick: () => { state.step = 0; state.orderId = null; state.truvOrderId = null; state.bridgeToken = null; state.orderData = null; state.formData = {}; state.bridgeEvents = []; state.apiLogs = []; state.webhooks = []; render(); } }, 'New Application'));
+  if (raw.short_share_url) {
+    actions.appendChild(el('a', { href: raw.short_share_url, target: '_blank', className: 'btn btn-outline', style: 'text-decoration:none;' }, 'Share Link'));
+  }
+  root.appendChild(actions);
+
+  return root;
+}
+
+function addResultRow(grid, label, value) {
+  const row = el('div', { className: 'result-row' });
+  row.appendChild(el('div', { className: 'result-label' }, label));
+  row.appendChild(el('div', { className: 'result-value' }, String(value)));
+  grid.appendChild(row);
+}
+
+async function fetchOrderData() {
+  if (!state.orderId) return;
+  try {
+    const resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId));
+    state.orderData = await resp.json();
+    await fetchLogs();
+    render();
+  } catch (e) { console.error(e); }
+}
+
+async function refreshOrder() {
+  if (!state.orderId) return;
+  state.orderData = null; render();
+  try {
+    await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/refresh', { method: 'POST' });
+    await new Promise(r => setTimeout(r, 1000));
+    await fetchOrderData();
+  } catch (e) { console.error(e); }
+}
+
+// --- SSE ---
+function connectSSE(orderId) {
+  if (state.eventSource) state.eventSource.close();
+  const es = new EventSource(API_BASE + '/api/events/stream?order_id=' + encodeURIComponent(orderId));
+  es.addEventListener('api_call', function(e) { state.apiLogs.push(JSON.parse(e.data)); renderApiPanel(); });
+  es.addEventListener('webhook', function(e) {
+    const whData = JSON.parse(e.data);
+    state.webhooks.push(whData);
+    if (state.step === 2) render(); else renderApiPanel();
+  });
+  es.addEventListener('ping', function() {});
+  state.eventSource = es;
+}
+
+async function fetchLogs() {
+  if (!state.orderId) return;
+  try {
+    const [l, w] = await Promise.all([
+      fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/logs').then(r => r.json()),
+      fetch(API_BASE + '/api/webhooks').then(r => r.json()),
+    ]);
+    state.apiLogs = l; state.webhooks = w;
+  } catch (e) { console.error(e); }
+}
+
+// --- API Panel ---
+let activeTab = 'guide';
+
+function renderApiPanel() {
+  const tabs = document.getElementById('apiPanelTabs');
+  tabs.replaceChildren();
+  const tabDefs = [
+    { key: 'guide', label: 'Guide' },
+    { key: 'api', label: 'API Logs', count: state.apiLogs.length },
+    { key: 'bridge', label: 'Events', count: state.bridgeEvents.length },
+    { key: 'webhooks', label: 'Webhooks', count: state.webhooks.length },
+  ];
+  tabDefs.forEach(t => {
+    const label = t.count ? t.label + ' (' + t.count + ')' : t.label;
+    tabs.appendChild(el('button', { className: 'api-tab' + (activeTab === t.key ? ' active' : ''), onclick: () => { activeTab = t.key; renderApiPanel(); } }, label));
+  });
+
+  const content = document.getElementById('apiTabContent');
+  content.replaceChildren();
+
+  if (activeTab === 'guide') {
+    STEPS.forEach((s, i) => {
+      const block = el('div', { className: 'guide-block' + (i === state.step ? ' ' : ''), style: i === state.step ? 'border:1px solid var(--gold-border);background:var(--gold-light);' : '' });
+      block.appendChild(el('h4', {}, (i + 1) + '. ' + s.title + (i === state.step ? ' (current)' : '')));
+      block.appendChild(el('p', {}, s.guide));
+      content.appendChild(block);
+    });
+  } else if (activeTab === 'api') {
+    if (state.apiLogs.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\u2139\uFE0F'), 'API calls will appear here as you progress'])); return; }
+    state.apiLogs.forEach(log => {
+      const entry = el('div', { className: 'log-entry' });
+      const badge = el('span', { className: 'log-badge ' + (log.method === 'GET' ? 'log-badge-get' : 'log-badge-post') }, log.method);
+      const body = el('div', { className: 'log-body' });
+      if (log.request_body) { const s = el('div', { className: 'log-body-section' }); s.appendChild(el('h5', {}, 'Request')); s.appendChild(el('pre', {}, tryFormat(log.request_body))); body.appendChild(s); }
+      if (log.response_body) { const s = el('div', { className: 'log-body-section' }); s.appendChild(el('h5', {}, 'Response')); s.appendChild(el('pre', {}, tryFormat(log.response_body))); body.appendChild(s); }
+      const header = el('div', { className: 'log-header', onclick: () => body.classList.toggle('open') }, [
+        badge, el('span', { className: 'log-endpoint' }, log.endpoint),
+        el('span', { className: 'log-meta' }, (log.status_code ? log.status_code + ' ' : '') + (log.duration_ms ? log.duration_ms + 'ms' : '')),
+      ]);
+      entry.appendChild(header);
+      entry.appendChild(body);
+      content.appendChild(entry);
+    });
+  } else if (activeTab === 'bridge') {
+    if (state.bridgeEvents.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\u26A1'), 'Bridge events will appear here during verification'])); return; }
+    state.bridgeEvents.forEach(ev => {
+      const entry = el('div', { className: 'wh-entry' });
+      const header = el('div', { className: 'wh-header', onclick: function() { const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none'; } });
+      header.appendChild(el('span', { className: 'wh-type' }, ev.type));
+      if (ev.data && ev.data.eventType) header.appendChild(el('span', { className: 'wh-status', style: 'background:var(--accent-subtle);color:var(--accent);' }, ev.data.eventType));
+      header.appendChild(el('span', { className: 'wh-time' }, ev.timestamp ? ev.timestamp.split('T')[1].split('.')[0] : ''));
+      entry.appendChild(header);
+      const body = el('div', { className: 'wh-body' });
+      body.appendChild(el('pre', {}, JSON.stringify(ev.data || {}, null, 2)));
+      entry.appendChild(body);
+      content.appendChild(entry);
+    });
+  } else {
+    // Webhooks tab
+    if (state.tunnelUrl) {
+      const info = el('div', { className: 'tunnel-info' });
+      info.appendChild(el('span', {}, 'Webhook URL:'));
+      info.appendChild(el('a', { href: state.tunnelUrl, target: '_blank' }, state.tunnelUrl));
+      content.appendChild(info);
+    }
+    if (state.webhooks.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\uD83D\uDD14'), 'Webhook events will appear here in real time'])); return; }
+    state.webhooks.forEach(w => {
+      const payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+      const eventType = payload.event_type || w.event_type || 'unknown';
+      const status = payload.status || w.status || '';
+      const ts = payload.event_created_at || payload.updated_at || '';
+      const timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
+      const statusColors = { pending: '#f59e0b', sent: '#3b82f6', completed: '#059669', done: '#059669', failed: '#ef4444' };
+      const sc = statusColors[status] || '#6b7280';
+
+      const entry = el('div', { className: 'wh-entry' });
+      const header = el('div', { className: 'wh-header', onclick: function() { const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none'; } });
+      header.appendChild(el('span', { className: 'wh-type' }, eventType));
+      if (status) header.appendChild(el('span', { className: 'wh-status', style: 'background:' + sc + '18;color:' + sc + ';' }, status));
+      header.appendChild(el('span', { className: 'wh-time' }, timeStr));
+      entry.appendChild(header);
+
+      const body = el('div', { className: 'wh-body' });
+      body.appendChild(el('pre', {}, JSON.stringify(payload, null, 2)));
+      entry.appendChild(body);
+      content.appendChild(entry);
+    });
+  }
+}
+
+function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return String(s); } }
+
+// --- Init ---
+fetch(API_BASE + '/api/config').then(r => r.json()).then(d => { state.productType = d.product_type; render(); }).catch(() => {});
+fetch(API_BASE + '/api/tunnel-url').then(r => r.json()).then(d => { state.tunnelUrl = d.url; renderApiPanel(); }).catch(() => {});
+render();
+</script>
+</body>
+</html>
