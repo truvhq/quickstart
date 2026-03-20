@@ -11,7 +11,7 @@ import { createSseHandler } from '../shared/sse.js';
 import { setupWebhook, teardownWebhook } from '../shared/webhook-setup.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE = 'income' } = process.env;
+const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE, TEMPLATE_ID } = process.env;
 
 if (!API_CLIENT_ID || !API_SECRET) {
   console.error('Missing API_CLIENT_ID or API_SECRET in .env');
@@ -48,6 +48,7 @@ app.post('/api/orders', async (req, res) => {
       phone: data.phone,
       ssn: data.ssn,
       product_type: data.product_type || API_PRODUCT_TYPE,
+      template_id: TEMPLATE_ID,
     };
 
     const result = await truv.createOrder(params);
@@ -60,6 +61,7 @@ app.post('/api/orders', async (req, res) => {
     db.createOrder({
       orderId,
       truvOrderId: truvData.id,
+      userId: truvData.user_id,
       demoId: 'application',
       bridgeToken: truvData.bridge_token,
       shareUrl: truvData.share_url,
@@ -168,14 +170,17 @@ app.post('/api/webhooks/truv', (req, res) => {
   console.log(`TRUV: Webhook received (sig_match=${sigMatch})`, JSON.stringify(req.body));
 
   const payload = req.body;
-  const truvOrderId = payload.order_id;
 
+  // Match webhook to order by user_id (present in all webhook types)
   let orderId = null;
-  if (truvOrderId) {
-    const order = db.findOrderByTruvId(truvOrderId);
+  const userId = payload.user_id;
+  if (userId) {
+    const order = db.findOrderByUserId(userId);
     if (order) {
       orderId = order.id;
-      if (payload.status) db.updateOrder(orderId, { status: payload.status });
+      if (payload.status === 'completed' && payload.event_type === 'order-status-updated') {
+        db.updateOrder(orderId, { status: 'completed' });
+      }
     }
   }
 

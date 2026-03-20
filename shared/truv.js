@@ -86,6 +86,7 @@ export class TruvClient {
 
     if (params.phone) payload.phone = params.phone;
     if (params.ssn) payload.social_security_number = params.ssn;
+    if (params.template_id) payload.template_id = params.template_id;
 
     if (['deposit_switch', 'pll', 'employment', 'income', 'assets'].includes(productType)) {
       payload.employers = [{ company_name: 'Home Depot' }];

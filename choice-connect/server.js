@@ -11,7 +11,7 @@ import { createSseHandler } from '../shared/sse.js';
 import { setupWebhook, teardownWebhook } from '../shared/webhook-setup.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE = 'income' } = process.env;
+const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE, TEMPLATE_ID } = process.env;
 
 if (!API_CLIENT_ID || !API_SECRET) {
   console.error('Missing API_CLIENT_ID or API_SECRET in .env');

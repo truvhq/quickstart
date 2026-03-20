@@ -23,6 +23,7 @@ export function initDb() {
     CREATE TABLE IF NOT EXISTS orders (
       id TEXT PRIMARY KEY,
       truv_order_id TEXT,
+      user_id TEXT,
       demo_id TEXT,
       bridge_token TEXT,
       share_url TEXT,
@@ -72,11 +73,11 @@ export function generateId() {
 
 // --- Orders ---
 
-export function createOrder({ orderId, truvOrderId, demoId, bridgeToken, shareUrl, status = 'created', rawResponse }) {
+export function createOrder({ orderId, truvOrderId, userId, demoId, bridgeToken, shareUrl, status = 'created', rawResponse }) {
   const conn = getDb();
   conn.prepare(
-    'INSERT INTO orders (id, truv_order_id, demo_id, bridge_token, share_url, status, raw_response) VALUES (?, ?, ?, ?, ?, ?, ?)'
-  ).run(orderId, truvOrderId || null, demoId || null, bridgeToken || null, shareUrl || null, status, rawResponse ? JSON.stringify(rawResponse) : null);
+    'INSERT INTO orders (id, truv_order_id, user_id, demo_id, bridge_token, share_url, status, raw_response) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+  ).run(orderId, truvOrderId || null, userId || null, demoId || null, bridgeToken || null, shareUrl || null, status, rawResponse ? JSON.stringify(rawResponse) : null);
   return conn.prepare('SELECT * FROM orders WHERE id = ?').get(orderId);
 }
 
@@ -98,6 +99,10 @@ export function updateOrder(orderId, fields) {
 
 export function findOrderByTruvId(truvOrderId) {
   return getDb().prepare('SELECT * FROM orders WHERE truv_order_id = ?').get(truvOrderId) || null;
+}
+
+export function findOrderByUserId(userId) {
+  return getDb().prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 1').get(userId) || null;
 }
 
 // --- API Logs ---

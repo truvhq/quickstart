@@ -78,10 +78,12 @@ export function unsubscribe(orderId, callback) {
 }
 
 function publish(orderId, eventType, data) {
-  if (!orderId) return;
-  const subs = subscribers.get(orderId);
-  if (!subs) return;
-  for (const cb of subs) {
-    try { cb({ event: eventType, data }); } catch { /* ignore */ }
+  // Publish to order-specific subscribers
+  if (orderId) {
+    const subs = subscribers.get(orderId);
+    if (subs) for (const cb of subs) { try { cb({ event: eventType, data }); } catch { /* ignore */ } }
   }
+  // Publish to global subscribers (for unfiltered webhook feeds)
+  const globalSubs = subscribers.get('*');
+  if (globalSubs) for (const cb of globalSubs) { try { cb({ event: eventType, data }); } catch { /* ignore */ } }
 }

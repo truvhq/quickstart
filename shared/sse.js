@@ -2,8 +2,7 @@ import * as apiLogger from './api-logger.js';
 
 export function createSseHandler() {
   return (req, res) => {
-    const orderId = req.query.order_id;
-    if (!orderId) return res.status(400).json({ error: 'order_id required' });
+    const orderId = req.query.order_id || '*';
 
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',

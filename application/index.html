@@ -82,7 +82,7 @@
     .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
 
     /* Bridge */
-    .bridge-wrapper { width: 100%; height: 100vh; border: none; border-radius: 0; overflow: hidden; position: relative; background: #fff; }
+    .bridge-wrapper { width: 100%; height: 100%; border: none; border-radius: 0; overflow: hidden; position: relative; background: #fff; zoom: 0.85; }
     .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
 
     /* Waiting state */
@@ -149,9 +149,17 @@
     .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
     .empty-state .empty-icon { font-size: 32px; margin-bottom: 12px; display: block; }
 
-    .guide-block { margin-bottom: 20px; padding: 16px; background: var(--border-light); border-radius: var(--radius-sm); }
-    .guide-block h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-    .guide-block p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .guide-block { margin-bottom: 12px; padding: 16px; background: var(--border-light); border-radius: var(--radius-sm); }
+    .guide-block h4 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+    .guide-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+    .guide-detail p { margin: 8px 0; }
+    .guide-detail pre { background: #1a1a2e; color: #e2e8f0; padding: 10px 12px; border-radius: 6px; font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; overflow-x: auto; white-space: pre; margin: 8px 0; line-height: 1.5; }
+    .guide-detail code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; }
+    .guide-detail pre code { background: none; padding: 0; }
+    .guide-detail ul, .guide-detail ol { margin: 8px 0; padding-left: 20px; }
+    .guide-detail li { margin: 4px 0; }
+    .guide-detail h5 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin: 12px 0 4px; }
+    .guide-detail a { color: var(--accent); font-weight: 500; }
 
     .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
 
@@ -178,10 +186,89 @@
 <script>
 const API_BASE = window.location.origin;
 const STEPS = [
-  { title: 'Tell us about yourself', guide: 'Collect applicant info. The backend calls POST /v1/orders/ to create a verification order and get a bridge_token.' },
-  { title: 'Complete verification', guide: 'The Truv Bridge widget opens inline. Complete verification with sandbox credentials: goodlogin / goodpassword.' },
-  { title: 'Processing', guide: 'Waiting for Truv to process the verification. The server receives real-time webhook events as the order progresses.' },
-  { title: 'Results', guide: 'The backend calls GET /v1/orders/{id}/ to retrieve verified data. Review income, employment, and identity details.' },
+  {
+    title: 'Collect applicant info',
+    summary: 'Create an order via POST /v1/orders/',
+    guide: `
+      <p>The form collects applicant PII and sends it to your backend. The server calls:</p>
+      <pre>POST /v1/orders/
+{
+  "first_name": "...",
+  "last_name": "...",
+  "products": ["income"],
+  "employers": [{ "company_name": "Home Depot" }]
+}</pre>
+      <p>The response contains a <code>bridge_token</code> used to initialize the Bridge widget, and an order <code>id</code> for polling results.</p>
+      <h5>Key fields</h5>
+      <ul>
+        <li><code>bridge_token</code> — single-use token to open Bridge</li>
+        <li><code>user_id</code> — identifies the user across webhooks</li>
+        <li><code>share_url</code> — shareable link for the applicant</li>
+        <li><code>template_id</code> — optional, for branded experience</li>
+      </ul>
+      <p><a href="https://docs.truv.com/reference/create-an-order" target="_blank">API Reference →</a></p>
+    `,
+  },
+  {
+    title: 'Bridge verification',
+    summary: 'Applicant connects payroll via TruvBridge widget',
+    guide: `
+      <p>The Bridge widget is initialized with:</p>
+      <pre>TruvBridge.init({
+  bridgeToken: "...",
+  isOrder: true,
+  position: { type: "inline", container: el }
+})</pre>
+      <p>Bridge fires events as the user progresses:</p>
+      <ul>
+        <li><code>onLoad</code> — widget ready</li>
+        <li><code>onEvent(LOAD, OPEN, LINK_CREATED, ...)</code> — user actions</li>
+        <li><code>onEvent(COMPLETED, source: "order")</code> — verification done</li>
+        <li><code>onSuccess</code> / <code>onClose</code> — final callbacks</li>
+      </ul>
+      <p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p>
+      <p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs →</a></p>
+    `,
+  },
+  {
+    title: 'Webhook processing',
+    summary: 'Receive real-time webhook events from Truv',
+    guide: `
+      <p>Truv sends webhooks to your registered URL as the verification progresses. Events arrive in this order:</p>
+      <ol>
+        <li><code>order-created</code> — order is pending</li>
+        <li><code>task-status-updated</code> — login → parse → full_parse → done</li>
+        <li><code>link-connected</code> — payroll link established</li>
+        <li><code>profile-created</code>, <code>employment-created</code>, <code>statements-created</code>, <code>bank-accounts-created</code></li>
+        <li><code>order-status-updated</code> (status: completed) — all done</li>
+      </ol>
+      <p>All webhooks include <code>user_id</code> for matching. Verify the <code>X-Webhook-Sign</code> header with HMAC-SHA256.</p>
+      <pre>const sig = crypto
+  .createHmac('sha256', API_SECRET)
+  .update(rawBody)
+  .digest('hex');</pre>
+      <p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs →</a></p>
+    `,
+  },
+  {
+    title: 'Retrieve results',
+    summary: 'Fetch verified data via GET /v1/orders/{id}/',
+    guide: `
+      <p>Once the order is completed, fetch the full results:</p>
+      <pre>GET /v1/orders/{order_id}/</pre>
+      <p>The response includes nested <code>employers[]</code> with:</p>
+      <ul>
+        <li><strong>Profile</strong> — name, SSN, DOB, address</li>
+        <li><strong>Employment</strong> — title, start date, income, manager</li>
+        <li><strong>Pay Statements</strong> — gross/net pay, earnings, deductions per period</li>
+        <li><strong>W-2 Forms</strong> — annual wages and tax withholdings</li>
+        <li><strong>Bank Accounts</strong> — direct deposit routing info</li>
+        <li><strong>Annual Income Summary</strong> — aggregated by year</li>
+      </ul>
+      <p>You can also call <code>POST /v1/orders/{id}/refresh/</code> to re-pull data from the payroll provider.</p>
+      <p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference →</a></p>
+    `,
+  },
 ];
 
 let state = {
@@ -226,8 +313,6 @@ function goStep(n) { state.step = n; render(); }
 function render() {
   const appPanel = document.querySelector('.app-panel');
   appPanel.className = state.step === 1 ? 'app-panel no-pad' : 'app-panel';
-  const apiPanel = document.querySelector('.api-panel');
-  apiPanel.className = state.step === 1 ? 'api-panel hidden' : 'api-panel';
   const panel = document.getElementById('appPanel');
   panel.replaceChildren();
   panel.className = state.step === 0 ? 'app-content' : 'app-content full-width';
@@ -244,7 +329,7 @@ function render() {
 function buildFormScreen() {
   const card = el('div');
   card.appendChild(el('h2', {}, 'Tell us about yourself'));
-  card.appendChild(el('p', { className: 'subtitle' }, 'We need a few details to verify your identity and employment. This information is transmitted securely.'));
+  card.appendChild(el('p', { className: 'subtitle' }, 'Enter applicant details to create a verification order. The backend sends these to the Truv Orders API.'));
 
   card.appendChild(el('div', { className: 'form-row form-row-2' }, [
     el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'First name'), el('input', { className: 'form-input', id: 'firstName', value: state.formData.first_name || '', placeholder: 'Joe' })]),
@@ -278,7 +363,7 @@ async function handleSubmit() {
   if (!state.agreed) return;
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.replaceChildren(el('span', { className: 'spinner-sm' }), document.createTextNode(' Creating order...'));
+  btn.replaceChildren(el('span', { className: 'spinner-sm' }));
 
   state.formData = {
     first_name: document.getElementById('firstName').value || undefined,
@@ -355,7 +440,7 @@ function buildWaitingScreen() {
 
   if (state.webhooks.length > 0) {
     const feed = el('div', { style: 'text-align:left;width:100%;max-width:420px;' });
-    state.webhooks.forEach(w => {
+    [...state.webhooks].reverse().forEach(w => {
       const payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
       const eventType = payload.event_type || w.event_type || 'unknown';
       const status = payload.status || w.status || '';
@@ -610,12 +695,9 @@ function buildResultsScreen() {
   }
 
   // Actions
-  const actions = el('div', { style: 'display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);' });
+  const actions = el('div', { style: 'display:flex;gap:12px;margin-top:24px;padding-top:20px;padding-bottom:48px;border-top:1px solid var(--border);' });
   actions.appendChild(el('button', { className: 'btn btn-outline', onclick: refreshOrder }, 'Refresh Data'));
   actions.appendChild(el('button', { className: 'btn btn-outline', onclick: () => { state.step = 0; state.orderId = null; state.truvOrderId = null; state.bridgeToken = null; state.orderData = null; state.formData = {}; state.bridgeEvents = []; state.apiLogs = []; state.webhooks = []; render(); } }, 'New Application'));
-  if (raw.short_share_url) {
-    actions.appendChild(el('a', { href: raw.short_share_url, target: '_blank', className: 'btn btn-outline', style: 'text-decoration:none;' }, 'Share Link'));
-  }
   root.appendChild(actions);
 
   return root;
@@ -651,15 +733,27 @@ async function refreshOrder() {
 // --- SSE ---
 function connectSSE(orderId) {
   if (state.eventSource) state.eventSource.close();
+  // Order-specific stream for API logs
   const es = new EventSource(API_BASE + '/api/events/stream?order_id=' + encodeURIComponent(orderId));
   es.addEventListener('api_call', function(e) { state.apiLogs.push(JSON.parse(e.data)); renderApiPanel(); });
-  es.addEventListener('webhook', function(e) {
+  es.addEventListener('ping', function() {});
+  state.eventSource = es;
+}
+
+// Global SSE stream for all webhooks (unfiltered)
+let globalEs = null;
+function connectGlobalSSE() {
+  if (globalEs) return;
+  const seenIds = new Set(state.webhooks.map(w => w.id));
+  globalEs = new EventSource(API_BASE + '/api/events/stream');
+  globalEs.addEventListener('webhook', function(e) {
     const whData = JSON.parse(e.data);
+    if (seenIds.has(whData.id)) return;
+    seenIds.add(whData.id);
     state.webhooks.push(whData);
     if (state.step === 2) render(); else renderApiPanel();
   });
-  es.addEventListener('ping', function() {});
-  state.eventSource = es;
+  globalEs.addEventListener('ping', function() {});
 }
 
 async function fetchLogs() {
@@ -695,10 +789,21 @@ function renderApiPanel() {
 
   if (activeTab === 'guide') {
     STEPS.forEach((s, i) => {
-      const block = el('div', { className: 'guide-block' + (i === state.step ? ' ' : ''), style: i === state.step ? 'border:1px solid var(--gold-border);background:var(--gold-light);' : '' });
-      block.appendChild(el('h4', {}, (i + 1) + '. ' + s.title + (i === state.step ? ' (current)' : '')));
-      block.appendChild(el('p', {}, s.guide));
-      content.appendChild(block);
+      if (i === state.step) {
+        const block = el('div', { className: 'guide-block', style: 'border:1px solid var(--gold-border);background:var(--gold-light);' });
+        block.appendChild(el('h4', { style: 'color:var(--accent);' }, (i + 1) + '. ' + s.title));
+        const body = el('div', { className: 'guide-detail' });
+        // Guide HTML is static/hardcoded, not user-supplied
+        body.innerHTML = s.guide; // eslint-disable-line
+        block.appendChild(body);
+        content.appendChild(block);
+      } else {
+        const cls = i < state.step ? 'color:var(--success);' : 'color:var(--text-muted);';
+        const line = el('div', { style: 'padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border-light);' });
+        line.appendChild(el('span', { style: 'font-weight:600;' + cls }, (i < state.step ? '\u2713 ' : '') + (i + 1) + '. ' + s.title));
+        line.appendChild(el('span', { style: 'margin-left:auto;font-size:12px;color:var(--text-muted);' }, s.summary));
+        content.appendChild(line);
+      }
     });
   } else if (activeTab === 'api') {
     if (state.apiLogs.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\u2139\uFE0F'), 'API calls will appear here as you progress'])); return; }
@@ -718,12 +823,12 @@ function renderApiPanel() {
     });
   } else if (activeTab === 'bridge') {
     if (state.bridgeEvents.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\u26A1'), 'Bridge events will appear here during verification'])); return; }
-    state.bridgeEvents.forEach(ev => {
+    [...state.bridgeEvents].reverse().forEach(ev => {
       const entry = el('div', { className: 'wh-entry' });
       const header = el('div', { className: 'wh-header', onclick: function() { const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none'; } });
       header.appendChild(el('span', { className: 'wh-type' }, ev.type));
       if (ev.data && ev.data.eventType) header.appendChild(el('span', { className: 'wh-status', style: 'background:var(--accent-subtle);color:var(--accent);' }, ev.data.eventType));
-      header.appendChild(el('span', { className: 'wh-time' }, ev.timestamp ? ev.timestamp.split('T')[1].split('.')[0] : ''));
+      header.appendChild(el('span', { className: 'wh-time' }, ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : ''));
       entry.appendChild(header);
       const body = el('div', { className: 'wh-body' });
       body.appendChild(el('pre', {}, JSON.stringify(ev.data || {}, null, 2)));
@@ -739,11 +844,11 @@ function renderApiPanel() {
       content.appendChild(info);
     }
     if (state.webhooks.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\uD83D\uDD14'), 'Webhook events will appear here in real time'])); return; }
-    state.webhooks.forEach(w => {
+    [...state.webhooks].reverse().forEach(w => {
       const payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
       const eventType = payload.event_type || w.event_type || 'unknown';
       const status = payload.status || w.status || '';
-      const ts = payload.event_created_at || payload.updated_at || '';
+      const ts = payload.event_created_at || payload.updated_at || w.received_at || '';
       const timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
       const statusColors = { pending: '#f59e0b', sent: '#3b82f6', completed: '#059669', done: '#059669', failed: '#ef4444' };
       const sc = statusColors[status] || '#6b7280';
@@ -768,6 +873,7 @@ function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } c
 // --- Init ---
 fetch(API_BASE + '/api/config').then(r => r.json()).then(d => { state.productType = d.product_type; render(); }).catch(() => {});
 fetch(API_BASE + '/api/tunnel-url').then(r => r.json()).then(d => { state.tunnelUrl = d.url; renderApiPanel(); }).catch(() => {});
+connectGlobalSSE();
 render();
 </script>
 </body>
