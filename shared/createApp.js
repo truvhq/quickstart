@@ -33,6 +33,11 @@ export function createApp({ dirName, demoId, port, webhookMatch = 'user_id', jso
   }));
   app.use(cors());
 
+  // Serve shared frontend assets
+  const sharedDir = path.resolve(dirName, '..', 'shared');
+  app.get('/shared/styles.css', (_req, res) => res.sendFile(path.join(sharedDir, 'styles.css')));
+  app.get('/shared/panel.js', (_req, res) => res.sendFile(path.join(sharedDir, 'panel.js')));
+
   // Serve index.html
   app.get('/', (_req, res) => res.sendFile(path.join(dirName, 'index.html')));
 

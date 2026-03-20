@@ -5,38 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Truv Quickstart — Follow-up</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="/shared/styles.css" />
   <script src="https://cdn.truv.com/bridge.js"></script>
   <style>
-    :root {
-      --primary: #4169E1; --primary-light: #E8EDFF; --primary-hover: #3458c7;
-      --text: #1A1A1A; --text-secondary: #666; --text-muted: #999;
-      --bg: #F5F5F5; --bg-white: #fff; --bg-input: #F8F9FA;
-      --border: #E5E7EB; --border-light: #F0F1F3;
-      --success: #16a34a; --success-bg: #f0fdf4;
-      --warning: #d97706; --warning-bg: #fffbeb;
-      --error: #dc2626; --error-bg: #fef2f2;
-      --radius: 12px; --radius-sm: 8px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    .header { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
+    /* Header sub-components (not in shared CSS) */
     .header-left { display: flex; align-items: center; gap: 12px; }
     .header-logo { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; }
     .header-title { font-size: 16px; font-weight: 600; }
     .header-badge { font-size: 12px; color: var(--text-secondary); background: var(--bg-input); padding: 4px 10px; border-radius: 12px; }
-    .main-layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
-    .app-panel { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: center; }
-    .api-panel { flex: 1; border-left: 1px solid var(--border); background: var(--bg-white); display: flex; flex-direction: column; overflow: hidden; }
-    .screen-container { width: 100%; max-width: 560px; }
-    .screen-card { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); padding: 32px; }
-    .screen-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-    .screen-card .desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; gap: 8px; }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-sm { padding: 6px 14px; font-size: 13px; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Task cards */
     .task-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; background: var(--bg-white); }
     .task-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
     .task-icon.employment { background: #dbeafe; }
@@ -46,39 +24,11 @@
     .task-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
     .task-desc { font-size: 12px; color: var(--text-secondary); }
     .task-status { flex-shrink: 0; }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .badge-pending { background: var(--warning-bg); color: var(--warning); }
-    .badge-completed { background: var(--success-bg); color: var(--success); }
-    .badge-get { background: #dbeafe; color: #1d4ed8; }
-    .badge-post { background: #dcfce7; color: #166534; }
+
+    /* Bridge embed */
     .bridge-wrapper { width: 100%; height: 700px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; position: relative; background: #fff; margin-top: 16px; }
     .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
     .bridge-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-secondary); font-size: 14px; }
-    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; margin-bottom: 16px; }
-    .back-link:hover { color: var(--primary); }
-    .api-panel-tabs { display: flex; border-bottom: 1px solid var(--border); }
-    .api-panel-tabs button { flex: 1; padding: 12px 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: inherit; }
-    .api-panel-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); }
-    .api-tab-content { flex: 1; overflow-y: auto; padding: 16px; }
-    .api-log-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; overflow: hidden; }
-    .api-log-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; background: var(--bg-input); }
-    .api-log-header:hover { background: var(--border-light); }
-    .api-log-endpoint { flex: 1; font-family: monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .api-log-meta { display: flex; gap: 8px; font-size: 11px; color: var(--text-muted); }
-    .api-log-body { padding: 10px; border-top: 1px solid var(--border-light); display: none; }
-    .api-log-body.open { display: block; }
-    .api-log-body pre { font-size: 11px; font-family: monospace; background: var(--bg-input); padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
-    .api-log-body h5 { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .api-log-body h5 + pre { margin-bottom: 10px; }
-    .bridge-event { padding: 8px 10px; border-left: 3px solid var(--primary); margin-bottom: 6px; background: var(--bg-input); border-radius: 0 6px 6px 0; font-size: 12px; }
-    .bridge-event .be-type { font-weight: 600; color: var(--primary); }
-    .bridge-event .be-time { float: right; color: var(--text-muted); font-size: 11px; }
-    .bridge-event .be-data { margin-top: 4px; color: var(--text-secondary); font-family: monospace; font-size: 11px; }
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
-    .hidden { display: none !important; }
-    @media (max-width: 900px) { .api-panel { display: none; } }
   </style>
 </head>
 <body>
@@ -93,75 +43,53 @@
 
 <div class="main-layout">
   <div class="app-panel" id="appPanel"></div>
-  <div class="api-panel" id="apiPanel">
-    <div class="api-panel-tabs" id="apiPanelTabs"></div>
-    <div class="api-tab-content" id="apiTabContent"></div>
-  </div>
+  <div id="apiPanel" class="api-panel"></div>
 </div>
 
+<script src="/shared/panel.js"></script>
 <script>
-const API_BASE = window.location.origin;
+var panel = new QuickstartPanel({ tabs: ['api', 'bridge', 'webhooks'] });
 
-const TASKS = [
+var TASKS = [
   { id: 'documents', name: 'Upload Documents', desc: 'Verify employment documents', product: 'employment', icon: '\uD83D\uDCC4', iconClass: 'employment' },
   { id: 'income', name: 'Verify Income', desc: 'Confirm income and pay history', product: 'income', icon: '\uD83D\uDCB0', iconClass: 'income' },
   { id: 'assets', name: 'Verify Assets', desc: 'Confirm asset accounts', product: 'assets', icon: '\uD83C\uDFE6', iconClass: 'assets' },
   { id: 'identity', name: 'Verify Identity', desc: 'Confirm identity via employer records', product: 'employment', icon: '\uD83D\uDD10', iconClass: 'employment' },
 ];
 
-let state = {
-  screen: 'tasks', // 'tasks' or 'bridge'
+var state = {
+  screen: 'tasks',
   activeTask: null,
-  taskStatus: {},  // taskId -> 'pending' | 'completed'
-  orderId: null, bridgeToken: null,
-  bridgeEvents: [], apiLogs: [], webhooks: [],
-  eventSource: null,
+  taskStatus: {},
+  orderId: null,
+  bridgeToken: null,
 };
 
 // Initialize all tasks as pending
-TASKS.forEach(t => { state.taskStatus[t.id] = 'pending'; });
-
-function el(tag, attrs, children) {
-  const node = document.createElement(tag);
-  if (attrs) for (const [k, v] of Object.entries(attrs)) {
-    if (k === 'className') node.className = v;
-    else if (k === 'onclick') node.addEventListener('click', v);
-    else if (k === 'style' && typeof v === 'string') node.setAttribute('style', v);
-    else if (k === 'disabled') node.disabled = v;
-    else if (k === 'id') node.id = v;
-    else node.setAttribute(k, v);
-  }
-  if (children != null) {
-    if (Array.isArray(children)) children.forEach(c => { if (c != null) node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
-    else if (typeof children === 'string') node.textContent = children;
-    else node.appendChild(children);
-  }
-  return node;
-}
+TASKS.forEach(function (t) { state.taskStatus[t.id] = 'pending'; });
 
 function render() {
-  const panel = document.getElementById('appPanel');
-  panel.replaceChildren();
-  const sc = el('div', { className: 'screen-container' });
+  var appPanel = document.getElementById('appPanel');
+  appPanel.replaceChildren();
+  var sc = el('div', { className: 'screen-container' });
 
   if (state.screen === 'tasks') sc.appendChild(buildTaskList());
   else sc.appendChild(buildBridgeScreen());
 
-  panel.appendChild(sc);
-  renderApiPanel();
+  appPanel.appendChild(sc);
 }
 
 // --- Task List ---
 function buildTaskList() {
-  const card = el('div', { className: 'screen-card' });
-  card.appendChild(el('h2', {}, 'Complete Your Application'));
+  var card = el('div', { className: 'screen-card' });
+  card.appendChild(el('h2', null, 'Complete Your Application'));
   card.appendChild(el('p', { className: 'desc' }, 'You have pending tasks to finish your application. Complete each verification step below.'));
 
-  TASKS.forEach(task => {
-    const status = state.taskStatus[task.id];
-    const isCompleted = status === 'completed';
+  TASKS.forEach(function (task) {
+    var status = state.taskStatus[task.id];
+    var isCompleted = status === 'completed';
 
-    const taskCard = el('div', { className: 'task-card' });
+    var taskCard = el('div', { className: 'task-card' });
     taskCard.appendChild(el('div', { className: 'task-icon ' + task.iconClass }, task.icon));
     taskCard.appendChild(el('div', { className: 'task-info' }, [
       el('div', { className: 'task-name' }, task.name),
@@ -169,9 +97,9 @@ function buildTaskList() {
     ]));
 
     if (isCompleted) {
-      taskCard.appendChild(el('span', { className: 'badge badge-completed' }, 'Completed'));
+      taskCard.appendChild(el('span', { className: 'badge badge-success' }, 'Completed'));
     } else {
-      taskCard.appendChild(el('button', { className: 'btn btn-primary btn-sm', onclick: () => startTask(task) }, 'Start'));
+      taskCard.appendChild(el('button', { className: 'btn btn-primary btn-sm', onclick: function () { startTask(task); } }, 'Start'));
     }
 
     card.appendChild(taskCard);
@@ -182,41 +110,41 @@ function buildTaskList() {
 
 async function startTask(task) {
   state.activeTask = task;
-  state.bridgeEvents = [];
 
   try {
-    const resp = await fetch(API_BASE + '/api/orders', {
+    var resp = await fetch(API_BASE + '/api/orders', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ product_type: task.product }),
     });
-    const data = await resp.json();
+    var data = await resp.json();
     if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); return; }
 
     state.orderId = data.order_id;
     state.bridgeToken = data.bridge_token;
-    connectSSE(state.orderId);
+    panel.connectSSE(state.orderId);
+    panel.fetchLogs(state.orderId);
     state.screen = 'bridge';
     render();
   } catch (e) { console.error(e); }
 }
 
 // --- Bridge ---
-let bridgeInstance = null;
+var bridgeInstance = null;
 
 function buildBridgeScreen() {
-  const task = state.activeTask;
-  const card = el('div', { className: 'screen-card' });
+  var task = state.activeTask;
+  var card = el('div', { className: 'screen-card' });
 
   card.appendChild(el('div', { className: 'back-link', onclick: returnToTasks }, [
-    el('span', {}, '\u2190'),
-    el('span', {}, 'Back to tasks'),
+    el('span', null, '\u2190'),
+    el('span', null, 'Back to tasks'),
   ]));
 
-  card.appendChild(el('h2', {}, task.name));
+  card.appendChild(el('h2', null, task.name));
   card.appendChild(el('p', { className: 'desc' }, 'Use sandbox credentials: goodlogin / goodpassword'));
 
-  const wrapper = el('div', { className: 'bridge-wrapper', id: 'bridgeContainer' });
-  wrapper.appendChild(el('div', { className: 'bridge-loading' }, [el('div', { className: 'spinner' }), el('span', {}, 'Loading Bridge...')]));
+  var wrapper = el('div', { className: 'bridge-wrapper', id: 'bridgeContainer' });
+  wrapper.appendChild(el('div', { className: 'bridge-loading' }, [el('div', { className: 'spinner' }), el('span', null, 'Loading Bridge...')]));
   card.appendChild(wrapper);
 
   setTimeout(initBridge, 100);
@@ -229,20 +157,20 @@ function initBridge() {
     bridgeToken: state.bridgeToken,
     isOrder: true,
     position: { type: 'inline', container: document.getElementById('bridgeContainer') },
-    onLoad: function() {
-      addBridgeEvent('onLoad', null);
-      const l = document.querySelector('.bridge-loading');
+    onLoad: function () {
+      panel.addBridgeEvent('onLoad', null);
+      var l = document.querySelector('.bridge-loading');
       if (l) l.style.display = 'none';
     },
-    onEvent: function(eventType, payload, source) {
-      addBridgeEvent('onEvent', { eventType, source });
+    onEvent: function (eventType, payload, source) {
+      panel.addBridgeEvent('onEvent', { eventType: eventType, source: source });
       if (source === 'order' && eventType === 'COMPLETED') {
         state.taskStatus[state.activeTask.id] = 'completed';
         setTimeout(returnToTasks, 2000);
       }
     },
-    onSuccess: function() { addBridgeEvent('onSuccess', null); },
-    onClose: function() { addBridgeEvent('onClose', null); },
+    onSuccess: function () { panel.addBridgeEvent('onSuccess', null); },
+    onClose: function () { panel.addBridgeEvent('onClose', null); },
   });
   if (bridgeInstance) bridgeInstance.open();
 }
@@ -254,81 +182,6 @@ function returnToTasks() {
   state.bridgeToken = null;
   render();
 }
-
-function addBridgeEvent(type, data) { state.bridgeEvents.push({ type, data, timestamp: new Date().toISOString() }); renderApiPanel(); }
-
-// --- SSE ---
-function connectSSE(orderId) {
-  if (state.eventSource) state.eventSource.close();
-  const es = new EventSource(API_BASE + '/api/events/stream?order_id=' + encodeURIComponent(orderId));
-  es.addEventListener('api_call', function(e) { state.apiLogs.push(JSON.parse(e.data)); renderApiPanel(); });
-  es.addEventListener('webhook', function(e) { state.webhooks.push(JSON.parse(e.data)); renderApiPanel(); });
-  es.addEventListener('ping', function() {});
-  state.eventSource = es;
-}
-
-// --- API Panel ---
-let activeTab = 'api';
-
-function renderApiPanel() {
-  const tabs = document.getElementById('apiPanelTabs');
-  tabs.replaceChildren();
-  ['api', 'bridge', 'webhooks'].forEach((name, i) => {
-    const label = ['API Logs', 'Events', 'Webhooks'][i];
-    tabs.appendChild(el('button', { className: activeTab === name ? 'active' : '', onclick: () => { activeTab = name; renderApiPanel(); } }, label));
-  });
-
-  const content = document.getElementById('apiTabContent');
-  content.replaceChildren();
-
-  if (activeTab === 'api') {
-    if (state.apiLogs.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, 'No API calls yet')); return; }
-    state.apiLogs.forEach(log => {
-      const entry = el('div', { className: 'api-log-entry' });
-      const badge = el('span', { className: 'badge ' + (log.method === 'GET' ? 'badge-get' : 'badge-post') }, log.method);
-      const body = el('div', { className: 'api-log-body' });
-      if (log.request_body) { body.appendChild(el('h5', {}, 'Request')); body.appendChild(el('pre', {}, tryFormat(log.request_body))); }
-      if (log.response_body) { body.appendChild(el('h5', {}, 'Response')); body.appendChild(el('pre', {}, tryFormat(log.response_body))); }
-      entry.appendChild(el('div', { className: 'api-log-header', onclick: () => body.classList.toggle('open') }, [
-        badge, el('span', { className: 'api-log-endpoint' }, log.endpoint),
-        el('span', { className: 'api-log-meta' }, [el('span', {}, log.status_code ? String(log.status_code) : ''), el('span', {}, log.duration_ms ? log.duration_ms + 'ms' : '')]),
-      ]));
-      entry.appendChild(body);
-      content.appendChild(entry);
-    });
-  } else if (activeTab === 'bridge') {
-    if (state.bridgeEvents.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, 'No Bridge events yet')); return; }
-    state.bridgeEvents.forEach(ev => {
-      const item = el('div', { className: 'bridge-event' });
-      item.appendChild(el('span', { className: 'be-type' }, ev.type));
-      item.appendChild(el('span', { className: 'be-time' }, ev.timestamp ? ev.timestamp.split('T')[1].split('.')[0] : ''));
-      if (ev.data) item.appendChild(el('div', { className: 'be-data' }, JSON.stringify(ev.data)));
-      content.appendChild(item);
-    });
-  } else {
-    if (state.webhooks.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, 'No webhooks yet')); return; }
-    state.webhooks.forEach(w => {
-      const payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
-      const eventType = payload.event_type || w.event_type || 'unknown';
-      const status = payload.status || w.status || '';
-      const ts = payload.event_created_at || payload.updated_at || '';
-      const timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
-      const statusColors = { pending: '#f59e0b', sent: '#3b82f6', completed: '#10b981', done: '#10b981', failed: '#ef4444', error: '#ef4444' };
-      const statusColor = statusColors[status] || '#6b7280';
-
-      const card = el('div', { style: 'border:1px solid var(--border-light);border-radius:8px;margin-bottom:10px;overflow:hidden;' });
-      const header = el('div', { style: 'display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-input);cursor:pointer;', onclick: function() { var p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'block' : 'none'; } });
-      header.appendChild(el('span', { style: 'font-size:12px;font-weight:600;' }, eventType));
-      if (status) header.appendChild(el('span', { style: 'font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;background:' + statusColor + '18;color:' + statusColor + ';' }, status));
-      header.appendChild(el('span', { style: 'margin-left:auto;font-size:11px;color:var(--text-muted);' }, timeStr));
-      card.appendChild(header);
-      card.appendChild(el('pre', { style: 'display:none;font-size:11px;font-family:monospace;padding:10px 12px;margin:0;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;border-top:1px solid var(--border-light);' }, JSON.stringify(payload, null, 2)));
-      content.appendChild(card);
-    });
-  }
-}
-
-function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return String(s); } }
 
 render();
 </script>

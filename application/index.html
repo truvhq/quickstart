@@ -3,90 +3,39 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Acme — Quickstart</title>
+  <title>Truv Quickstart — Application</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="/shared/styles.css" />
   <script src="https://cdn.truv.com/bridge.js"></script>
   <style>
-    :root {
-      --accent: #1a56db;
-      --accent-hover: #1648b8;
-      --accent-subtle: #eff6ff;
-      --gold: #1a56db;
-      --gold-light: #eff6ff;
-      --gold-border: #bfdbfe;
-      --text: #1a1a1a;
-      --text-secondary: #6b7280;
-      --text-muted: #9ca3af;
-      --bg: #ffffff;
-      --white: #ffffff;
-      --border: #e5e7eb;
-      --border-light: #f3f4f6;
-      --success: #059669;
-      --success-bg: #ecfdf5;
-      --success-border: #a7f3d0;
-      --warning: #d97706;
-      --warning-bg: #fffbeb;
-      --error: #dc2626;
-      --error-bg: #fef2f2;
-      --radius: 12px;
-      --radius-sm: 8px;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    /* Header sub-components (not in shared CSS) */
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; }
+    .header-title { font-size: 16px; font-weight: 600; }
+    .header-badge { font-size: 12px; color: var(--text-secondary); background: var(--bg-input); padding: 4px 10px; border-radius: 12px; }
 
-    /* Layout */
-    .main-layout { display: flex; height: 100vh; overflow: hidden; }
-    .app-panel { flex: 2; overflow-y: auto; display: flex; justify-content: center; padding: 40px 32px; }
+    /* Layout overrides — app panel wider than API panel */
+    .app-panel { flex: 2; }
     .app-panel.no-pad { padding: 0; }
-    .app-content { width: 100%; max-width: 520px; transition: max-width 0.2s; }
+    .app-content { width: 100%; max-width: 520px; transition: max-width 0.2s; height: 100%; }
     .app-content.full-width { max-width: 100%; }
-    .hidden { display: none !important; }
 
-    /* API Panel */
-    .api-panel { flex: 1; min-width: 0; border-left: 1px solid var(--border); background: var(--white); display: flex; flex-direction: column; overflow: hidden; }
-    .api-panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 2px; }
-    .api-tab { padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--text-muted); background: none; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
-    .api-tab:hover { color: var(--text-secondary); background: var(--border-light); }
-    .api-tab.active { color: var(--accent); background: var(--accent-subtle); }
-    .api-tab-content { flex: 1; overflow-y: auto; padding: 16px 20px; }
-
-    /* Card */
-    .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 36px; }
-
-    /* Headings */
-    h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
-    .subtitle { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 28px; }
-
-    /* Form */
-    .form-row { display: grid; gap: 16px; margin-bottom: 16px; }
+    /* Form grid (2-col variant) */
     .form-row-2 { grid-template-columns: 1fr 1fr; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 13px; font-weight: 500; color: var(--text); }
-    .form-input { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); font-family: inherit; outline: none; color: var(--text); transition: border-color 0.15s; }
-    .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,219,0.1); }
-    .form-input::placeholder { color: var(--text-muted); }
+    .form-row { display: grid; gap: 16px; margin-bottom: 16px; }
 
     /* Checkbox */
     .checkbox-row { display: flex; align-items: center; gap: 10px; margin: 24px 0; }
-    .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+    .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
     .checkbox-row label { font-size: 13px; color: var(--text-secondary); cursor: pointer; }
-    .checkbox-row label a { color: var(--accent); text-decoration: underline; }
+    .checkbox-row label a { color: var(--primary); text-decoration: underline; }
 
-    /* Buttons */
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; font-size: 14px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; gap: 8px; }
-    .btn-primary { background: var(--accent); color: #fff; width: 100%; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* Bridge */
+    /* Bridge embed */
     .bridge-wrapper { width: 100%; height: 100%; border: none; border-radius: 0; overflow: hidden; position: relative; background: #fff; zoom: 0.85; }
     .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
 
-    /* Waiting state */
-    .waiting-ring { border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1.2s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Waiting screen */
+    .waiting-ring { border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1.2s linear infinite; }
     .webhook-pill { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f3f4f6; border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; animation: fadeIn 0.3s ease; }
     .webhook-pill .wp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .webhook-pill .wp-dot.green { background: var(--success); }
@@ -104,59 +53,26 @@
     .result-section { margin-bottom: 24px; }
     .result-section h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
     .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .status-completed { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+    .status-completed { background: var(--success-bg); color: var(--success); border: 1px solid #a7f3d0; }
     .status-pending { background: var(--warning-bg); color: var(--warning); }
 
-    /* API log entries */
-    .log-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
-    .log-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; transition: background 0.1s; }
-    .log-header:hover { background: var(--border-light); }
-    .log-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .log-badge-get { background: #dbeafe; color: #1d4ed8; }
-    .log-badge-post { background: #dcfce7; color: #166534; }
-    .log-endpoint { flex: 1; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .log-meta { font-size: 11px; color: var(--text-muted); }
-    .log-body { border-top: 1px solid var(--border-light); display: none; }
-    .log-body.open { display: block; }
-    .log-body-section { padding: 10px 12px; }
-    .log-body-section h5 { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .log-body-section pre { font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; background: var(--border-light); padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; line-height: 1.5; }
+    /* Headings */
+    h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
+    .subtitle { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 28px; }
 
-    /* Webhook panel entries */
-    .wh-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
-    .wh-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; background: var(--border-light); }
-    .wh-header:hover { background: #eee; }
-    .wh-type { font-size: 12px; font-weight: 600; }
-    .wh-status { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; }
-    .wh-time { margin-left: auto; font-size: 11px; color: var(--text-muted); }
-    .wh-body { display: none; border-top: 1px solid var(--border-light); padding: 10px 12px; }
-    .wh-body pre { font-size: 11px; font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
-
-    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
-    .empty-state .empty-icon { font-size: 32px; margin-bottom: 12px; display: block; }
-
-    .guide-block { margin-bottom: 12px; padding: 16px; background: var(--border-light); border-radius: var(--radius-sm); }
-    .guide-block h4 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
-    .guide-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
-    .guide-detail p { margin: 8px 0; }
-    .guide-detail pre { background: #1a1a2e; color: #e2e8f0; padding: 10px 12px; border-radius: 6px; font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; overflow-x: auto; white-space: pre; margin: 8px 0; line-height: 1.5; }
-    .guide-detail code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; }
-    .guide-detail pre code { background: none; padding: 0; }
-    .guide-detail ul, .guide-detail ol { margin: 8px 0; padding-left: 20px; }
-    .guide-detail li { margin: 4px 0; }
-    .guide-detail h5 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin: 12px 0 4px; }
-    .guide-detail a { color: var(--accent); font-weight: 500; }
-
+    /* Small spinner for buttons */
     .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
-
-    .tunnel-info { padding: 10px 14px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; margin-bottom: 16px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
-    .tunnel-info span { color: #1e40af; font-weight: 600; }
-    .tunnel-info a { color: #2563eb; word-break: break-all; }
-
-    @media (max-width: 1000px) { .api-panel { display: none; } }
   </style>
 </head>
 <body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo"></div>
+    <div class="header-title">Truv Quickstart</div>
+    <div class="header-badge">Application</div>
+  </div>
+</div>
 
 <div class="main-layout">
   <div class="app-panel" id="appPanel">
@@ -196,7 +112,7 @@
           <input type="checkbox" id="agree" checked>
           <label for="agree">I agree to the <a href="#">Acme Terms of Service</a></label>
         </div>
-        <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">Continue</button>
+        <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()" style="width:100%">Continue</button>
       </div>
 
       <!-- Step 1: Bridge -->
@@ -220,27 +136,15 @@
     </div>
   </div>
 
-  <div class="api-panel">
-    <div class="api-panel-header">
-      <button class="api-tab active" data-tab="guide" id="tabGuide">Guide</button>
-      <button class="api-tab" data-tab="api" id="tabApi">API Logs</button>
-      <button class="api-tab" data-tab="bridge" id="tabBridge">Events</button>
-      <button class="api-tab" data-tab="webhooks" id="tabWebhooks">Webhooks</button>
-    </div>
-    <div class="api-tab-content" id="apiTabContent"></div>
-  </div>
+  <div id="apiPanel" class="api-panel"></div>
 </div>
 
+<script src="/shared/panel.js"></script>
 <script>
-// Guide content is static HTML authored by developers, not user-supplied.
-// All dynamic data from API responses is escaped via esc() before rendering.
-
-var API_BASE = window.location.origin;
-
+// --- Guide steps (developer-authored static HTML) ---
 var STEPS = [
   {
     title: 'Collect applicant info',
-    summary: 'Create an order via POST /v1/orders/',
     guide: '<p>The form collects applicant PII and sends it to your backend. The server calls:</p>'
       + '<pre>POST /v1/orders/\n{\n  "first_name": "...",\n  "last_name": "...",\n  "products": ["income"],\n  "employers": [{ "company_name": "Home Depot" }]\n}</pre>'
       + '<p>The response contains a <code>bridge_token</code> used to initialize the Bridge widget, and an order <code>id</code> for polling results.</p>'
@@ -249,11 +153,10 @@ var STEPS = [
       + '<li><code>user_id</code> — identifies the user across webhooks</li>'
       + '<li><code>share_url</code> — shareable link for the applicant</li>'
       + '<li><code>template_id</code> — optional, for branded experience</li></ul>'
-      + '<p><a href="https://docs.truv.com/reference/create-an-order" target="_blank">API Reference →</a></p>',
+      + '<p><a href="https://docs.truv.com/reference/create-an-order" target="_blank">API Reference \u2192</a></p>',
   },
   {
     title: 'Bridge verification',
-    summary: 'Applicant connects payroll via TruvBridge widget',
     guide: '<p>The Bridge widget is initialized with:</p>'
       + '<pre>TruvBridge.init({\n  bridgeToken: "...",\n  isOrder: true,\n  position: { type: "inline", container: el }\n})</pre>'
       + '<p>Bridge fires events as the user progresses:</p><ul>'
@@ -262,24 +165,22 @@ var STEPS = [
       + '<li><code>onEvent(COMPLETED, source: "order")</code> — verification done</li>'
       + '<li><code>onSuccess</code> / <code>onClose</code> — final callbacks</li></ul>'
       + '<p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p>'
-      + '<p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs →</a></p>',
+      + '<p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs \u2192</a></p>',
   },
   {
     title: 'Webhook processing',
-    summary: 'Receive real-time webhook events from Truv',
     guide: '<p>Truv sends webhooks to your registered URL as the verification progresses. Events arrive in this order:</p><ol>'
       + '<li><code>order-created</code> — order is pending</li>'
-      + '<li><code>task-status-updated</code> — login → parse → full_parse → done</li>'
+      + '<li><code>task-status-updated</code> — login \u2192 parse \u2192 full_parse \u2192 done</li>'
       + '<li><code>link-connected</code> — payroll link established</li>'
       + '<li><code>profile-created</code>, <code>employment-created</code>, <code>statements-created</code>, <code>bank-accounts-created</code></li>'
       + '<li><code>order-status-updated</code> (status: completed) — all done</li></ol>'
       + '<p>All webhooks include <code>user_id</code> for matching. Verify the <code>X-Webhook-Sign</code> header with HMAC-SHA256.</p>'
       + '<pre>const sig = crypto\n  .createHmac(\'sha256\', API_SECRET)\n  .update(rawBody)\n  .digest(\'hex\');</pre>'
-      + '<p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs →</a></p>',
+      + '<p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs \u2192</a></p>',
   },
   {
     title: 'Retrieve results',
-    summary: 'Fetch verified data via GET /v1/orders/{id}/',
     guide: '<p>Once the order is completed, fetch the full results:</p>'
       + '<pre>GET /v1/orders/{order_id}/</pre>'
       + '<p>The response includes nested <code>employers[]</code> with:</p><ul>'
@@ -290,44 +191,49 @@ var STEPS = [
       + '<li><strong>Bank Accounts</strong> — direct deposit routing info</li>'
       + '<li><strong>Annual Income Summary</strong> — aggregated by year</li></ul>'
       + '<p>You can also call <code>POST /v1/orders/{id}/refresh/</code> to re-pull data from the payroll provider.</p>'
-      + '<p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference →</a></p>',
+      + '<p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference \u2192</a></p>',
   },
 ];
 
+// --- Panel ---
+var panel = new QuickstartPanel({
+  tabs: ['guide', 'api', 'bridge', 'webhooks'],
+  steps: STEPS,
+  onWebhook: function(wh) {
+    if (state.step === 2) updateWaitingFeed();
+  }
+});
+
 // --- State ---
 var state = {
-  step: 0, orderId: null, truvOrderId: null, bridgeToken: null,
-  productType: 'income', bridgeEvents: [],
-  apiLogs: [], webhooks: [], orderData: null, eventSource: null, tunnelUrl: null,
+  step: 0, orderId: null, truvOrderId: null, userId: null,
+  bridgeToken: null, productType: 'income', orderData: null
 };
 
 // --- Helpers ---
-function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function $(amount) { return '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function freq(f) { return { BW: 'Biweekly', W: 'Weekly', M: 'Monthly', SM: 'Semi-Monthly', A: 'Annual' }[f] || f; }
-function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } catch(e) { return String(s); } }
-function resultRow(label, value) {
-  return '<div class="result-row"><div class="result-label">' + esc(label) + '</div><div class="result-value">' + esc(String(value)) + '</div></div>';
-}
 
 // --- Step switching ---
 var screens = ['stepForm', 'stepBridge', 'stepWaiting', 'stepResults'];
 
 function goStep(n) {
   state.step = n;
+  panel.setStep(n);
+
   var appPanel = document.getElementById('appPanel');
   var appContent = document.getElementById('appContent');
   appPanel.className = n === 1 ? 'app-panel no-pad' : 'app-panel';
   appContent.className = n === 0 ? 'app-content' : 'app-content full-width';
 
   for (var i = 0; i < screens.length; i++) {
-    var el = document.getElementById(screens[i]);
+    var scr = document.getElementById(screens[i]);
     if (i === n) {
-      el.classList.remove('hidden');
-      if (screens[i] === 'stepWaiting') el.style.display = 'flex';
+      scr.classList.remove('hidden');
+      if (screens[i] === 'stepWaiting') scr.style.display = 'flex';
     } else {
-      el.classList.add('hidden');
-      if (screens[i] === 'stepWaiting') el.style.display = 'none';
+      scr.classList.add('hidden');
+      if (screens[i] === 'stepWaiting') scr.style.display = 'none';
     }
   }
 
@@ -335,8 +241,6 @@ function goStep(n) {
   if (n === 2) { waitingStartedAt = Date.now(); updateWaitingFeed(); }
   if (n === 3 && !state.orderData) setTimeout(fetchOrderData, 100);
   if (n === 3 && state.orderData) renderResults();
-
-  renderApiPanel();
 }
 
 // --- Step 1: Submit form ---
@@ -368,8 +272,8 @@ async function handleSubmit() {
     state.truvOrderId = data.truv_order_id;
     state.userId = data.user_id;
     state.bridgeToken = data.bridge_token;
-    connectSSE(state.orderId);
-    await fetchLogs();
+    panel.connectSSE(state.orderId);
+    await panel.fetchLogs(state.orderId);
     goStep(1);
   } catch (e) { console.error(e); btn.disabled = false; btn.textContent = 'Continue'; }
 }
@@ -383,22 +287,17 @@ function initBridge() {
     bridgeToken: state.bridgeToken,
     isOrder: true,
     position: { type: 'inline', container: document.getElementById('bridgeContainer') },
-    onLoad: function() { addBridgeEvent('onLoad', null); },
+    onLoad: function() { panel.addBridgeEvent('onLoad', null); },
     onEvent: function(eventType, payload, source) {
-      addBridgeEvent('onEvent', { eventType: eventType, source: source });
+      panel.addBridgeEvent('onEvent', { eventType: eventType, source: source });
       if (source === 'order' && eventType === 'COMPLETED') {
-        setTimeout(async function() { await fetchLogs(); goStep(2); }, 1500);
+        setTimeout(async function() { await panel.fetchLogs(state.orderId); goStep(2); }, 1500);
       }
     },
-    onSuccess: function() { addBridgeEvent('onSuccess', null); },
-    onClose: function() { addBridgeEvent('onClose', null); },
+    onSuccess: function() { panel.addBridgeEvent('onSuccess', null); },
+    onClose: function() { panel.addBridgeEvent('onClose', null); },
   });
   if (bridgeInstance) bridgeInstance.open();
-}
-
-function addBridgeEvent(type, data) {
-  state.bridgeEvents.push({ type: type, data: data, timestamp: new Date().toISOString() });
-  renderApiPanel();
 }
 
 // --- Step 3: Waiting ---
@@ -408,7 +307,7 @@ var WAITING_MIN_MS = 10000;
 function updateWaitingFeed() {
   if (state.step !== 2) return;
   var feed = document.getElementById('webhookFeed');
-  if (state.webhooks.length === 0) {
+  if (panel.webhooks.length === 0) {
     feed.textContent = 'No webhooks received yet...';
     feed.style.textAlign = 'center';
     feed.style.fontSize = '13px';
@@ -417,9 +316,8 @@ function updateWaitingFeed() {
     feed.style.textAlign = 'left';
     feed.style.fontSize = '';
     feed.style.color = '';
-    // Build webhook pills using DOM methods for safety
     feed.textContent = '';
-    var reversed = state.webhooks.slice().reverse();
+    var reversed = panel.webhooks.slice().reverse();
     for (var i = 0; i < reversed.length; i++) {
       var w = reversed[i];
       var payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
@@ -448,7 +346,7 @@ function updateWaitingFeed() {
 
   // Auto-advance
   var elapsed = Date.now() - waitingStartedAt;
-  var isCompleted = state.webhooks.some(function(w) {
+  var isCompleted = panel.webhooks.some(function(w) {
     var p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
     return p.event_type === 'order-status-updated' && p.status === 'completed';
   });
@@ -465,7 +363,6 @@ function renderResults() {
   var data = state.orderData || {};
   var raw = data.raw_response || {};
 
-  // Build results using DOM for safety with API data
   container.textContent = '';
 
   var h2 = document.createElement('h2');
@@ -638,7 +535,7 @@ function renderResults() {
         if (st.file) {
           var dl = document.createElement('a');
           dl.href = st.file; dl.target = '_blank';
-          dl.style.cssText = 'display:inline-block;margin-top:10px;font-size:12px;color:var(--accent);font-weight:500;';
+          dl.style.cssText = 'display:inline-block;margin-top:10px;font-size:12px;color:var(--primary);font-weight:500;';
           dl.textContent = 'Download PDF';
           stBody.appendChild(dl);
         }
@@ -683,7 +580,7 @@ function renderResults() {
         if (w.file) {
           var pdfLink = document.createElement('a');
           pdfLink.href = w.file; pdfLink.target = '_blank';
-          pdfLink.style.cssText = 'color:var(--accent);font-weight:500;font-size:12px;';
+          pdfLink.style.cssText = 'color:var(--primary);font-weight:500;font-size:12px;';
           pdfLink.textContent = 'PDF';
           dlTd.appendChild(pdfLink);
         }
@@ -748,14 +645,14 @@ function addRow(grid, label, value) {
 
 // DOM helper: subheading for earnings/deductions
 function makeSubheading(text) {
-  var el = document.createElement('div');
-  el.style.cssText = 'font-size:12px;font-weight:600;color:var(--text-secondary);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.5px;';
-  el.textContent = text;
-  return el;
+  var node = document.createElement('div');
+  node.style.cssText = 'font-size:12px;font-weight:600;color:var(--text-secondary);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.5px;';
+  node.textContent = text;
+  return node;
 }
 
 function resetApp() {
-  state = { step: 0, orderId: null, truvOrderId: null, userId: null, bridgeToken: null, productType: state.productType, bridgeEvents: [], apiLogs: [], webhooks: [], orderData: null, eventSource: null, tunnelUrl: state.tunnelUrl };
+  state = { step: 0, orderId: null, truvOrderId: null, userId: null, bridgeToken: null, productType: state.productType, orderData: null };
   document.getElementById('firstName').value = '';
   document.getElementById('lastName').value = '';
   document.getElementById('email').value = '';
@@ -764,6 +661,11 @@ function resetApp() {
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('submitBtn').textContent = 'Continue';
   document.getElementById('bridgeContainer').textContent = '';
+  panel.apiLogs = [];
+  panel.bridgeEvents = [];
+  panel.webhooks = [];
+  panel.setStep(0);
+  panel.render();
   goStep(0);
 }
 
@@ -772,7 +674,7 @@ async function fetchOrderData() {
   try {
     var resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId));
     state.orderData = await resp.json();
-    await fetchLogs();
+    await panel.fetchLogs(state.orderId);
     renderResults();
   } catch (e) { console.error(e); }
 }
@@ -800,242 +702,14 @@ async function refreshOrder() {
   } catch (e) { console.error(e); }
 }
 
-// --- SSE ---
-function connectSSE(orderId) {
-  if (state.eventSource) state.eventSource.close();
-  var es = new EventSource(API_BASE + '/api/events/stream?order_id=' + encodeURIComponent(orderId));
-  es.addEventListener('api_call', function(e) { state.apiLogs.push(JSON.parse(e.data)); renderApiPanel(); });
-  es.addEventListener('ping', function() {});
-  state.eventSource = es;
-}
-
-var globalEs = null;
-function connectGlobalSSE() {
-  if (globalEs) return;
-  globalEs = new EventSource(API_BASE + '/api/events/stream');
-  globalEs.addEventListener('webhook', function(e) {
-    var whData = JSON.parse(e.data);
-    // Only accept webhooks for the current user
-    var whPayload = typeof whData.payload === 'string' ? JSON.parse(whData.payload) : (whData.payload || {});
-    if (state.userId && whPayload.user_id && whPayload.user_id !== state.userId) return;
-    if (state.webhooks.some(function(w) { return w.id === whData.id; })) return;
-    state.webhooks.push(whData);
-    if (state.step === 2) updateWaitingFeed(); else renderApiPanel();
-  });
-  globalEs.addEventListener('ping', function() {});
-}
-
-async function fetchLogs() {
-  if (!state.orderId) return;
-  try {
-    var results = await Promise.all([
-      fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/logs').then(function(r) { return r.json(); }),
-      fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/webhooks').then(function(r) { return r.json(); }),
-    ]);
-    state.apiLogs = results[0]; state.webhooks = results[1];
-  } catch (e) { console.error(e); }
-}
-
-// --- API Panel ---
-var activeTab = 'guide';
-
-document.querySelectorAll('.api-tab').forEach(function(tab) {
-  tab.addEventListener('click', function() { activeTab = tab.dataset.tab; renderApiPanel(); });
-});
-
-function renderApiPanel() {
-  // Update tab labels
-  document.getElementById('tabApi').textContent = 'API Logs' + (state.apiLogs.length ? ' (' + state.apiLogs.length + ')' : '');
-  document.getElementById('tabBridge').textContent = 'Events' + (state.bridgeEvents.length ? ' (' + state.bridgeEvents.length + ')' : '');
-  document.getElementById('tabWebhooks').textContent = 'Webhooks' + (state.webhooks.length ? ' (' + state.webhooks.length + ')' : '');
-
-  // Update active class
-  document.querySelectorAll('.api-tab').forEach(function(tab) {
-    tab.classList.toggle('active', tab.dataset.tab === activeTab);
-  });
-
-  var content = document.getElementById('apiTabContent');
-  content.textContent = '';
-
-  if (activeTab === 'guide') {
-    renderGuideTab(content);
-  } else if (activeTab === 'api') {
-    renderApiLogsTab(content);
-  } else if (activeTab === 'bridge') {
-    renderBridgeEventsTab(content);
-  } else {
-    renderWebhooksTab(content);
-  }
-}
-
-function renderGuideTab(content) {
-  STEPS.forEach(function(s, i) {
-    if (i === state.step) {
-      var block = document.createElement('div');
-      block.className = 'guide-block';
-      block.style.cssText = 'border:1px solid var(--gold-border);background:var(--gold-light);';
-      var h4 = document.createElement('h4');
-      h4.style.color = 'var(--accent)';
-      h4.textContent = (i + 1) + '. ' + s.title;
-      block.appendChild(h4);
-      var body = document.createElement('div');
-      body.className = 'guide-detail';
-      // Guide HTML is static/hardcoded developer content, not user-supplied
-      body.innerHTML = s.guide; // eslint-disable-line
-      block.appendChild(body);
-      content.appendChild(block);
-    } else {
-      var line = document.createElement('div');
-      line.style.cssText = 'padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border-light);';
-      var span1 = document.createElement('span');
-      span1.style.cssText = 'font-weight:600;' + (i < state.step ? 'color:var(--success);' : 'color:var(--text-muted);');
-      span1.textContent = (i < state.step ? '\u2713 ' : '') + (i + 1) + '. ' + s.title;
-      line.appendChild(span1);
-      var span2 = document.createElement('span');
-      span2.style.cssText = 'margin-left:auto;font-size:12px;color:var(--text-muted);';
-      span2.textContent = s.summary;
-      line.appendChild(span2);
-      content.appendChild(line);
-    }
-  });
-}
-
-function renderApiLogsTab(content) {
-  if (state.apiLogs.length === 0) {
-    var empty = document.createElement('div'); empty.className = 'empty-state';
-    var icon = document.createElement('span'); icon.className = 'empty-icon'; icon.textContent = '\u2139\uFE0F';
-    empty.appendChild(icon);
-    empty.appendChild(document.createTextNode('API calls will appear here as you progress'));
-    content.appendChild(empty);
-    return;
-  }
-  state.apiLogs.forEach(function(log) {
-    var entry = document.createElement('div'); entry.className = 'log-entry';
-    var header = document.createElement('div'); header.className = 'log-header';
-    var badge = document.createElement('span');
-    badge.className = 'log-badge ' + (log.method === 'GET' ? 'log-badge-get' : 'log-badge-post');
-    badge.textContent = log.method;
-    header.appendChild(badge);
-    var endpoint = document.createElement('span'); endpoint.className = 'log-endpoint'; endpoint.textContent = log.endpoint;
-    header.appendChild(endpoint);
-    var metaStr = (log.status_code ? log.status_code + ' ' : '') + (log.duration_ms ? log.duration_ms + 'ms' : '');
-    var metaEl = document.createElement('span'); metaEl.className = 'log-meta'; metaEl.textContent = metaStr;
-    header.appendChild(metaEl);
-
-    var body = document.createElement('div'); body.className = 'log-body';
-    header.onclick = function() { body.classList.toggle('open'); };
-
-    if (log.request_body) {
-      var rs = document.createElement('div'); rs.className = 'log-body-section';
-      var rh = document.createElement('h5'); rh.textContent = 'Request'; rs.appendChild(rh);
-      var rp = document.createElement('pre'); rp.textContent = tryFormat(log.request_body); rs.appendChild(rp);
-      body.appendChild(rs);
-    }
-    if (log.response_body) {
-      var rbs = document.createElement('div'); rbs.className = 'log-body-section';
-      var rbh = document.createElement('h5'); rbh.textContent = 'Response'; rbs.appendChild(rbh);
-      var rbp = document.createElement('pre'); rbp.textContent = tryFormat(log.response_body); rbs.appendChild(rbp);
-      body.appendChild(rbs);
-    }
-
-    entry.appendChild(header);
-    entry.appendChild(body);
-    content.appendChild(entry);
-  });
-}
-
-function renderBridgeEventsTab(content) {
-  if (state.bridgeEvents.length === 0) {
-    var empty = document.createElement('div'); empty.className = 'empty-state';
-    var icon = document.createElement('span'); icon.className = 'empty-icon'; icon.textContent = '\u26A1';
-    empty.appendChild(icon);
-    empty.appendChild(document.createTextNode('Bridge events will appear here during verification'));
-    content.appendChild(empty);
-    return;
-  }
-  state.bridgeEvents.slice().reverse().forEach(function(ev) {
-    var entry = document.createElement('div'); entry.className = 'wh-entry';
-    var header = document.createElement('div'); header.className = 'wh-header';
-    var typeEl = document.createElement('span'); typeEl.className = 'wh-type'; typeEl.textContent = ev.type;
-    header.appendChild(typeEl);
-    if (ev.data && ev.data.eventType) {
-      var tag = document.createElement('span');
-      tag.className = 'wh-status';
-      tag.style.cssText = 'background:var(--accent-subtle);color:var(--accent);';
-      tag.textContent = ev.data.eventType;
-      header.appendChild(tag);
-    }
-    var timeEl = document.createElement('span'); timeEl.className = 'wh-time';
-    timeEl.textContent = ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : '';
-    header.appendChild(timeEl);
-
-    var body = document.createElement('div'); body.className = 'wh-body';
-    var pre = document.createElement('pre'); pre.textContent = JSON.stringify(ev.data || {}, null, 2);
-    body.appendChild(pre);
-
-    header.onclick = function() { body.style.display = body.style.display === 'none' ? 'block' : 'none'; };
-    entry.appendChild(header);
-    entry.appendChild(body);
-    content.appendChild(entry);
-  });
-}
-
-function renderWebhooksTab(content) {
-  if (state.tunnelUrl) {
-    var info = document.createElement('div'); info.className = 'tunnel-info';
-    var label = document.createElement('span'); label.textContent = 'Webhook URL:';
-    info.appendChild(label);
-    var link = document.createElement('a'); link.href = state.tunnelUrl; link.target = '_blank'; link.textContent = state.tunnelUrl;
-    info.appendChild(link);
-    content.appendChild(info);
-  }
-  if (state.webhooks.length === 0) {
-    var empty = document.createElement('div'); empty.className = 'empty-state';
-    var icon = document.createElement('span'); icon.className = 'empty-icon'; icon.textContent = '\uD83D\uDD14';
-    empty.appendChild(icon);
-    empty.appendChild(document.createTextNode('Webhook events will appear here in real time'));
-    content.appendChild(empty);
-    return;
-  }
-  state.webhooks.slice().reverse().forEach(function(w) {
-    var payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
-    var eventType = payload.event_type || w.event_type || 'unknown';
-    var status = payload.status || w.status || '';
-    var ts = payload.event_created_at || payload.updated_at || w.received_at || '';
-    var timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
-    var statusColors = { pending: '#f59e0b', sent: '#3b82f6', completed: '#059669', done: '#059669', failed: '#ef4444' };
-    var sc = statusColors[status] || '#6b7280';
-
-    var entry = document.createElement('div'); entry.className = 'wh-entry';
-    var header = document.createElement('div'); header.className = 'wh-header';
-    var typeEl = document.createElement('span'); typeEl.className = 'wh-type'; typeEl.textContent = eventType;
-    header.appendChild(typeEl);
-    if (status) {
-      var tag = document.createElement('span');
-      tag.className = 'wh-status';
-      tag.style.cssText = 'background:' + sc + '18;color:' + sc + ';';
-      tag.textContent = status;
-      header.appendChild(tag);
-    }
-    var timeEl = document.createElement('span'); timeEl.className = 'wh-time'; timeEl.textContent = timeStr;
-    header.appendChild(timeEl);
-
-    var body = document.createElement('div'); body.className = 'wh-body';
-    var pre = document.createElement('pre'); pre.textContent = JSON.stringify(payload, null, 2);
-    body.appendChild(pre);
-
-    header.onclick = function() { body.style.display = body.style.display === 'none' ? 'block' : 'none'; };
-    entry.appendChild(header);
-    entry.appendChild(body);
-    content.appendChild(entry);
-  });
-}
-
 // --- Init ---
 fetch(API_BASE + '/api/config').then(function(r) { return r.json(); }).then(function(d) { state.productType = d.product_type; }).catch(function() {});
-fetch(API_BASE + '/api/tunnel-url').then(function(r) { return r.json(); }).then(function(d) { state.tunnelUrl = d.url; renderApiPanel(); }).catch(function() {});
-connectGlobalSSE();
-renderApiPanel();
+panel.connectGlobalSSE(function(wh) {
+  var payload = typeof wh.payload === 'string' ? JSON.parse(wh.payload) : (wh.payload || {});
+  if (state.userId && payload.user_id && payload.user_id !== state.userId) return false;
+  return true;
+});
+goStep(0);
 </script>
 </body>
 </html>
