@@ -116,10 +116,6 @@ export class TruvClient {
     return this._request('POST', `orders/${truvOrderId}/refresh/`);
   }
 
-  async getOrderCertifications(truvOrderId) {
-    return this._request('GET', `orders/${truvOrderId}/certifications/`);
-  }
-
   // --- Token Exchange & Reports ---
 
   async getAccessToken(publicToken) {

@@ -176,7 +176,3 @@ export function updateDocCollection(collectionId, fields) {
   vals.push(collectionId);
   getDb().prepare(`UPDATE document_collections SET ${sets} WHERE id = ?`).run(...vals);
 }
-
-export function getAllDocCollections() {
-  return getDb().prepare('SELECT * FROM document_collections ORDER BY created_at DESC').all();
-}

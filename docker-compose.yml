@@ -3,7 +3,7 @@ services:
   python:
     build:
       context: .
-      dockerfile: ./python/Dockerfile
+      dockerfile: ./quickstarts/python/Dockerfile
     env_file:
       - .env
     ports:
@@ -11,7 +11,7 @@ services:
   ruby:
     build:
       context: .
-      dockerfile: ./ruby/Dockerfile
+      dockerfile: ./quickstarts/ruby/Dockerfile
     env_file:
       - .env
     ports:
@@ -19,7 +19,7 @@ services:
   golang:
     build:
       context: .
-      dockerfile: ./golang/Dockerfile
+      dockerfile: ./quickstarts/golang/Dockerfile
     env_file:
       - .env
     ports:
@@ -27,7 +27,7 @@ services:
   node:
     build:
       context: .
-      dockerfile: ./node/Dockerfile
+      dockerfile: ./quickstarts/node/Dockerfile
     env_file:
       - .env
     ports:
@@ -35,9 +35,8 @@ services:
   csharp:
     build:
       context: .
-      dockerfile: ./c-sharp/Dockerfile
+      dockerfile: ./quickstarts/c-sharp/Dockerfile
     env_file:
       - .env
     ports:
       - "5005:80"
-
