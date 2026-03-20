@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: env install embedded bridge hosted python_docker python_local
+.PHONY: env install application follow-up employee-portal upload-documents choice-connect
 
 env:
 	test -f .env || cp .env.example .env
@@ -8,55 +8,44 @@ env:
 install:
 	npm install
 
-embedded: install
-	node embedded-orders/server.js
+application: install
+	node application/server.js
 
-bridge: install
-	node bridge-widget/server.js
+follow-up: install
+	node follow-up/server.js
 
-hosted: install
-	node hosted-orders/server.js
+employee-portal: install
+	node employee-portal/server.js
 
+upload-documents: install
+	node upload-documents/server.js
+
+choice-connect: install
+	node choice-connect/server.js
+
+# Legacy language examples (in legacy/ folder)
 python_docker:
 	docker-compose up --build python
 
-node_docker:
-	docker-compose up --build node
-
-ruby_docker:
-	docker-compose up --build ruby
-
-csharp_docker:
-	docker-compose up --build csharp
-
-golang_docker:
-	docker-compose up --build golang
-
-node_local:
-	cd node && \
-	npm install && \
-	set -a && source ../.env && set +a && \
-	npm start
-
 python_local:
-	python3 -m venv ./python/.venv && \
-	./python/.venv/bin/pip3 install -r python/requirements.txt && \
-	FLASK_DEBUG=true ./python/.venv/bin/python3 -m python.src.server
+	python3 -m venv ./legacy/python/.venv && \
+	./legacy/python/.venv/bin/pip3 install -r legacy/python/requirements.txt && \
+	FLASK_DEBUG=true ./legacy/python/.venv/bin/python3 -m legacy.python.src.server
 
 ruby_local:
-	cd ruby && \
+	cd legacy/ruby && \
 	bundle install && \
-	set -a && source ../.env && set +a && \
+	set -a && source ../../.env && set +a && \
 	./bin/rails server
 
 csharp_local:
-	cd c-sharp && \
-	set -a && source ../.env && set +a && \
+	cd legacy/c-sharp && \
+	set -a && source ../../.env && set +a && \
 	dotnet watch run
 
 golang_local:
-	cd golang && \
+	cd legacy/golang && \
 	go get && \
-	set -a && source ../.env && set +a && \
+	set -a && source ../../.env && set +a && \
 	go install && \
 	go run truv
