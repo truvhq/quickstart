@@ -62,9 +62,10 @@ body {
   height: calc(100vh - 56px);
 }
 
-/* App panel (left side) */
+/* App panel (left side) — fills remaining space */
 .app-panel {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
   padding: 24px;
   display: flex;
@@ -72,13 +73,16 @@ body {
   align-items: center;
 }
 
-/* API panel (right side) */
+/* API panel (right side) — fixed 1/3 width */
 .api-panel {
-  flex: 1;
+  flex: none;
+  width: 33.333%;
+  min-width: 0;
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   background: var(--bg-white);
+  overflow: hidden;
 }
 
 /* Screen container */

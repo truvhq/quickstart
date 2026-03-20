@@ -93,7 +93,8 @@
     // Tabs bar
     var tabsBar = el('div', { className: 'api-panel-tabs' });
     this.tabs.forEach(function (tab) {
-      var label = tab.charAt(0).toUpperCase() + tab.slice(1);
+      var labels = { guide: 'Guide', api: 'API', bridge: 'Bridge', webhooks: 'Webhooks' };
+      var label = labels[tab] || tab;
       var count = '';
       if (tab === 'api') count = self.apiLogs.length ? ' (' + self.apiLogs.length + ')' : '';
       if (tab === 'bridge') count = self.bridgeEvents.length ? ' (' + self.bridgeEvents.length + ')' : '';
@@ -135,27 +136,25 @@
     this.steps.forEach(function (step, i) {
       var isDone = i < self.currentStep;
       var isActive = i === self.currentStep;
-      var stepEl = el('div', {
-        style: 'padding:10px 0;border-bottom:1px solid var(--border-light);'
-      });
 
-      var marker = isDone ? '\u2713 ' : (i + 1) + '. ';
-      var titleStyle = 'font-size:13px;';
-      if (isActive) titleStyle += 'font-weight:600;color:var(--primary);';
-      else if (isDone) titleStyle += 'color:var(--success);';
-      else titleStyle += 'color:var(--text-muted);';
-
-      var titleEl = el('div', { style: titleStyle }, marker + step.title);
-      stepEl.appendChild(titleEl);
-
-      if (isActive && step.guide) {
-        var guideEl = el('div', { style: 'font-size:12px;color:var(--text-secondary);margin-top:6px;line-height:1.6;' });
-        // Developer-authored static guide content — safe to use innerHTML
-        guideEl.innerHTML = step.guide;
-        stepEl.appendChild(guideEl);
+      if (isActive) {
+        var block = el('div', { className: 'guide-block' });
+        var h4 = el('div', { style: 'font-size:13px;font-weight:600;color:var(--primary);margin-bottom:8px;' }, (i + 1) + '. ' + step.title);
+        block.appendChild(h4);
+        if (step.guide) {
+          var guideEl = el('div', { className: 'guide-detail' });
+          // Developer-authored static guide content — safe to use innerHTML
+          guideEl.innerHTML = step.guide;
+          block.appendChild(guideEl);
+        }
+        content.appendChild(block);
+      } else {
+        var marker = isDone ? '\u2713 ' : (i + 1) + '. ';
+        var style = 'padding:10px 16px;font-size:13px;border-bottom:1px solid var(--border-light);';
+        if (isDone) style += 'color:var(--success);';
+        else style += 'color:var(--text-muted);';
+        content.appendChild(el('div', { style: style }, marker + step.title));
       }
-
-      content.appendChild(stepEl);
     });
   };
 
