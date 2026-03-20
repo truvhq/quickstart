@@ -34,13 +34,13 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-
     /* Layout */
     .main-layout { display: flex; height: 100vh; overflow: hidden; }
     .app-panel { flex: 2; overflow-y: auto; display: flex; justify-content: center; padding: 40px 32px; }
     .app-panel.no-pad { padding: 0; }
     .app-content { width: 100%; max-width: 520px; transition: max-width 0.2s; }
     .app-content.full-width { max-width: 100%; }
+    .hidden { display: none !important; }
 
     /* API Panel */
     .api-panel { flex: 1; min-width: 0; border-left: 1px solid var(--border); background: var(--white); display: flex; flex-direction: column; overflow: hidden; }
@@ -54,17 +54,16 @@
     .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 36px; }
 
     /* Headings */
-    .app-content h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
-    .app-content .subtitle { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 28px; }
+    h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
+    .subtitle { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 28px; }
 
     /* Form */
     .form-row { display: grid; gap: 16px; margin-bottom: 16px; }
     .form-row-2 { grid-template-columns: 1fr 1fr; }
-    .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-label { font-size: 13px; font-weight: 500; color: var(--text); }
-    .form-input, .form-select { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); font-family: inherit; outline: none; color: var(--text); transition: border-color 0.15s; }
-    .form-input:focus, .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,219,0.1); }
+    .form-input { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); font-family: inherit; outline: none; color: var(--text); transition: border-color 0.15s; }
+    .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,219,0.1); }
     .form-input::placeholder { color: var(--text-muted); }
 
     /* Checkbox */
@@ -86,13 +85,8 @@
     .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
 
     /* Waiting state */
-    .waiting-card { text-align: center; padding: 60px 36px; }
-    .waiting-icon { width: 64px; height: 64px; margin: 0 auto 24px; position: relative; }
-    .waiting-ring { width: 64px; height: 64px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1.2s linear infinite; }
+    .waiting-ring { border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1.2s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .waiting-card h2 { margin-bottom: 8px; }
-    .waiting-card .subtitle { margin-bottom: 32px; }
-    .webhook-feed { text-align: left; max-width: 400px; margin: 0 auto; }
     .webhook-pill { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f3f4f6; border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; animation: fadeIn 0.3s ease; }
     .webhook-pill .wp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .webhook-pill .wp-dot.green { background: var(--success); }
@@ -108,8 +102,7 @@
     .result-label { padding: 12px 0; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
     .result-value { padding: 12px 0; font-size: 13px; font-weight: 600; }
     .result-section { margin-bottom: 24px; }
-    .result-section h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .result-section h3 .icon { font-size: 16px; }
+    .result-section h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
     .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .status-completed { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
     .status-pending { background: var(--warning-bg); color: var(--warning); }
@@ -121,7 +114,6 @@
     .log-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .log-badge-get { background: #dbeafe; color: #1d4ed8; }
     .log-badge-post { background: #dcfce7; color: #166534; }
-    .log-badge-webhook { background: var(--gold-light); color: #92400e; }
     .log-endpoint { flex: 1; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .log-meta { font-size: 11px; color: var(--text-muted); }
     .log-body { border-top: 1px solid var(--border-light); display: none; }
@@ -129,12 +121,6 @@
     .log-body-section { padding: 10px 12px; }
     .log-body-section h5 { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
     .log-body-section pre { font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; background: var(--border-light); padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; line-height: 1.5; }
-
-    /* Bridge events */
-    .bridge-ev { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-left: 3px solid var(--accent); margin-bottom: 6px; background: var(--accent-subtle); border-radius: 0 6px 6px 0; font-size: 12px; }
-    .bridge-ev-type { font-weight: 600; color: var(--accent); }
-    .bridge-ev-time { margin-left: auto; font-size: 11px; color: var(--text-muted); }
-    .bridge-ev-data { margin-top: 4px; color: var(--text-secondary); font-family: monospace; font-size: 11px; }
 
     /* Webhook panel entries */
     .wh-entry { border: 1px solid var(--border-light); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
@@ -167,217 +153,216 @@
     .tunnel-info span { color: #1e40af; font-weight: 600; }
     .tunnel-info a { color: #2563eb; word-break: break-all; }
 
-    .api-panel.hidden { display: none; }
     @media (max-width: 1000px) { .api-panel { display: none; } }
   </style>
 </head>
 <body>
 
 <div class="main-layout">
-  <div class="app-panel">
-    <div class="app-content" id="appPanel"></div>
+  <div class="app-panel" id="appPanel">
+    <div class="app-content" id="appContent">
+
+      <!-- Step 0: Form -->
+      <div id="stepForm">
+        <h2>Tell us about yourself</h2>
+        <p class="subtitle">Enter applicant details to create a verification order. The backend sends these to the Truv Orders API.</p>
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label">First name</label>
+            <input class="form-input" id="firstName" placeholder="Joe">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last name</label>
+            <input class="form-input" id="lastName" placeholder="Doe">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email address</label>
+            <input class="form-input" id="email" type="email" placeholder="joe@example.com">
+          </div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label class="form-label">Phone number</label>
+            <input class="form-input" id="phone" type="tel" placeholder="123456789">
+          </div>
+          <div class="form-group">
+            <label class="form-label">SSN (last 4)</label>
+            <input class="form-input" id="ssn" placeholder="6789">
+          </div>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="agree" checked>
+          <label for="agree">I agree to the <a href="#">Acme Terms of Service</a></label>
+        </div>
+        <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">Continue</button>
+      </div>
+
+      <!-- Step 1: Bridge -->
+      <div id="stepBridge" class="hidden" style="width:100%;height:100%;">
+        <div class="bridge-wrapper" id="bridgeContainer"></div>
+      </div>
+
+      <!-- Step 2: Waiting -->
+      <div id="stepWaiting" class="hidden" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
+        <div style="width:72px;height:72px;margin-bottom:28px;">
+          <div class="waiting-ring" style="width:72px;height:72px;"></div>
+        </div>
+        <h2 style="margin-bottom:8px;">Waiting for webhooks</h2>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;max-width:400px;margin-bottom:36px;">Truv sends webhook events as the verification progresses. Watch them arrive in real time.</p>
+        <div id="webhookFeed" style="text-align:left;width:100%;max-width:420px;"></div>
+      </div>
+
+      <!-- Step 3: Results -->
+      <div id="stepResults" class="hidden"></div>
+
+    </div>
   </div>
+
   <div class="api-panel">
-    <div class="api-panel-header" id="apiPanelTabs"></div>
+    <div class="api-panel-header">
+      <button class="api-tab active" data-tab="guide" id="tabGuide">Guide</button>
+      <button class="api-tab" data-tab="api" id="tabApi">API Logs</button>
+      <button class="api-tab" data-tab="bridge" id="tabBridge">Events</button>
+      <button class="api-tab" data-tab="webhooks" id="tabWebhooks">Webhooks</button>
+    </div>
     <div class="api-tab-content" id="apiTabContent"></div>
   </div>
 </div>
 
 <script>
-const API_BASE = window.location.origin;
-const STEPS = [
+// Guide content is static HTML authored by developers, not user-supplied.
+// All dynamic data from API responses is escaped via esc() before rendering.
+
+var API_BASE = window.location.origin;
+
+var STEPS = [
   {
     title: 'Collect applicant info',
     summary: 'Create an order via POST /v1/orders/',
-    guide: `
-      <p>The form collects applicant PII and sends it to your backend. The server calls:</p>
-      <pre>POST /v1/orders/
-{
-  "first_name": "...",
-  "last_name": "...",
-  "products": ["income"],
-  "employers": [{ "company_name": "Home Depot" }]
-}</pre>
-      <p>The response contains a <code>bridge_token</code> used to initialize the Bridge widget, and an order <code>id</code> for polling results.</p>
-      <h5>Key fields</h5>
-      <ul>
-        <li><code>bridge_token</code> — single-use token to open Bridge</li>
-        <li><code>user_id</code> — identifies the user across webhooks</li>
-        <li><code>share_url</code> — shareable link for the applicant</li>
-        <li><code>template_id</code> — optional, for branded experience</li>
-      </ul>
-      <p><a href="https://docs.truv.com/reference/create-an-order" target="_blank">API Reference →</a></p>
-    `,
+    guide: '<p>The form collects applicant PII and sends it to your backend. The server calls:</p>'
+      + '<pre>POST /v1/orders/\n{\n  "first_name": "...",\n  "last_name": "...",\n  "products": ["income"],\n  "employers": [{ "company_name": "Home Depot" }]\n}</pre>'
+      + '<p>The response contains a <code>bridge_token</code> used to initialize the Bridge widget, and an order <code>id</code> for polling results.</p>'
+      + '<h5>Key fields</h5><ul>'
+      + '<li><code>bridge_token</code> — single-use token to open Bridge</li>'
+      + '<li><code>user_id</code> — identifies the user across webhooks</li>'
+      + '<li><code>share_url</code> — shareable link for the applicant</li>'
+      + '<li><code>template_id</code> — optional, for branded experience</li></ul>'
+      + '<p><a href="https://docs.truv.com/reference/create-an-order" target="_blank">API Reference →</a></p>',
   },
   {
     title: 'Bridge verification',
     summary: 'Applicant connects payroll via TruvBridge widget',
-    guide: `
-      <p>The Bridge widget is initialized with:</p>
-      <pre>TruvBridge.init({
-  bridgeToken: "...",
-  isOrder: true,
-  position: { type: "inline", container: el }
-})</pre>
-      <p>Bridge fires events as the user progresses:</p>
-      <ul>
-        <li><code>onLoad</code> — widget ready</li>
-        <li><code>onEvent(LOAD, OPEN, LINK_CREATED, ...)</code> — user actions</li>
-        <li><code>onEvent(COMPLETED, source: "order")</code> — verification done</li>
-        <li><code>onSuccess</code> / <code>onClose</code> — final callbacks</li>
-      </ul>
-      <p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p>
-      <p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs →</a></p>
-    `,
+    guide: '<p>The Bridge widget is initialized with:</p>'
+      + '<pre>TruvBridge.init({\n  bridgeToken: "...",\n  isOrder: true,\n  position: { type: "inline", container: el }\n})</pre>'
+      + '<p>Bridge fires events as the user progresses:</p><ul>'
+      + '<li><code>onLoad</code> — widget ready</li>'
+      + '<li><code>onEvent(LOAD, OPEN, LINK_CREATED, ...)</code> — user actions</li>'
+      + '<li><code>onEvent(COMPLETED, source: "order")</code> — verification done</li>'
+      + '<li><code>onSuccess</code> / <code>onClose</code> — final callbacks</li></ul>'
+      + '<p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p>'
+      + '<p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs →</a></p>',
   },
   {
     title: 'Webhook processing',
     summary: 'Receive real-time webhook events from Truv',
-    guide: `
-      <p>Truv sends webhooks to your registered URL as the verification progresses. Events arrive in this order:</p>
-      <ol>
-        <li><code>order-created</code> — order is pending</li>
-        <li><code>task-status-updated</code> — login → parse → full_parse → done</li>
-        <li><code>link-connected</code> — payroll link established</li>
-        <li><code>profile-created</code>, <code>employment-created</code>, <code>statements-created</code>, <code>bank-accounts-created</code></li>
-        <li><code>order-status-updated</code> (status: completed) — all done</li>
-      </ol>
-      <p>All webhooks include <code>user_id</code> for matching. Verify the <code>X-Webhook-Sign</code> header with HMAC-SHA256.</p>
-      <pre>const sig = crypto
-  .createHmac('sha256', API_SECRET)
-  .update(rawBody)
-  .digest('hex');</pre>
-      <p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs →</a></p>
-    `,
+    guide: '<p>Truv sends webhooks to your registered URL as the verification progresses. Events arrive in this order:</p><ol>'
+      + '<li><code>order-created</code> — order is pending</li>'
+      + '<li><code>task-status-updated</code> — login → parse → full_parse → done</li>'
+      + '<li><code>link-connected</code> — payroll link established</li>'
+      + '<li><code>profile-created</code>, <code>employment-created</code>, <code>statements-created</code>, <code>bank-accounts-created</code></li>'
+      + '<li><code>order-status-updated</code> (status: completed) — all done</li></ol>'
+      + '<p>All webhooks include <code>user_id</code> for matching. Verify the <code>X-Webhook-Sign</code> header with HMAC-SHA256.</p>'
+      + '<pre>const sig = crypto\n  .createHmac(\'sha256\', API_SECRET)\n  .update(rawBody)\n  .digest(\'hex\');</pre>'
+      + '<p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs →</a></p>',
   },
   {
     title: 'Retrieve results',
     summary: 'Fetch verified data via GET /v1/orders/{id}/',
-    guide: `
-      <p>Once the order is completed, fetch the full results:</p>
-      <pre>GET /v1/orders/{order_id}/</pre>
-      <p>The response includes nested <code>employers[]</code> with:</p>
-      <ul>
-        <li><strong>Profile</strong> — name, SSN, DOB, address</li>
-        <li><strong>Employment</strong> — title, start date, income, manager</li>
-        <li><strong>Pay Statements</strong> — gross/net pay, earnings, deductions per period</li>
-        <li><strong>W-2 Forms</strong> — annual wages and tax withholdings</li>
-        <li><strong>Bank Accounts</strong> — direct deposit routing info</li>
-        <li><strong>Annual Income Summary</strong> — aggregated by year</li>
-      </ul>
-      <p>You can also call <code>POST /v1/orders/{id}/refresh/</code> to re-pull data from the payroll provider.</p>
-      <p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference →</a></p>
-    `,
+    guide: '<p>Once the order is completed, fetch the full results:</p>'
+      + '<pre>GET /v1/orders/{order_id}/</pre>'
+      + '<p>The response includes nested <code>employers[]</code> with:</p><ul>'
+      + '<li><strong>Profile</strong> — name, SSN, DOB, address</li>'
+      + '<li><strong>Employment</strong> — title, start date, income, manager</li>'
+      + '<li><strong>Pay Statements</strong> — gross/net pay, earnings, deductions per period</li>'
+      + '<li><strong>W-2 Forms</strong> — annual wages and tax withholdings</li>'
+      + '<li><strong>Bank Accounts</strong> — direct deposit routing info</li>'
+      + '<li><strong>Annual Income Summary</strong> — aggregated by year</li></ul>'
+      + '<p>You can also call <code>POST /v1/orders/{id}/refresh/</code> to re-pull data from the payroll provider.</p>'
+      + '<p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference →</a></p>',
   },
 ];
 
-let state = {
+// --- State ---
+var state = {
   step: 0, orderId: null, truvOrderId: null, bridgeToken: null,
-  productType: 'income', formData: {}, bridgeEvents: [],
+  productType: 'income', bridgeEvents: [],
   apiLogs: [], webhooks: [], orderData: null, eventSource: null, tunnelUrl: null,
-  agreed: true,
 };
 
-// --- DOM helpers ---
-function el(tag, attrs, children) {
-  const node = document.createElement(tag);
-  if (attrs) for (const [k, v] of Object.entries(attrs)) {
-    if (k === 'className') node.className = v;
-    else if (k === 'onclick') node.addEventListener('click', v);
-    else if (k === 'onchange') node.addEventListener('change', v);
-    else if (k === 'style' && typeof v === 'string') node.setAttribute('style', v);
-    else if (k === 'disabled') node.disabled = v;
-    else if (k === 'readOnly') node.readOnly = v;
-    else if (k === 'checked') node.checked = v;
-    else if (k === 'type') node.type = v;
-    else if (k === 'value') node.value = v;
-    else if (k === 'placeholder') node.placeholder = v;
-    else if (k === 'id') node.id = v;
-    else if (k === 'selected') node.selected = v;
-    else if (k === 'href') node.href = v;
-    else if (k === 'target') node.target = v;
-    else if (k === 'for') node.htmlFor = v;
-    else node.setAttribute(k, v);
-  }
-  if (children != null) {
-    if (Array.isArray(children)) children.forEach(c => { if (c != null) node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
-    else if (typeof children === 'string') node.textContent = children;
-    else node.appendChild(children);
-  }
-  return node;
+// --- Helpers ---
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function $(amount) { return '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function freq(f) { return { BW: 'Biweekly', W: 'Weekly', M: 'Monthly', SM: 'Semi-Monthly', A: 'Annual' }[f] || f; }
+function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } catch(e) { return String(s); } }
+function resultRow(label, value) {
+  return '<div class="result-row"><div class="result-label">' + esc(label) + '</div><div class="result-value">' + esc(String(value)) + '</div></div>';
 }
 
-function goStep(n) { state.step = n; render(); }
+// --- Step switching ---
+var screens = ['stepForm', 'stepBridge', 'stepWaiting', 'stepResults'];
 
-// --- Render ---
-function render() {
-  const appPanel = document.querySelector('.app-panel');
-  appPanel.className = state.step === 1 ? 'app-panel no-pad' : 'app-panel';
-  const panel = document.getElementById('appPanel');
-  panel.replaceChildren();
-  panel.className = state.step === 0 ? 'app-content' : 'app-content full-width';
+function goStep(n) {
+  state.step = n;
+  var appPanel = document.getElementById('appPanel');
+  var appContent = document.getElementById('appContent');
+  appPanel.className = n === 1 ? 'app-panel no-pad' : 'app-panel';
+  appContent.className = n === 0 ? 'app-content' : 'app-content full-width';
 
-  if (state.step === 0) panel.appendChild(buildFormScreen());
-  else if (state.step === 1) panel.appendChild(buildBridgeScreen());
-  else if (state.step === 2) panel.appendChild(buildWaitingScreen());
-  else panel.appendChild(buildResultsScreen());
+  for (var i = 0; i < screens.length; i++) {
+    var el = document.getElementById(screens[i]);
+    if (i === n) {
+      el.classList.remove('hidden');
+      if (screens[i] === 'stepWaiting') el.style.display = 'flex';
+    } else {
+      el.classList.add('hidden');
+      if (screens[i] === 'stepWaiting') el.style.display = 'none';
+    }
+  }
+
+  if (n === 1) setTimeout(initBridge, 100);
+  if (n === 2) { waitingStartedAt = Date.now(); updateWaitingFeed(); }
+  if (n === 3 && !state.orderData) setTimeout(fetchOrderData, 100);
+  if (n === 3 && state.orderData) renderResults();
 
   renderApiPanel();
 }
 
-// --- Step 1: Form ---
-function buildFormScreen() {
-  const card = el('div');
-  card.appendChild(el('h2', {}, 'Tell us about yourself'));
-  card.appendChild(el('p', { className: 'subtitle' }, 'Enter applicant details to create a verification order. The backend sends these to the Truv Orders API.'));
-
-  card.appendChild(el('div', { className: 'form-row form-row-2' }, [
-    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'First name'), el('input', { className: 'form-input', id: 'firstName', value: state.formData.first_name || '', placeholder: 'Joe' })]),
-    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Last name'), el('input', { className: 'form-input', id: 'lastName', value: state.formData.last_name || '', placeholder: 'Doe' })]),
-  ]));
-
-  card.appendChild(el('div', { className: 'form-row' }, [
-    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Email address'), el('input', { className: 'form-input', id: 'email', type: 'email', value: state.formData.email || '', placeholder: 'joe@example.com' })]),
-  ]));
-
-  card.appendChild(el('div', { className: 'form-row form-row-2' }, [
-    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'Phone number'), el('input', { className: 'form-input', id: 'phone', type: 'tel', value: state.formData.phone || '', placeholder: '123456789' })]),
-    el('div', { className: 'form-group' }, [el('label', { className: 'form-label' }, 'SSN (last 4)'), el('input', { className: 'form-input', id: 'ssn', value: state.formData.ssn || '', placeholder: '6789' })]),
-  ]));
-
-  // TOS
-  const cb = el('input', { type: 'checkbox', id: 'agree', checked: state.agreed, onchange: function() { state.agreed = this.checked; } });
-  card.appendChild(el('div', { className: 'checkbox-row' }, [
-    cb,
-    el('label', { 'for': 'agree' }, [
-      document.createTextNode('I agree to the '),
-      el('a', { href: '#' }, 'Acme Terms of Service'),
-    ]),
-  ]));
-
-  card.appendChild(el('button', { className: 'btn btn-primary', id: 'submitBtn', onclick: handleSubmit }, 'Continue'));
-  return card;
-}
-
+// --- Step 1: Submit form ---
 async function handleSubmit() {
-  if (!state.agreed) return;
-  const btn = document.getElementById('submitBtn');
+  if (!document.getElementById('agree').checked) return;
+  var btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.replaceChildren(el('span', { className: 'spinner-sm' }));
+  btn.textContent = '';
+  var spinner = document.createElement('span');
+  spinner.className = 'spinner-sm';
+  btn.appendChild(spinner);
 
-  state.formData = {
+  var formData = {
     first_name: document.getElementById('firstName').value || undefined,
     last_name: document.getElementById('lastName').value || undefined,
     email: document.getElementById('email').value || undefined,
     phone: document.getElementById('phone').value || undefined,
     ssn: document.getElementById('ssn').value || undefined,
   };
+
   try {
-    const resp = await fetch(API_BASE + '/api/orders', {
+    var resp = await fetch(API_BASE + '/api/orders', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...state.formData, product_type: state.productType }),
+      body: JSON.stringify({ ...formData, product_type: state.productType }),
     });
-    const data = await resp.json();
+    var data = await resp.json();
     if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); btn.disabled = false; btn.textContent = 'Continue'; return; }
     state.orderId = data.order_id;
     state.truvOrderId = data.truv_order_id;
@@ -389,13 +374,7 @@ async function handleSubmit() {
 }
 
 // --- Step 2: Bridge ---
-let bridgeInstance = null;
-
-function buildBridgeScreen() {
-  const wrapper = el('div', { className: 'bridge-wrapper', id: 'bridgeContainer' });
-  setTimeout(initBridge, 100);
-  return wrapper;
-}
+var bridgeInstance = null;
 
 function initBridge() {
   if (!state.bridgeToken) return;
@@ -403,13 +382,9 @@ function initBridge() {
     bridgeToken: state.bridgeToken,
     isOrder: true,
     position: { type: 'inline', container: document.getElementById('bridgeContainer') },
-    onLoad: function() {
-      addBridgeEvent('onLoad', null);
-      const l = document.querySelector('.bridge-loading');
-      if (l) l.style.display = 'none';
-    },
+    onLoad: function() { addBridgeEvent('onLoad', null); },
     onEvent: function(eventType, payload, source) {
-      addBridgeEvent('onEvent', { eventType, source });
+      addBridgeEvent('onEvent', { eventType: eventType, source: source });
       if (source === 'order' && eventType === 'COMPLETED') {
         setTimeout(async function() { await fetchLogs(); goStep(2); }, 1500);
       }
@@ -420,312 +395,406 @@ function initBridge() {
   if (bridgeInstance) bridgeInstance.open();
 }
 
-function addBridgeEvent(type, data) { state.bridgeEvents.push({ type, data, timestamp: new Date().toISOString() }); renderApiPanel(); }
+function addBridgeEvent(type, data) {
+  state.bridgeEvents.push({ type: type, data: data, timestamp: new Date().toISOString() });
+  renderApiPanel();
+}
 
 // --- Step 3: Waiting ---
-let waitingStartedAt = null;
-const WAITING_MIN_MS = 10000;
+var waitingStartedAt = null;
+var WAITING_MIN_MS = 10000;
 
-function buildWaitingScreen() {
-  if (!waitingStartedAt) waitingStartedAt = Date.now();
-
-  const root = el('div', { style: 'display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;' });
-
-  const icon = el('div', { style: 'width:72px;height:72px;margin-bottom:28px;position:relative;' });
-  icon.appendChild(el('div', { className: 'waiting-ring', style: 'width:72px;height:72px;' }));
-  root.appendChild(icon);
-
-  root.appendChild(el('h2', { style: 'margin-bottom:8px;' }, 'Waiting for webhooks'));
-  root.appendChild(el('p', { style: 'font-size:14px;color:var(--text-secondary);line-height:1.6;max-width:400px;margin-bottom:36px;' }, 'Truv sends webhook events as the verification progresses. Watch them arrive in real time.'));
-
-  if (state.webhooks.length > 0) {
-    const feed = el('div', { style: 'text-align:left;width:100%;max-width:420px;' });
-    [...state.webhooks].reverse().forEach(w => {
-      const payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
-      const eventType = payload.event_type || w.event_type || 'unknown';
-      const status = payload.status || w.status || '';
-      const ts = payload.event_created_at || payload.updated_at || w.received_at || '';
-      const timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
-      const dotColor = status === 'completed' || status === 'done' ? 'green' : status === 'pending' ? 'yellow' : 'blue';
-
-      feed.appendChild(el('div', { className: 'webhook-pill' }, [
-        el('div', { className: 'wp-dot ' + dotColor }),
-        el('span', { className: 'wp-text' }, eventType.replace(/-/g, ' ')),
-        el('span', { className: 'wp-time' }, timeStr),
-      ]));
-    });
-    root.appendChild(feed);
+function updateWaitingFeed() {
+  if (state.step !== 2) return;
+  var feed = document.getElementById('webhookFeed');
+  if (state.webhooks.length === 0) {
+    feed.textContent = 'No webhooks received yet...';
+    feed.style.textAlign = 'center';
+    feed.style.fontSize = '13px';
+    feed.style.color = 'var(--text-muted)';
   } else {
-    root.appendChild(el('p', { style: 'font-size:13px;color:var(--text-muted);' }, 'No webhooks received yet...'));
+    feed.style.textAlign = 'left';
+    feed.style.fontSize = '';
+    feed.style.color = '';
+    // Build webhook pills using DOM methods for safety
+    feed.textContent = '';
+    var reversed = state.webhooks.slice().reverse();
+    for (var i = 0; i < reversed.length; i++) {
+      var w = reversed[i];
+      var payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+      var eventType = payload.event_type || w.event_type || 'unknown';
+      var status = payload.status || w.status || '';
+      var ts = payload.event_created_at || payload.updated_at || w.received_at || '';
+      var timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
+      var dotColor = status === 'completed' || status === 'done' ? 'green' : status === 'pending' ? 'yellow' : 'blue';
+
+      var pill = document.createElement('div');
+      pill.className = 'webhook-pill';
+      var dot = document.createElement('div');
+      dot.className = 'wp-dot ' + dotColor;
+      pill.appendChild(dot);
+      var text = document.createElement('span');
+      text.className = 'wp-text';
+      text.textContent = eventType.replace(/-/g, ' ');
+      pill.appendChild(text);
+      var time = document.createElement('span');
+      time.className = 'wp-time';
+      time.textContent = timeStr;
+      pill.appendChild(time);
+      feed.appendChild(pill);
+    }
   }
 
-  // Auto-advance after min wait time + order completed
-  const elapsed = Date.now() - waitingStartedAt;
-  const isCompleted = state.webhooks.some(w => {
-    const p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+  // Auto-advance
+  var elapsed = Date.now() - waitingStartedAt;
+  var isCompleted = state.webhooks.some(function(w) {
+    var p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
     return p.event_type === 'order-status-updated' && p.status === 'completed';
   });
   if (isCompleted && elapsed >= WAITING_MIN_MS) {
-    setTimeout(() => { waitingStartedAt = null; goStep(3); }, 1000);
+    setTimeout(function() { waitingStartedAt = null; goStep(3); }, 1000);
   } else if (isCompleted) {
-    setTimeout(() => { waitingStartedAt = null; goStep(3); }, WAITING_MIN_MS - elapsed + 1000);
+    setTimeout(function() { waitingStartedAt = null; goStep(3); }, WAITING_MIN_MS - elapsed + 1000);
   }
-
-  return root;
 }
 
 // --- Step 4: Results ---
-function $(amount) { return '$' + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-function freq(f) { return { BW: 'Biweekly', W: 'Weekly', M: 'Monthly', SM: 'Semi-Monthly', A: 'Annual' }[f] || f; }
+function renderResults() {
+  var container = document.getElementById('stepResults');
+  var data = state.orderData || {};
+  var raw = data.raw_response || {};
 
-function buildResultsScreen() {
-  if (state.orderId && !state.orderData) {
-    setTimeout(fetchOrderData, 100);
-    const wrap = el('div', { style: 'text-align:center;padding:60px;' });
-    wrap.appendChild(el('div', { className: 'waiting-ring', style: 'width:40px;height:40px;margin:0 auto 12px;' }));
-    wrap.appendChild(el('p', { style: 'font-size:14px;color:var(--text-secondary);' }, 'Loading results...'));
-    return wrap;
-  }
+  // Build results using DOM for safety with API data
+  container.textContent = '';
 
-  const data = state.orderData || {};
-  const raw = data.raw_response || {};
-  const root = el('div');
+  var h2 = document.createElement('h2');
+  h2.textContent = 'Verification Results';
+  container.appendChild(h2);
 
-  root.appendChild(el('h2', {}, 'Verification Results'));
-  root.appendChild(el('p', { className: 'subtitle' }, 'Order ' + (data.truv_order_id || state.truvOrderId || '') + ' \u2022 ' + (raw.verification_type || state.productType || '') + ' \u2022 ' + (data.status || '')));
+  var subtitle = document.createElement('p');
+  subtitle.className = 'subtitle';
+  subtitle.textContent = 'Order ' + (data.truv_order_id || state.truvOrderId || '') + ' \u2022 ' + (raw.verification_type || state.productType || '') + ' \u2022 ' + (data.status || '');
+  container.appendChild(subtitle);
 
-  // Iterate employers
-  const employers = raw.employers || [];
-  for (const emp of employers) {
-    const employment = (emp.employments && emp.employments[0]) || {};
-    const profile = employment.profile || {};
-    const company = employment.company || {};
-    const stmts = employment.statements || [];
-    const annualSummary = employment.annual_income_summary || [];
-    const bankAccounts = employment.bank_accounts || [];
-    const w2s = employment.w2s || [];
+  var employers = raw.employers || [];
+  for (var ei = 0; ei < employers.length; ei++) {
+    var emp = employers[ei];
+    var employment = (emp.employments && emp.employments[0]) || {};
+    var profile = employment.profile || {};
+    var company = employment.company || {};
+    var stmts = employment.statements || [];
+    var annualSummary = employment.annual_income_summary || [];
+    var bankAccounts = employment.bank_accounts || [];
+    var w2s = employment.w2s || [];
 
     // Employer header
-    const empHeader = el('div', { style: 'display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px 0;border-bottom:2px solid var(--border);' });
-    if (emp.company_logo) {
-      empHeader.appendChild(el('img', { style: 'width:40px;height:40px;border-radius:8px;object-fit:contain;border:1px solid var(--border);', src: emp.company_logo }));
-    } else if (emp.provider && emp.provider.logo_url) {
-      empHeader.appendChild(el('img', { style: 'width:40px;height:40px;border-radius:8px;object-fit:contain;', src: emp.provider.logo_url }));
+    var empHeader = document.createElement('div');
+    empHeader.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px 0;border-bottom:2px solid var(--border);';
+    var logoUrl = emp.company_logo || (emp.provider && emp.provider.logo_url) || '';
+    if (logoUrl) {
+      var logo = document.createElement('img');
+      logo.style.cssText = 'width:40px;height:40px;border-radius:8px;object-fit:contain;border:1px solid var(--border);';
+      logo.src = logoUrl;
+      empHeader.appendChild(logo);
     }
-    const empInfo = el('div');
-    empInfo.appendChild(el('div', { style: 'font-size:18px;font-weight:700;' }, emp.company_name || company.name || 'Employer'));
-    const meta = [emp.provider ? 'via ' + emp.provider.name : '', emp.data_source || ''].filter(Boolean).join(' \u2022 ');
-    if (meta) empInfo.appendChild(el('div', { style: 'font-size:13px;color:var(--text-secondary);margin-top:2px;' }, meta));
+    var empInfo = document.createElement('div');
+    var empName = document.createElement('div');
+    empName.style.cssText = 'font-size:18px;font-weight:700;';
+    empName.textContent = emp.company_name || company.name || 'Employer';
+    empInfo.appendChild(empName);
+    var meta = [emp.provider ? 'via ' + emp.provider.name : '', emp.data_source || ''].filter(Boolean).join(' \u2022 ');
+    if (meta) {
+      var metaEl = document.createElement('div');
+      metaEl.style.cssText = 'font-size:13px;color:var(--text-secondary);margin-top:2px;';
+      metaEl.textContent = meta;
+      empInfo.appendChild(metaEl);
+    }
     empHeader.appendChild(empInfo);
-    const empStatus = el('span', { className: 'status-badge ' + (emp.status === 'completed' ? 'status-completed' : 'status-pending'), style: 'margin-left:auto;' }, emp.status || '-');
+    var empStatus = document.createElement('span');
+    empStatus.className = 'status-badge ' + (emp.status === 'completed' ? 'status-completed' : 'status-pending');
+    empStatus.style.marginLeft = 'auto';
+    empStatus.textContent = emp.status || '-';
     empHeader.appendChild(empStatus);
-    root.appendChild(empHeader);
+    container.appendChild(empHeader);
 
     // Profile section
     if (profile.first_name) {
-      const sec = el('div', { className: 'result-section' });
-      sec.appendChild(el('h3', {}, 'Profile'));
-      const g = el('div', { className: 'results-grid' });
-      addResultRow(g, 'Full Name', profile.full_name || (profile.first_name + ' ' + profile.last_name));
-      if (profile.email) addResultRow(g, 'Email', profile.email);
-      if (profile.date_of_birth) addResultRow(g, 'Date of Birth', profile.date_of_birth);
-      if (profile.ssn) addResultRow(g, 'SSN', profile.ssn.replace(/^(\d{3})(\d{2})(\d{4})$/, '$1-$2-$3'));
+      var sec = makeSection('Profile');
+      var g = document.createElement('div'); g.className = 'results-grid';
+      addRow(g, 'Full Name', profile.full_name || (profile.first_name + ' ' + profile.last_name));
+      if (profile.email) addRow(g, 'Email', profile.email);
+      if (profile.date_of_birth) addRow(g, 'Date of Birth', profile.date_of_birth);
+      if (profile.ssn) addRow(g, 'SSN', profile.ssn.replace(/^(\d{3})(\d{2})(\d{4})$/, '$1-$2-$3'));
       if (profile.home_address) {
-        const a = profile.home_address;
-        addResultRow(g, 'Address', [a.street, a.city, a.state, a.zip].filter(Boolean).join(', '));
+        var a = profile.home_address;
+        addRow(g, 'Address', [a.street, a.city, a.state, a.zip].filter(Boolean).join(', '));
       }
-      sec.appendChild(g);
-      root.appendChild(sec);
+      sec.appendChild(g); container.appendChild(sec);
     }
 
     // Employment section
     if (employment.job_title) {
-      const sec = el('div', { className: 'result-section' });
-      sec.appendChild(el('h3', {}, 'Employment'));
-      const g = el('div', { className: 'results-grid' });
-      addResultRow(g, 'Job Title', employment.job_title);
-      addResultRow(g, 'Job Type', employment.job_type === 'F' ? 'Full-time' : employment.job_type === 'P' ? 'Part-time' : employment.job_type || '-');
-      addResultRow(g, 'Status', employment.is_active ? 'Active' : 'Inactive');
-      addResultRow(g, 'Start Date', employment.start_date || '-');
-      if (employment.end_date) addResultRow(g, 'End Date', employment.end_date);
-      if (employment.original_hire_date) addResultRow(g, 'Original Hire Date', employment.original_hire_date);
-      if (employment.employed_in_role) addResultRow(g, 'Tenure', employment.employed_in_role);
-      if (employment.manager_name) addResultRow(g, 'Manager', employment.manager_name);
-      if (employment.income) addResultRow(g, 'Annual Income', $(employment.income));
-      if (employment.pay_rate) addResultRow(g, 'Pay Rate', $(employment.pay_rate) + ' ' + freq(employment.pay_frequency));
-      if (company.phone) addResultRow(g, 'Company Phone', company.phone);
+      var sec2 = makeSection('Employment');
+      var g2 = document.createElement('div'); g2.className = 'results-grid';
+      addRow(g2, 'Job Title', employment.job_title);
+      addRow(g2, 'Job Type', employment.job_type === 'F' ? 'Full-time' : employment.job_type === 'P' ? 'Part-time' : employment.job_type || '-');
+      addRow(g2, 'Status', employment.is_active ? 'Active' : 'Inactive');
+      addRow(g2, 'Start Date', employment.start_date || '-');
+      if (employment.end_date) addRow(g2, 'End Date', employment.end_date);
+      if (employment.original_hire_date) addRow(g2, 'Original Hire Date', employment.original_hire_date);
+      if (employment.employed_in_role) addRow(g2, 'Tenure', employment.employed_in_role);
+      if (employment.manager_name) addRow(g2, 'Manager', employment.manager_name);
+      if (employment.income) addRow(g2, 'Annual Income', $(employment.income));
+      if (employment.pay_rate) addRow(g2, 'Pay Rate', $(employment.pay_rate) + ' ' + freq(employment.pay_frequency));
+      if (company.phone) addRow(g2, 'Company Phone', company.phone);
       if (company.address) {
-        const a = company.address;
-        addResultRow(g, 'Company Address', [a.street, a.city, a.state, a.zip].filter(Boolean).join(', '));
+        var ca = company.address;
+        addRow(g2, 'Company Address', [ca.street, ca.city, ca.state, ca.zip].filter(Boolean).join(', '));
       }
-      sec.appendChild(g);
-      root.appendChild(sec);
+      sec2.appendChild(g2); container.appendChild(sec2);
     }
 
     // Annual Income Summary
     if (annualSummary.length > 0) {
-      const sec = el('div', { className: 'result-section' });
-      sec.appendChild(el('h3', {}, 'Annual Income Summary'));
-      const table = el('table', { style: 'width:100%;border-collapse:collapse;font-size:13px;' });
-      const thead = el('tr', { style: 'border-bottom:2px solid var(--border);' });
-      ['Year', 'Gross Pay', 'Net Pay', 'Regular', 'Overtime', 'Other'].forEach(h => {
-        thead.appendChild(el('th', { style: 'text-align:left;padding:8px 12px;font-weight:600;color:var(--text-secondary);' }, h));
+      var sec3 = makeSection('Annual Income Summary');
+      var table = document.createElement('table');
+      table.style.cssText = 'width:100%;border-collapse:collapse;font-size:13px;';
+      var thead = document.createElement('tr');
+      thead.style.cssText = 'border-bottom:2px solid var(--border);';
+      ['Year', 'Gross Pay', 'Net Pay', 'Regular', 'Overtime', 'Other'].forEach(function(h) {
+        var th = document.createElement('th');
+        th.style.cssText = 'text-align:left;padding:8px 12px;font-weight:600;color:var(--text-secondary);';
+        th.textContent = h;
+        thead.appendChild(th);
       });
       table.appendChild(thead);
-      annualSummary.forEach(yr => {
-        const tr = el('tr', { style: 'border-bottom:1px solid var(--border-light);' });
-        [yr.year, $(yr.gross_pay), $(yr.net_pay), yr.regular ? $(yr.regular) : '-', yr.overtime ? $(yr.overtime) : '-', yr.other_pay ? $(yr.other_pay) : '-'].forEach((v, i) => {
-          tr.appendChild(el('td', { style: 'padding:8px 12px;' + (i === 0 ? 'font-weight:600;' : '') }, String(v)));
+      annualSummary.forEach(function(yr) {
+        var tr = document.createElement('tr');
+        tr.style.cssText = 'border-bottom:1px solid var(--border-light);';
+        [String(yr.year), $(yr.gross_pay), $(yr.net_pay), yr.regular ? $(yr.regular) : '-', yr.overtime ? $(yr.overtime) : '-', yr.other_pay ? $(yr.other_pay) : '-'].forEach(function(v, i) {
+          var td = document.createElement('td');
+          td.style.cssText = 'padding:8px 12px;' + (i === 0 ? 'font-weight:600;' : '');
+          td.textContent = v;
+          tr.appendChild(td);
         });
         table.appendChild(tr);
       });
-      sec.appendChild(table);
-      root.appendChild(sec);
+      sec3.appendChild(table); container.appendChild(sec3);
     }
 
-    // Recent Pay Statements (latest 3)
+    // Pay Statements
     if (stmts.length > 0) {
-      const sec = el('div', { className: 'result-section' });
-      sec.appendChild(el('h3', {}, 'Pay Statements (' + stmts.length + ' total)'));
-      const recent = stmts.slice(0, 3);
-      recent.forEach(st => {
-        const stCard = el('div', { style: 'border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;overflow:hidden;' });
-        const stHeader = el('div', { style: 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--border-light);cursor:pointer;', onclick: function() { const body = this.nextElementSibling; body.style.display = body.style.display === 'none' ? 'block' : 'none'; } });
-        stHeader.appendChild(el('div', { style: 'font-weight:600;font-size:13px;' }, 'Pay Date: ' + st.pay_date));
-        stHeader.appendChild(el('div', { style: 'display:flex;gap:16px;font-size:13px;' }, [
-          el('span', { style: 'color:var(--text-secondary);' }, 'Gross: '),
-          el('span', { style: 'font-weight:600;' }, $(st.gross_pay)),
-          el('span', { style: 'color:var(--text-secondary);margin-left:8px;' }, 'Net: '),
-          el('span', { style: 'font-weight:600;color:var(--success);' }, $(st.net_pay)),
-        ]));
+      var sec4 = makeSection('Pay Statements (' + stmts.length + ' total)');
+      var recent = stmts.slice(0, 3);
+      recent.forEach(function(st) {
+        var stCard = document.createElement('div');
+        stCard.style.cssText = 'border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;overflow:hidden;';
+
+        var stHeader = document.createElement('div');
+        stHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--border-light);cursor:pointer;';
+        stHeader.onclick = function() { var b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none'; };
+        var hLeft = document.createElement('div');
+        hLeft.style.cssText = 'font-weight:600;font-size:13px;';
+        hLeft.textContent = 'Pay Date: ' + st.pay_date;
+        stHeader.appendChild(hLeft);
+        var hRight = document.createElement('div');
+        hRight.style.cssText = 'display:flex;gap:16px;font-size:13px;';
+        hRight.textContent = 'Gross: ' + $(st.gross_pay) + '  Net: ' + $(st.net_pay);
+        stHeader.appendChild(hRight);
         stCard.appendChild(stHeader);
-        const stBody = el('div', { style: 'display:none;padding:12px 16px;' });
-        const stGrid = el('div', { className: 'results-grid', style: 'margin-bottom:12px;' });
-        addResultRow(stGrid, 'Period', (st.period_start || '') + ' to ' + (st.period_end || ''));
-        addResultRow(stGrid, 'Hours', st.hours || '-');
-        addResultRow(stGrid, 'Regular', st.regular ? $(st.regular) : '-');
-        addResultRow(stGrid, 'Overtime', st.overtime ? $(st.overtime) : '-');
-        stBody.appendChild(stGrid);
-        // Earnings
+
+        var stBody = document.createElement('div');
+        stBody.style.cssText = 'display:none;padding:12px 16px;';
+        var sg = document.createElement('div'); sg.className = 'results-grid'; sg.style.marginBottom = '12px';
+        addRow(sg, 'Period', (st.period_start || '') + ' to ' + (st.period_end || ''));
+        addRow(sg, 'Hours', String(st.hours || '-'));
+        addRow(sg, 'Regular', st.regular ? $(st.regular) : '-');
+        addRow(sg, 'Overtime', st.overtime ? $(st.overtime) : '-');
+        stBody.appendChild(sg);
+
         if (st.earnings && st.earnings.length) {
-          stBody.appendChild(el('div', { style: 'font-size:12px;font-weight:600;color:var(--text-secondary);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.5px;' }, 'Earnings'));
-          const et = el('table', { style: 'width:100%;font-size:12px;border-collapse:collapse;' });
-          st.earnings.forEach(e => {
-            const tr = el('tr', { style: 'border-bottom:1px solid var(--border-light);' });
-            tr.appendChild(el('td', { style: 'padding:4px 8px;' }, e.name));
-            tr.appendChild(el('td', { style: 'padding:4px 8px;text-align:right;font-weight:500;' }, $(e.amount)));
+          stBody.appendChild(makeSubheading('Earnings'));
+          var et = document.createElement('table'); et.style.cssText = 'width:100%;font-size:12px;border-collapse:collapse;';
+          st.earnings.forEach(function(e) {
+            var tr = document.createElement('tr'); tr.style.cssText = 'border-bottom:1px solid var(--border-light);';
+            var td1 = document.createElement('td'); td1.style.cssText = 'padding:4px 8px;'; td1.textContent = e.name; tr.appendChild(td1);
+            var td2 = document.createElement('td'); td2.style.cssText = 'padding:4px 8px;text-align:right;font-weight:500;'; td2.textContent = $(e.amount); tr.appendChild(td2);
             et.appendChild(tr);
           });
           stBody.appendChild(et);
         }
-        // Deductions
         if (st.deductions && st.deductions.length) {
-          stBody.appendChild(el('div', { style: 'font-size:12px;font-weight:600;color:var(--text-secondary);margin:12px 0 4px;text-transform:uppercase;letter-spacing:0.5px;' }, 'Deductions'));
-          const dt = el('table', { style: 'width:100%;font-size:12px;border-collapse:collapse;' });
-          st.deductions.forEach(d => {
-            const tr = el('tr', { style: 'border-bottom:1px solid var(--border-light);' });
-            tr.appendChild(el('td', { style: 'padding:4px 8px;' }, d.name));
-            tr.appendChild(el('td', { style: 'padding:4px 8px;text-align:right;font-weight:500;color:var(--error);' }, '-' + $(d.amount)));
+          stBody.appendChild(makeSubheading('Deductions'));
+          var dt = document.createElement('table'); dt.style.cssText = 'width:100%;font-size:12px;border-collapse:collapse;';
+          st.deductions.forEach(function(d) {
+            var tr = document.createElement('tr'); tr.style.cssText = 'border-bottom:1px solid var(--border-light);';
+            var td1 = document.createElement('td'); td1.style.cssText = 'padding:4px 8px;'; td1.textContent = d.name; tr.appendChild(td1);
+            var td2 = document.createElement('td'); td2.style.cssText = 'padding:4px 8px;text-align:right;font-weight:500;color:var(--error);'; td2.textContent = '-' + $(d.amount); tr.appendChild(td2);
             dt.appendChild(tr);
           });
           stBody.appendChild(dt);
         }
         if (st.file) {
-          stBody.appendChild(el('a', { href: st.file, target: '_blank', style: 'display:inline-block;margin-top:10px;font-size:12px;color:var(--accent);font-weight:500;' }, 'Download PDF'));
+          var dl = document.createElement('a');
+          dl.href = st.file; dl.target = '_blank';
+          dl.style.cssText = 'display:inline-block;margin-top:10px;font-size:12px;color:var(--accent);font-weight:500;';
+          dl.textContent = 'Download PDF';
+          stBody.appendChild(dl);
         }
         stCard.appendChild(stBody);
-        sec.appendChild(stCard);
+        sec4.appendChild(stCard);
       });
       if (stmts.length > 3) {
-        sec.appendChild(el('p', { style: 'font-size:12px;color:var(--text-muted);' }, '+ ' + (stmts.length - 3) + ' more statements available in API response'));
+        var more = document.createElement('p');
+        more.style.cssText = 'font-size:12px;color:var(--text-muted);';
+        more.textContent = '+ ' + (stmts.length - 3) + ' more statements available in API response';
+        sec4.appendChild(more);
       }
-      root.appendChild(sec);
+      container.appendChild(sec4);
     }
 
     // W-2s
     if (w2s.length > 0) {
-      const sec = el('div', { className: 'result-section' });
-      sec.appendChild(el('h3', {}, 'W-2 Forms'));
-      const table = el('table', { style: 'width:100%;border-collapse:collapse;font-size:13px;' });
-      const thead = el('tr', { style: 'border-bottom:2px solid var(--border);' });
-      ['Year', 'Wages', 'Federal Tax', 'SS Tax', 'Medicare Tax', ''].forEach(h => {
-        thead.appendChild(el('th', { style: 'text-align:left;padding:8px 12px;font-weight:600;color:var(--text-secondary);' }, h));
+      var sec5 = makeSection('W-2 Forms');
+      var t2 = document.createElement('table');
+      t2.style.cssText = 'width:100%;border-collapse:collapse;font-size:13px;';
+      var th2 = document.createElement('tr');
+      th2.style.cssText = 'border-bottom:2px solid var(--border);';
+      ['Year', 'Wages', 'Federal Tax', 'SS Tax', 'Medicare Tax', ''].forEach(function(h) {
+        var th = document.createElement('th');
+        th.style.cssText = 'text-align:left;padding:8px 12px;font-weight:600;color:var(--text-secondary);';
+        th.textContent = h;
+        th2.appendChild(th);
       });
-      table.appendChild(thead);
-      w2s.forEach(w => {
-        const tr = el('tr', { style: 'border-bottom:1px solid var(--border-light);' });
-        tr.appendChild(el('td', { style: 'padding:8px 12px;font-weight:600;' }, String(w.year)));
-        tr.appendChild(el('td', { style: 'padding:8px 12px;' }, w.wages ? $(w.wages) : '-'));
-        tr.appendChild(el('td', { style: 'padding:8px 12px;' }, w.federal_tax ? $(w.federal_tax) : '-'));
-        tr.appendChild(el('td', { style: 'padding:8px 12px;' }, w.social_security_tax ? $(w.social_security_tax) : '-'));
-        tr.appendChild(el('td', { style: 'padding:8px 12px;' }, w.medicare_tax ? $(w.medicare_tax) : '-'));
-        const dl = el('td', { style: 'padding:8px 12px;' });
-        if (w.file) dl.appendChild(el('a', { href: w.file, target: '_blank', style: 'color:var(--accent);font-weight:500;font-size:12px;' }, 'PDF'));
-        tr.appendChild(dl);
-        table.appendChild(tr);
+      t2.appendChild(th2);
+      w2s.forEach(function(w) {
+        var tr = document.createElement('tr');
+        tr.style.cssText = 'border-bottom:1px solid var(--border-light);';
+        var cells = [String(w.year), w.wages ? $(w.wages) : '-', w.federal_tax ? $(w.federal_tax) : '-', w.social_security_tax ? $(w.social_security_tax) : '-', w.medicare_tax ? $(w.medicare_tax) : '-'];
+        cells.forEach(function(v, i) {
+          var td = document.createElement('td');
+          td.style.cssText = 'padding:8px 12px;' + (i === 0 ? 'font-weight:600;' : '');
+          td.textContent = v;
+          tr.appendChild(td);
+        });
+        var dlTd = document.createElement('td');
+        dlTd.style.cssText = 'padding:8px 12px;';
+        if (w.file) {
+          var pdfLink = document.createElement('a');
+          pdfLink.href = w.file; pdfLink.target = '_blank';
+          pdfLink.style.cssText = 'color:var(--accent);font-weight:500;font-size:12px;';
+          pdfLink.textContent = 'PDF';
+          dlTd.appendChild(pdfLink);
+        }
+        tr.appendChild(dlTd);
+        t2.appendChild(tr);
       });
-      sec.appendChild(table);
-      root.appendChild(sec);
+      sec5.appendChild(t2); container.appendChild(sec5);
     }
 
     // Bank Accounts
     if (bankAccounts.length > 0) {
-      const sec = el('div', { className: 'result-section' });
-      sec.appendChild(el('h3', {}, 'Bank Accounts'));
-      const g = el('div', { className: 'results-grid' });
-      bankAccounts.forEach((ba, i) => {
-        addResultRow(g, 'Account ' + (i + 1), (ba.bank_name || '') + ' \u2022 ' + (ba.account_type === 'C' ? 'Checking' : 'Savings') + ' \u2022 ...' + (ba.account_number || '').slice(-4));
-        addResultRow(g, 'Deposit', (ba.deposit_type === 'A' ? 'Amount: ' : 'Percent: ') + $(ba.deposit_value));
+      var sec6 = makeSection('Bank Accounts');
+      var g6 = document.createElement('div'); g6.className = 'results-grid';
+      bankAccounts.forEach(function(ba, i) {
+        addRow(g6, 'Account ' + (i + 1), (ba.bank_name || '') + ' \u2022 ' + (ba.account_type === 'C' ? 'Checking' : 'Savings') + ' \u2022 ...' + (ba.account_number || '').slice(-4));
+        addRow(g6, 'Deposit', (ba.deposit_type === 'A' ? 'Amount: ' : 'Percent: ') + $(ba.deposit_value));
       });
-      sec.appendChild(g);
-      root.appendChild(sec);
+      sec6.appendChild(g6); container.appendChild(sec6);
     }
   }
 
-  // If no employers found, show basic order info
+  // No employers
   if (employers.length === 0) {
-    const sec = el('div', { className: 'result-section' });
-    sec.appendChild(el('h3', {}, 'Order Details'));
-    const g = el('div', { className: 'results-grid' });
-    addResultRow(g, 'Order ID', data.truv_order_id || state.truvOrderId || '-');
-    addResultRow(g, 'Status', data.status || '-');
-    addResultRow(g, 'Product', raw.verification_type || state.productType || '-');
-    sec.appendChild(g);
-    root.appendChild(sec);
+    var sec7 = makeSection('Order Details');
+    var g7 = document.createElement('div'); g7.className = 'results-grid';
+    addRow(g7, 'Order ID', data.truv_order_id || state.truvOrderId || '-');
+    addRow(g7, 'Status', data.status || '-');
+    addRow(g7, 'Product', raw.verification_type || state.productType || '-');
+    sec7.appendChild(g7); container.appendChild(sec7);
   }
 
   // Actions
-  const actions = el('div', { style: 'display:flex;gap:12px;margin-top:24px;padding-top:20px;padding-bottom:48px;border-top:1px solid var(--border);' });
-  actions.appendChild(el('button', { className: 'btn btn-outline', onclick: refreshOrder }, 'Refresh Data'));
-  actions.appendChild(el('button', { className: 'btn btn-outline', onclick: () => { state.step = 0; state.orderId = null; state.truvOrderId = null; state.bridgeToken = null; state.orderData = null; state.formData = {}; state.bridgeEvents = []; state.apiLogs = []; state.webhooks = []; render(); } }, 'New Application'));
-  root.appendChild(actions);
-
-  return root;
+  var actions = document.createElement('div');
+  actions.style.cssText = 'display:flex;gap:12px;margin-top:24px;padding-top:20px;padding-bottom:48px;border-top:1px solid var(--border);';
+  var refreshBtn = document.createElement('button');
+  refreshBtn.className = 'btn btn-outline';
+  refreshBtn.textContent = 'Refresh Data';
+  refreshBtn.onclick = refreshOrder;
+  actions.appendChild(refreshBtn);
+  var newBtn = document.createElement('button');
+  newBtn.className = 'btn btn-outline';
+  newBtn.textContent = 'New Application';
+  newBtn.onclick = resetApp;
+  actions.appendChild(newBtn);
+  container.appendChild(actions);
 }
 
-function addResultRow(grid, label, value) {
-  const row = el('div', { className: 'result-row' });
-  row.appendChild(el('div', { className: 'result-label' }, label));
-  row.appendChild(el('div', { className: 'result-value' }, String(value)));
-  grid.appendChild(row);
+// DOM helper: create a result section with title
+function makeSection(title) {
+  var sec = document.createElement('div'); sec.className = 'result-section';
+  var h3 = document.createElement('h3'); h3.textContent = title;
+  sec.appendChild(h3); return sec;
+}
+
+// DOM helper: add a label/value row to a grid
+function addRow(grid, label, value) {
+  var row = document.createElement('div'); row.className = 'result-row';
+  var l = document.createElement('div'); l.className = 'result-label'; l.textContent = label;
+  var v = document.createElement('div'); v.className = 'result-value'; v.textContent = String(value);
+  row.appendChild(l); row.appendChild(v); grid.appendChild(row);
+}
+
+// DOM helper: subheading for earnings/deductions
+function makeSubheading(text) {
+  var el = document.createElement('div');
+  el.style.cssText = 'font-size:12px;font-weight:600;color:var(--text-secondary);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.5px;';
+  el.textContent = text;
+  return el;
+}
+
+function resetApp() {
+  state = { step: 0, orderId: null, truvOrderId: null, bridgeToken: null, productType: state.productType, bridgeEvents: [], apiLogs: [], webhooks: [], orderData: null, eventSource: null, tunnelUrl: state.tunnelUrl };
+  document.getElementById('firstName').value = '';
+  document.getElementById('lastName').value = '';
+  document.getElementById('email').value = '';
+  document.getElementById('phone').value = '';
+  document.getElementById('ssn').value = '';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Continue';
+  document.getElementById('bridgeContainer').textContent = '';
+  goStep(0);
 }
 
 async function fetchOrderData() {
   if (!state.orderId) return;
   try {
-    const resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId));
+    var resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId));
     state.orderData = await resp.json();
     await fetchLogs();
-    render();
+    renderResults();
   } catch (e) { console.error(e); }
 }
 
 async function refreshOrder() {
   if (!state.orderId) return;
-  state.orderData = null; render();
+  state.orderData = null;
+  var container = document.getElementById('stepResults');
+  container.textContent = '';
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'text-align:center;padding:60px;';
+  var ring = document.createElement('div');
+  ring.className = 'waiting-ring';
+  ring.style.cssText = 'width:40px;height:40px;margin:0 auto 12px;';
+  wrap.appendChild(ring);
+  var p = document.createElement('p');
+  p.style.cssText = 'font-size:14px;color:var(--text-secondary);';
+  p.textContent = 'Loading results...';
+  wrap.appendChild(p);
+  container.appendChild(wrap);
   try {
     await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/refresh', { method: 'POST' });
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(function(r) { setTimeout(r, 1000); });
     await fetchOrderData();
   } catch (e) { console.error(e); }
 }
@@ -733,24 +802,23 @@ async function refreshOrder() {
 // --- SSE ---
 function connectSSE(orderId) {
   if (state.eventSource) state.eventSource.close();
-  // Order-specific stream for API logs
-  const es = new EventSource(API_BASE + '/api/events/stream?order_id=' + encodeURIComponent(orderId));
+  var es = new EventSource(API_BASE + '/api/events/stream?order_id=' + encodeURIComponent(orderId));
   es.addEventListener('api_call', function(e) { state.apiLogs.push(JSON.parse(e.data)); renderApiPanel(); });
   es.addEventListener('ping', function() {});
   state.eventSource = es;
 }
 
-// Global SSE stream for all webhooks (unfiltered)
-let globalEs = null;
+var globalEs = null;
 function connectGlobalSSE() {
   if (globalEs) return;
   globalEs = new EventSource(API_BASE + '/api/events/stream');
   globalEs.addEventListener('webhook', function(e) {
-    const whData = JSON.parse(e.data);
-    const alreadyHave = state.webhooks.some(w => w.id === whData.id);
-    if (alreadyHave) return;
+    var whData = JSON.parse(e.data);
+    // Only accept webhooks for the current order
+    if (state.orderId && whData.order_id && whData.order_id !== state.orderId) return;
+    if (state.webhooks.some(function(w) { return w.id === whData.id; })) return;
     state.webhooks.push(whData);
-    if (state.step === 2) render(); else renderApiPanel();
+    if (state.step === 2) updateWaitingFeed(); else renderApiPanel();
   });
   globalEs.addEventListener('ping', function() {});
 }
@@ -758,122 +826,214 @@ function connectGlobalSSE() {
 async function fetchLogs() {
   if (!state.orderId) return;
   try {
-    const [l, w] = await Promise.all([
-      fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/logs').then(r => r.json()),
-      fetch(API_BASE + '/api/webhooks').then(r => r.json()),
+    var results = await Promise.all([
+      fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/logs').then(function(r) { return r.json(); }),
+      fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId) + '/webhooks').then(function(r) { return r.json(); }),
     ]);
-    state.apiLogs = l; state.webhooks = w;
+    state.apiLogs = results[0]; state.webhooks = results[1];
   } catch (e) { console.error(e); }
 }
 
 // --- API Panel ---
-let activeTab = 'guide';
+var activeTab = 'guide';
+
+document.querySelectorAll('.api-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() { activeTab = tab.dataset.tab; renderApiPanel(); });
+});
 
 function renderApiPanel() {
-  const tabs = document.getElementById('apiPanelTabs');
-  tabs.replaceChildren();
-  const tabDefs = [
-    { key: 'guide', label: 'Guide' },
-    { key: 'api', label: 'API Logs', count: state.apiLogs.length },
-    { key: 'bridge', label: 'Events', count: state.bridgeEvents.length },
-    { key: 'webhooks', label: 'Webhooks', count: state.webhooks.length },
-  ];
-  tabDefs.forEach(t => {
-    const label = t.count ? t.label + ' (' + t.count + ')' : t.label;
-    tabs.appendChild(el('button', { className: 'api-tab' + (activeTab === t.key ? ' active' : ''), onclick: () => { activeTab = t.key; renderApiPanel(); } }, label));
+  // Update tab labels
+  document.getElementById('tabApi').textContent = 'API Logs' + (state.apiLogs.length ? ' (' + state.apiLogs.length + ')' : '');
+  document.getElementById('tabBridge').textContent = 'Events' + (state.bridgeEvents.length ? ' (' + state.bridgeEvents.length + ')' : '');
+  document.getElementById('tabWebhooks').textContent = 'Webhooks' + (state.webhooks.length ? ' (' + state.webhooks.length + ')' : '');
+
+  // Update active class
+  document.querySelectorAll('.api-tab').forEach(function(tab) {
+    tab.classList.toggle('active', tab.dataset.tab === activeTab);
   });
 
-  const content = document.getElementById('apiTabContent');
-  content.replaceChildren();
+  var content = document.getElementById('apiTabContent');
+  content.textContent = '';
 
   if (activeTab === 'guide') {
-    STEPS.forEach((s, i) => {
-      if (i === state.step) {
-        const block = el('div', { className: 'guide-block', style: 'border:1px solid var(--gold-border);background:var(--gold-light);' });
-        block.appendChild(el('h4', { style: 'color:var(--accent);' }, (i + 1) + '. ' + s.title));
-        const body = el('div', { className: 'guide-detail' });
-        // Guide HTML is static/hardcoded, not user-supplied
-        body.innerHTML = s.guide; // eslint-disable-line
-        block.appendChild(body);
-        content.appendChild(block);
-      } else {
-        const cls = i < state.step ? 'color:var(--success);' : 'color:var(--text-muted);';
-        const line = el('div', { style: 'padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border-light);' });
-        line.appendChild(el('span', { style: 'font-weight:600;' + cls }, (i < state.step ? '\u2713 ' : '') + (i + 1) + '. ' + s.title));
-        line.appendChild(el('span', { style: 'margin-left:auto;font-size:12px;color:var(--text-muted);' }, s.summary));
-        content.appendChild(line);
-      }
-    });
+    renderGuideTab(content);
   } else if (activeTab === 'api') {
-    if (state.apiLogs.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\u2139\uFE0F'), 'API calls will appear here as you progress'])); return; }
-    state.apiLogs.forEach(log => {
-      const entry = el('div', { className: 'log-entry' });
-      const badge = el('span', { className: 'log-badge ' + (log.method === 'GET' ? 'log-badge-get' : 'log-badge-post') }, log.method);
-      const body = el('div', { className: 'log-body' });
-      if (log.request_body) { const s = el('div', { className: 'log-body-section' }); s.appendChild(el('h5', {}, 'Request')); s.appendChild(el('pre', {}, tryFormat(log.request_body))); body.appendChild(s); }
-      if (log.response_body) { const s = el('div', { className: 'log-body-section' }); s.appendChild(el('h5', {}, 'Response')); s.appendChild(el('pre', {}, tryFormat(log.response_body))); body.appendChild(s); }
-      const header = el('div', { className: 'log-header', onclick: () => body.classList.toggle('open') }, [
-        badge, el('span', { className: 'log-endpoint' }, log.endpoint),
-        el('span', { className: 'log-meta' }, (log.status_code ? log.status_code + ' ' : '') + (log.duration_ms ? log.duration_ms + 'ms' : '')),
-      ]);
-      entry.appendChild(header);
-      entry.appendChild(body);
-      content.appendChild(entry);
-    });
+    renderApiLogsTab(content);
   } else if (activeTab === 'bridge') {
-    if (state.bridgeEvents.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\u26A1'), 'Bridge events will appear here during verification'])); return; }
-    [...state.bridgeEvents].reverse().forEach(ev => {
-      const entry = el('div', { className: 'wh-entry' });
-      const header = el('div', { className: 'wh-header', onclick: function() { const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none'; } });
-      header.appendChild(el('span', { className: 'wh-type' }, ev.type));
-      if (ev.data && ev.data.eventType) header.appendChild(el('span', { className: 'wh-status', style: 'background:var(--accent-subtle);color:var(--accent);' }, ev.data.eventType));
-      header.appendChild(el('span', { className: 'wh-time' }, ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : ''));
-      entry.appendChild(header);
-      const body = el('div', { className: 'wh-body' });
-      body.appendChild(el('pre', {}, JSON.stringify(ev.data || {}, null, 2)));
-      entry.appendChild(body);
-      content.appendChild(entry);
-    });
+    renderBridgeEventsTab(content);
   } else {
-    // Webhooks tab
-    if (state.tunnelUrl) {
-      const info = el('div', { className: 'tunnel-info' });
-      info.appendChild(el('span', {}, 'Webhook URL:'));
-      info.appendChild(el('a', { href: state.tunnelUrl, target: '_blank' }, state.tunnelUrl));
-      content.appendChild(info);
-    }
-    if (state.webhooks.length === 0) { content.appendChild(el('div', { className: 'empty-state' }, [el('span', { className: 'empty-icon' }, '\uD83D\uDD14'), 'Webhook events will appear here in real time'])); return; }
-    [...state.webhooks].reverse().forEach(w => {
-      const payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
-      const eventType = payload.event_type || w.event_type || 'unknown';
-      const status = payload.status || w.status || '';
-      const ts = payload.event_created_at || payload.updated_at || w.received_at || '';
-      const timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
-      const statusColors = { pending: '#f59e0b', sent: '#3b82f6', completed: '#059669', done: '#059669', failed: '#ef4444' };
-      const sc = statusColors[status] || '#6b7280';
-
-      const entry = el('div', { className: 'wh-entry' });
-      const header = el('div', { className: 'wh-header', onclick: function() { const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none'; } });
-      header.appendChild(el('span', { className: 'wh-type' }, eventType));
-      if (status) header.appendChild(el('span', { className: 'wh-status', style: 'background:' + sc + '18;color:' + sc + ';' }, status));
-      header.appendChild(el('span', { className: 'wh-time' }, timeStr));
-      entry.appendChild(header);
-
-      const body = el('div', { className: 'wh-body' });
-      body.appendChild(el('pre', {}, JSON.stringify(payload, null, 2)));
-      entry.appendChild(body);
-      content.appendChild(entry);
-    });
+    renderWebhooksTab(content);
   }
 }
 
-function tryFormat(s) { try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return String(s); } }
+function renderGuideTab(content) {
+  STEPS.forEach(function(s, i) {
+    if (i === state.step) {
+      var block = document.createElement('div');
+      block.className = 'guide-block';
+      block.style.cssText = 'border:1px solid var(--gold-border);background:var(--gold-light);';
+      var h4 = document.createElement('h4');
+      h4.style.color = 'var(--accent)';
+      h4.textContent = (i + 1) + '. ' + s.title;
+      block.appendChild(h4);
+      var body = document.createElement('div');
+      body.className = 'guide-detail';
+      // Guide HTML is static/hardcoded developer content, not user-supplied
+      body.innerHTML = s.guide; // eslint-disable-line
+      block.appendChild(body);
+      content.appendChild(block);
+    } else {
+      var line = document.createElement('div');
+      line.style.cssText = 'padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border-light);';
+      var span1 = document.createElement('span');
+      span1.style.cssText = 'font-weight:600;' + (i < state.step ? 'color:var(--success);' : 'color:var(--text-muted);');
+      span1.textContent = (i < state.step ? '\u2713 ' : '') + (i + 1) + '. ' + s.title;
+      line.appendChild(span1);
+      var span2 = document.createElement('span');
+      span2.style.cssText = 'margin-left:auto;font-size:12px;color:var(--text-muted);';
+      span2.textContent = s.summary;
+      line.appendChild(span2);
+      content.appendChild(line);
+    }
+  });
+}
+
+function renderApiLogsTab(content) {
+  if (state.apiLogs.length === 0) {
+    var empty = document.createElement('div'); empty.className = 'empty-state';
+    var icon = document.createElement('span'); icon.className = 'empty-icon'; icon.textContent = '\u2139\uFE0F';
+    empty.appendChild(icon);
+    empty.appendChild(document.createTextNode('API calls will appear here as you progress'));
+    content.appendChild(empty);
+    return;
+  }
+  state.apiLogs.forEach(function(log) {
+    var entry = document.createElement('div'); entry.className = 'log-entry';
+    var header = document.createElement('div'); header.className = 'log-header';
+    var badge = document.createElement('span');
+    badge.className = 'log-badge ' + (log.method === 'GET' ? 'log-badge-get' : 'log-badge-post');
+    badge.textContent = log.method;
+    header.appendChild(badge);
+    var endpoint = document.createElement('span'); endpoint.className = 'log-endpoint'; endpoint.textContent = log.endpoint;
+    header.appendChild(endpoint);
+    var metaStr = (log.status_code ? log.status_code + ' ' : '') + (log.duration_ms ? log.duration_ms + 'ms' : '');
+    var metaEl = document.createElement('span'); metaEl.className = 'log-meta'; metaEl.textContent = metaStr;
+    header.appendChild(metaEl);
+
+    var body = document.createElement('div'); body.className = 'log-body';
+    header.onclick = function() { body.classList.toggle('open'); };
+
+    if (log.request_body) {
+      var rs = document.createElement('div'); rs.className = 'log-body-section';
+      var rh = document.createElement('h5'); rh.textContent = 'Request'; rs.appendChild(rh);
+      var rp = document.createElement('pre'); rp.textContent = tryFormat(log.request_body); rs.appendChild(rp);
+      body.appendChild(rs);
+    }
+    if (log.response_body) {
+      var rbs = document.createElement('div'); rbs.className = 'log-body-section';
+      var rbh = document.createElement('h5'); rbh.textContent = 'Response'; rbs.appendChild(rbh);
+      var rbp = document.createElement('pre'); rbp.textContent = tryFormat(log.response_body); rbs.appendChild(rbp);
+      body.appendChild(rbs);
+    }
+
+    entry.appendChild(header);
+    entry.appendChild(body);
+    content.appendChild(entry);
+  });
+}
+
+function renderBridgeEventsTab(content) {
+  if (state.bridgeEvents.length === 0) {
+    var empty = document.createElement('div'); empty.className = 'empty-state';
+    var icon = document.createElement('span'); icon.className = 'empty-icon'; icon.textContent = '\u26A1';
+    empty.appendChild(icon);
+    empty.appendChild(document.createTextNode('Bridge events will appear here during verification'));
+    content.appendChild(empty);
+    return;
+  }
+  state.bridgeEvents.slice().reverse().forEach(function(ev) {
+    var entry = document.createElement('div'); entry.className = 'wh-entry';
+    var header = document.createElement('div'); header.className = 'wh-header';
+    var typeEl = document.createElement('span'); typeEl.className = 'wh-type'; typeEl.textContent = ev.type;
+    header.appendChild(typeEl);
+    if (ev.data && ev.data.eventType) {
+      var tag = document.createElement('span');
+      tag.className = 'wh-status';
+      tag.style.cssText = 'background:var(--accent-subtle);color:var(--accent);';
+      tag.textContent = ev.data.eventType;
+      header.appendChild(tag);
+    }
+    var timeEl = document.createElement('span'); timeEl.className = 'wh-time';
+    timeEl.textContent = ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : '';
+    header.appendChild(timeEl);
+
+    var body = document.createElement('div'); body.className = 'wh-body';
+    var pre = document.createElement('pre'); pre.textContent = JSON.stringify(ev.data || {}, null, 2);
+    body.appendChild(pre);
+
+    header.onclick = function() { body.style.display = body.style.display === 'none' ? 'block' : 'none'; };
+    entry.appendChild(header);
+    entry.appendChild(body);
+    content.appendChild(entry);
+  });
+}
+
+function renderWebhooksTab(content) {
+  if (state.tunnelUrl) {
+    var info = document.createElement('div'); info.className = 'tunnel-info';
+    var label = document.createElement('span'); label.textContent = 'Webhook URL:';
+    info.appendChild(label);
+    var link = document.createElement('a'); link.href = state.tunnelUrl; link.target = '_blank'; link.textContent = state.tunnelUrl;
+    info.appendChild(link);
+    content.appendChild(info);
+  }
+  if (state.webhooks.length === 0) {
+    var empty = document.createElement('div'); empty.className = 'empty-state';
+    var icon = document.createElement('span'); icon.className = 'empty-icon'; icon.textContent = '\uD83D\uDD14';
+    empty.appendChild(icon);
+    empty.appendChild(document.createTextNode('Webhook events will appear here in real time'));
+    content.appendChild(empty);
+    return;
+  }
+  state.webhooks.slice().reverse().forEach(function(w) {
+    var payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+    var eventType = payload.event_type || w.event_type || 'unknown';
+    var status = payload.status || w.status || '';
+    var ts = payload.event_created_at || payload.updated_at || w.received_at || '';
+    var timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
+    var statusColors = { pending: '#f59e0b', sent: '#3b82f6', completed: '#059669', done: '#059669', failed: '#ef4444' };
+    var sc = statusColors[status] || '#6b7280';
+
+    var entry = document.createElement('div'); entry.className = 'wh-entry';
+    var header = document.createElement('div'); header.className = 'wh-header';
+    var typeEl = document.createElement('span'); typeEl.className = 'wh-type'; typeEl.textContent = eventType;
+    header.appendChild(typeEl);
+    if (status) {
+      var tag = document.createElement('span');
+      tag.className = 'wh-status';
+      tag.style.cssText = 'background:' + sc + '18;color:' + sc + ';';
+      tag.textContent = status;
+      header.appendChild(tag);
+    }
+    var timeEl = document.createElement('span'); timeEl.className = 'wh-time'; timeEl.textContent = timeStr;
+    header.appendChild(timeEl);
+
+    var body = document.createElement('div'); body.className = 'wh-body';
+    var pre = document.createElement('pre'); pre.textContent = JSON.stringify(payload, null, 2);
+    body.appendChild(pre);
+
+    header.onclick = function() { body.style.display = body.style.display === 'none' ? 'block' : 'none'; };
+    entry.appendChild(header);
+    entry.appendChild(body);
+    content.appendChild(entry);
+  });
+}
 
 // --- Init ---
-fetch(API_BASE + '/api/config').then(r => r.json()).then(d => { state.productType = d.product_type; render(); }).catch(() => {});
-fetch(API_BASE + '/api/tunnel-url').then(r => r.json()).then(d => { state.tunnelUrl = d.url; renderApiPanel(); }).catch(() => {});
+fetch(API_BASE + '/api/config').then(function(r) { return r.json(); }).then(function(d) { state.productType = d.product_type; }).catch(function() {});
+fetch(API_BASE + '/api/tunnel-url').then(function(r) { return r.json(); }).then(function(d) { state.tunnelUrl = d.url; renderApiPanel(); }).catch(function() {});
 connectGlobalSSE();
-render();
+renderApiPanel();
 </script>
 </body>
 </html>
