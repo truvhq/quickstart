@@ -8,43 +8,47 @@ env:
 install:
 	npm install
 
+# Demos
 application: install
-	node application/server.js
+	node demos/application/server.js
 
 follow-up: install
-	node follow-up/server.js
+	node demos/follow-up/server.js
 
 employee-portal: install
-	node employee-portal/server.js
+	node demos/employee-portal/server.js
 
 upload-documents: install
-	node upload-documents/server.js
+	node demos/upload-documents/server.js
 
 choice-connect: install
-	node choice-connect/server.js
+	node demos/choice-connect/server.js
 
-# Legacy language examples (in examples/ folder)
-python_docker:
-	docker-compose up --build python
+# Quickstart language examples (in quickstarts/ folder)
+node_local:
+	cd quickstarts/node && \
+	npm install && \
+	set -a && source ../../.env && set +a && \
+	npm start
 
 python_local:
-	python3 -m venv ./examples/python/.venv && \
-	./examples/python/.venv/bin/pip3 install -r examples/python/requirements.txt && \
-	FLASK_DEBUG=true ./examples/python/.venv/bin/python3 -m legacy.python.src.server
+	python3 -m venv ./quickstarts/python/.venv && \
+	./quickstarts/python/.venv/bin/pip3 install -r quickstarts/python/requirements.txt && \
+	FLASK_DEBUG=true ./quickstarts/python/.venv/bin/python3 -m quickstarts.python.src.server
 
 ruby_local:
-	cd examples/ruby && \
+	cd quickstarts/ruby && \
 	bundle install && \
 	set -a && source ../../.env && set +a && \
 	./bin/rails server
 
 csharp_local:
-	cd examples/c-sharp && \
+	cd quickstarts/c-sharp && \
 	set -a && source ../../.env && set +a && \
 	dotnet watch run
 
 golang_local:
-	cd examples/golang && \
+	cd quickstarts/golang && \
 	go get && \
 	set -a && source ../../.env && set +a && \
 	go install && \

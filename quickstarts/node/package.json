@@ -1,0 +1,27 @@
+{
+  "name": "quickstart",
+  "description": "The Truv NodeJS Quickstart app.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ./src --ext js",
+    "prettier:check": "prettier --check '**/*.js'",
+    "prettier:fix": "prettier --write '**/*.js'",
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "Truv Team",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  }
+}
