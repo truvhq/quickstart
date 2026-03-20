@@ -167,7 +167,8 @@ app.get('/api/orders/:id/webhooks', (req, res) => {
 // Webhook receiver
 app.post('/api/webhooks/truv', (req, res) => {
   const sigMatch = verifyWebhookSignature(req.rawBody, API_SECRET, req.headers['x-webhook-sign']);
-  console.log(`TRUV: Webhook received (sig_match=${sigMatch})`, JSON.stringify(req.body));
+  if (!sigMatch) { console.warn('Webhook signature mismatch — ignoring'); return res.status(401).end(); }
+  console.log(`TRUV: Webhook received event_type=${req.body.event_type} status=${req.body.status}`);
 
   const payload = req.body;
 
@@ -205,7 +206,7 @@ app.get('/api/events/stream', createSseHandler());
 app.listen(3001, async () => {
   console.log('Application running on http://localhost:3001');
   try {
-    tunnelUrl = await setupWebhook({ port: 3001, path: '/api/webhooks/truv', truvClient: truv });
+    tunnelUrl = await setupWebhook({ path: '/api/webhooks/truv', truvClient: truv });
   } catch (err) {
     console.error('Webhook setup failed:', err.message);
   }

@@ -85,8 +85,10 @@ export function getOrder(orderId) {
   return getDb().prepare('SELECT * FROM orders WHERE id = ?').get(orderId) || null;
 }
 
+const ORDER_ALLOWED_COLS = new Set(['status', 'raw_response', 'bridge_token', 'share_url']);
+
 export function updateOrder(orderId, fields) {
-  const keys = Object.keys(fields);
+  const keys = Object.keys(fields).filter(k => ORDER_ALLOWED_COLS.has(k));
   if (keys.length === 0) return;
   const sets = keys.map(k => `${k} = ?`).join(', ');
   const vals = keys.map(k => {
@@ -161,8 +163,10 @@ export function getDocCollection(collectionId) {
   return getDb().prepare('SELECT * FROM document_collections WHERE id = ?').get(collectionId) || null;
 }
 
+const DOC_COLLECTION_ALLOWED_COLS = new Set(['status', 'raw_response']);
+
 export function updateDocCollection(collectionId, fields) {
-  const keys = Object.keys(fields);
+  const keys = Object.keys(fields).filter(k => DOC_COLLECTION_ALLOWED_COLS.has(k));
   if (keys.length === 0) return;
   const sets = keys.map(k => `${k} = ?`).join(', ');
   const vals = keys.map(k => {

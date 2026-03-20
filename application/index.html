@@ -744,12 +744,11 @@ function connectSSE(orderId) {
 let globalEs = null;
 function connectGlobalSSE() {
   if (globalEs) return;
-  const seenIds = new Set(state.webhooks.map(w => w.id));
   globalEs = new EventSource(API_BASE + '/api/events/stream');
   globalEs.addEventListener('webhook', function(e) {
     const whData = JSON.parse(e.data);
-    if (seenIds.has(whData.id)) return;
-    seenIds.add(whData.id);
+    const alreadyHave = state.webhooks.some(w => w.id === whData.id);
+    if (alreadyHave) return;
     state.webhooks.push(whData);
     if (state.step === 2) render(); else renderApiPanel();
   });

@@ -26,7 +26,7 @@ const app = express();
 // Increase JSON body limit for base64-encoded files (10MB per file, up to 10 files)
 app.use(express.json({
   limit: '100mb',
-  verify: (req, _res, buf) => { req.rawBody = buf.toString('utf-8'); },
+  verify: (req, _res, buf) => { if (req.url === '/api/webhooks/truv') req.rawBody = buf.toString('utf-8'); },
 }));
 app.use(cors());
 
@@ -208,7 +208,8 @@ app.get('/api/orders/:id/logs', (req, res) => {
 // Webhook receiver
 app.post('/api/webhooks/truv', (req, res) => {
   const sigMatch = verifyWebhookSignature(req.rawBody, API_SECRET, req.headers['x-webhook-sign']);
-  console.log(`TRUV: Webhook received (sig_match=${sigMatch})`);
+  if (!sigMatch) { console.warn('Webhook signature mismatch — ignoring'); return res.status(401).end(); }
+  console.log(`TRUV: Webhook received event_type=${req.body.event_type} status=${req.body.status}`);
 
   const payload = req.body;
   apiLogger.pushWebhookEvent({
@@ -232,7 +233,7 @@ app.get('/api/events/stream', createSseHandler());
 app.listen(3004, async () => {
   console.log('Upload Documents running on http://localhost:3004');
   try {
-    tunnelUrl = await setupWebhook({ port: 3004, path: '/api/webhooks/truv', truvClient: truv });
+    tunnelUrl = await setupWebhook({ path: '/api/webhooks/truv', truvClient: truv });
   } catch (err) {
     console.error('Webhook setup failed:', err.message);
   }

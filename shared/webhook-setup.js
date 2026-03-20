@@ -1,11 +1,13 @@
 let webhookId = null;
 
+const envType = process.env.TRUV_ENV_TYPE || 'sandbox';
+
 async function registerWebhook(truvClient, webhookUrl) {
   // Clean up old quickstart webhooks
   const listResult = await truvClient._request('GET', 'webhooks/');
   if (listResult.statusCode === 200 && listResult.data.results) {
     for (const wh of listResult.data.results) {
-      if (wh.name === 'quickstart' && wh.env_type === 'sandbox') {
+      if (wh.name === 'quickstart' && wh.env_type === envType) {
         await truvClient._request('DELETE', `webhooks/${wh.id}/`);
         console.log(`Deleted old quickstart webhook ${wh.id}`);
       }
@@ -16,7 +18,7 @@ async function registerWebhook(truvClient, webhookUrl) {
     json: {
       name: 'quickstart',
       webhook_url: webhookUrl,
-      env_type: 'sandbox',
+      env_type: envType,
       events: [
         'task-status-updated',
         'order-status-updated',
@@ -47,7 +49,7 @@ async function registerWebhook(truvClient, webhookUrl) {
   }
 }
 
-export async function setupWebhook({ port, path, truvClient }) {
+export async function setupWebhook({ path, truvClient }) {
   const ngrokUrl = process.env.NGROK_URL;
   if (!ngrokUrl) {
     console.log('NGROK_URL not set — skipping webhook registration. Set it in .env to receive webhooks.');
