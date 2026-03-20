@@ -35,7 +35,7 @@ app.post('/api/orders', async (req, res) => {
       statusCode: result.statusCode, durationMs: result.durationMs,
     });
 
-    res.json({ order_id: orderId, truv_order_id: truvData.id, bridge_token: truvData.bridge_token, status: truvData.status });
+    res.json({ order_id: orderId, truv_order_id: truvData.id, user_id: truvData.user_id, bridge_token: truvData.bridge_token, status: truvData.status });
   } catch (err) { console.error('POST /api/orders error:', err); res.status(500).json({ error: 'Internal server error' }); }
 });
 

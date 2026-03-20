@@ -366,6 +366,7 @@ async function handleSubmit() {
     if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); btn.disabled = false; btn.textContent = 'Continue'; return; }
     state.orderId = data.order_id;
     state.truvOrderId = data.truv_order_id;
+    state.userId = data.user_id;
     state.bridgeToken = data.bridge_token;
     connectSSE(state.orderId);
     await fetchLogs();
@@ -754,7 +755,7 @@ function makeSubheading(text) {
 }
 
 function resetApp() {
-  state = { step: 0, orderId: null, truvOrderId: null, bridgeToken: null, productType: state.productType, bridgeEvents: [], apiLogs: [], webhooks: [], orderData: null, eventSource: null, tunnelUrl: state.tunnelUrl };
+  state = { step: 0, orderId: null, truvOrderId: null, userId: null, bridgeToken: null, productType: state.productType, bridgeEvents: [], apiLogs: [], webhooks: [], orderData: null, eventSource: null, tunnelUrl: state.tunnelUrl };
   document.getElementById('firstName').value = '';
   document.getElementById('lastName').value = '';
   document.getElementById('email').value = '';
@@ -814,8 +815,9 @@ function connectGlobalSSE() {
   globalEs = new EventSource(API_BASE + '/api/events/stream');
   globalEs.addEventListener('webhook', function(e) {
     var whData = JSON.parse(e.data);
-    // Only accept webhooks for the current order
-    if (state.orderId && whData.order_id && whData.order_id !== state.orderId) return;
+    // Only accept webhooks for the current user
+    var whPayload = typeof whData.payload === 'string' ? JSON.parse(whData.payload) : (whData.payload || {});
+    if (state.userId && whPayload.user_id && whPayload.user_id !== state.userId) return;
     if (state.webhooks.some(function(w) { return w.id === whData.id; })) return;
     state.webhooks.push(whData);
     if (state.step === 2) updateWaitingFeed(); else renderApiPanel();
