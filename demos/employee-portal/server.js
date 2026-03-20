@@ -63,6 +63,7 @@ app.get('/api/orders/:id', async (req, res) => {
         orderId: order.id, method: 'GET', endpoint: `/v1/orders/${order.truv_order_id}/`,
         responseBody: result.data, statusCode: result.statusCode, durationMs: result.durationMs,
       });
+      if (result.statusCode >= 400) return res.status(result.statusCode).json({ error: 'Truv API error', details: result.data });
       db.updateOrder(order.id, { status: result.data.status || order.status, raw_response: result.data });
       order = db.getOrder(order.id);
     }

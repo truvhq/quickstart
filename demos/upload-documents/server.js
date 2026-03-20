@@ -27,7 +27,8 @@ app.post('/api/collections', async (req, res) => {
       demoId: 'upload-documents', status: truvData.status || 'created', rawResponse: truvData,
     });
     apiLogger.logApiCall({
-      orderId: collectionId, method: 'POST', endpoint: '/v1/documents/collections/',
+      orderId: collectionId, // collection ID used as correlation key for API logs
+      method: 'POST', endpoint: '/v1/documents/collections/',
       requestBody: { documents_count: documents.length }, responseBody: truvData,
       statusCode: result.statusCode, durationMs: result.durationMs,
     });
@@ -45,10 +46,12 @@ app.get('/api/collections/:id', async (req, res) => {
     if (collection.truv_collection_id) {
       const result = await truv.getDocumentCollection(collection.truv_collection_id);
       apiLogger.logApiCall({
-        orderId: collection.id, method: 'GET',
+        orderId: collection.id, // collection ID used as correlation key for API logs
+        method: 'GET',
         endpoint: `/v1/documents/collections/${collection.truv_collection_id}/`,
         responseBody: result.data, statusCode: result.statusCode, durationMs: result.durationMs,
       });
+      if (result.statusCode >= 400) return res.status(result.statusCode).json({ error: 'Truv API error', details: result.data });
       db.updateDocCollection(collection.id, { status: result.data.status || collection.status, raw_response: result.data });
     }
 

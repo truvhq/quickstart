@@ -40,7 +40,7 @@ export class TruvClient {
 
   async createUser(overrides = {}) {
     const payload = {
-      external_user_id: `qs-${uuidv4()}`,
+      external_user_id: `qs-${uuidv4()}`, // Replace with your internal user/application ID
       first_name: 'John',
       last_name: 'Johnson',
       email: 'j.johnson@example.com',
@@ -53,19 +53,20 @@ export class TruvClient {
     const payload = {
       product_type: productType,
       client_name: 'Truv Quickstart',
-      tracking_info: '1338-0111-A',
+      tracking_info: '1338-0111-A', // Replace with your internal reference (e.g. loan number)
     };
 
+    // Sandbox test account for deposit_switch and pll products
     if (productType === 'deposit_switch' || productType === 'pll') {
       payload.account = {
-        account_number: '16002600',
+        account_number: '16002600',   // Sandbox test value — replace with real account in production
         account_type: 'checking',
-        routing_number: '12345678',
-        bank_name: 'Truv Bank',
+        routing_number: '12345678',   // Sandbox test value
+        bank_name: 'Truv Bank',       // Sandbox test value
       };
       if (productType === 'pll') {
         payload.account.deposit_type = 'amount';
-        payload.account.deposit_value = '100';
+        payload.account.deposit_value = 100; // Numeric amount
       }
     }
 
@@ -77,7 +78,7 @@ export class TruvClient {
   async createOrder(params = {}) {
     const productType = params.product_type || 'income';
     const payload = {
-      order_number: `qs-${uuidv4()}`,
+      order_number: `qs-${uuidv4()}`, // Replace with your internal order/application ID
       first_name: params.first_name || 'John',
       last_name: params.last_name || 'Johnson',
       email: params.email || 'j.johnson@example.com',
@@ -88,20 +89,22 @@ export class TruvClient {
     if (params.ssn) payload.social_security_number = params.ssn;
     if (params.template_id) payload.template_id = params.template_id;
 
+    // Sandbox employer — use "Home Depot" with credentials goodlogin/goodpassword
     if (['deposit_switch', 'pll', 'employment', 'income', 'assets'].includes(productType)) {
       payload.employers = [{ company_name: 'Home Depot' }];
     }
 
+    // Sandbox test account for deposit_switch and pll products
     if (['deposit_switch', 'pll'].includes(productType)) {
       payload.employers[0].account = {
-        account_number: '16002600',
+        account_number: '16002600',   // Sandbox test value — replace with real account in production
         account_type: 'checking',
-        routing_number: '12345678',
-        bank_name: 'Truv Bank',
+        routing_number: '12345678',   // Sandbox test value
+        bank_name: 'Truv Bank',       // Sandbox test value
       };
       if (productType === 'pll') {
         payload.employers[0].account.deposit_type = 'amount';
-        payload.employers[0].account.deposit_value = '100';
+        payload.employers[0].account.deposit_value = 100; // Numeric amount
       }
     }
 
@@ -114,6 +117,20 @@ export class TruvClient {
 
   async refreshOrder(truvOrderId) {
     return this._request('POST', `orders/${truvOrderId}/refresh/`);
+  }
+
+  // --- Webhooks API ---
+
+  async listWebhooks() {
+    return this._request('GET', 'webhooks/');
+  }
+
+  async createWebhook(params) {
+    return this._request('POST', 'webhooks/', { json: params });
+  }
+
+  async deleteWebhook(webhookId) {
+    return this._request('DELETE', `webhooks/${webhookId}/`);
   }
 
   // --- Token Exchange & Reports ---

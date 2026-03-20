@@ -69,6 +69,7 @@
     .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
 
     /* Waiting screen */
+    .waiting-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; }
     .waiting-ring { border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1.2s linear infinite; }
     .webhook-pill { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f3f4f6; border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; animation: fadeIn 0.3s ease; }
     .webhook-pill .wp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
@@ -177,7 +178,7 @@
       </div>
 
       <!-- Step 2: Waiting -->
-      <div id="stepWaiting" class="hidden" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
+      <div id="stepWaiting" class="hidden waiting-screen">
         <div style="width:72px;height:72px;margin-bottom:28px;">
           <div class="waiting-ring" style="width:72px;height:72px;"></div>
         </div>
@@ -284,13 +285,8 @@ function goStep(n) {
 
   for (var i = 0; i < screens.length; i++) {
     var scr = document.getElementById(screens[i]);
-    if (i === n) {
-      scr.classList.remove('hidden');
-      if (screens[i] === 'stepWaiting') scr.style.display = 'flex';
-    } else {
-      scr.classList.add('hidden');
-      if (screens[i] === 'stepWaiting') scr.style.display = 'none';
-    }
+    if (i === n) scr.classList.remove('hidden');
+    else scr.classList.add('hidden');
   }
 
   if (n === 1) setTimeout(initBridge, 100);
@@ -358,6 +354,7 @@ function initBridge() {
 
 // --- Step 3: Waiting ---
 var waitingStartedAt = null;
+var advancePending = false;
 var WAITING_MIN_MS = 10000;
 
 function updateWaitingFeed() {
@@ -400,16 +397,17 @@ function updateWaitingFeed() {
     }
   }
 
-  // Auto-advance
+  // Auto-advance once order is completed (with minimum display time)
+  if (advancePending) return;
   var elapsed = Date.now() - waitingStartedAt;
   var isCompleted = panel.webhooks.some(function(w) {
     var p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
     return p.event_type === 'order-status-updated' && p.status === 'completed';
   });
-  if (isCompleted && elapsed >= WAITING_MIN_MS) {
-    setTimeout(function() { waitingStartedAt = null; goStep(3); }, 1000);
-  } else if (isCompleted) {
-    setTimeout(function() { waitingStartedAt = null; goStep(3); }, WAITING_MIN_MS - elapsed + 1000);
+  if (isCompleted) {
+    advancePending = true;
+    var delay = Math.max(1000, WAITING_MIN_MS - elapsed + 1000);
+    setTimeout(function() { waitingStartedAt = null; advancePending = false; goStep(3); }, delay);
   }
 }
 

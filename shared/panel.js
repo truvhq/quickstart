@@ -1,5 +1,6 @@
 /* shared/panel.js — Reusable API panel for all quickstart demos.
-   Exports: window.el, window.tryFormat, window.QuickstartPanel, window.API_BASE */
+   Exports: window.el, window.tryFormat, window.QuickstartPanel, window.API_BASE
+   Written in plain ES5 for broadest browser compatibility without a bundler. */
 
 (function () {
   'use strict';

@@ -59,7 +59,7 @@ export function createApp({ dirName, demoId, port, webhookMatch = 'user_id', jso
     res.json(db.getWebhookEvents(req.params.id));
   });
 
-  // Webhook receiver — verifies HMAC, matches by user_id, stores event
+  // Webhook receiver — verifies HMAC, matches to order (by user_id or order_id), stores event
   app.post('/api/webhooks/truv', (req, res) => {
     const sigMatch = verifyWebhookSignature(req.rawBody, API_SECRET, req.headers['x-webhook-sign']);
     if (!sigMatch) { console.warn('Webhook signature mismatch — ignoring'); return res.status(401).end(); }
