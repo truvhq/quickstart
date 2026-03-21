@@ -17,6 +17,7 @@ function getDb() {
   return db;
 }
 
+// SQLite DDL exec — not child_process.exec
 export function initDb() {
   const conn = getDb();
   conn.exec(`
@@ -34,26 +35,24 @@ export function initDb() {
 
     CREATE TABLE IF NOT EXISTS api_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_id TEXT,
+      user_id TEXT,
       method TEXT NOT NULL,
       endpoint TEXT NOT NULL,
       request_body TEXT,
       response_body TEXT,
       status_code INTEGER,
       duration_ms REAL,
-      timestamp TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (order_id) REFERENCES orders(id)
+      timestamp TEXT DEFAULT (datetime('now'))
     );
 
     CREATE TABLE IF NOT EXISTS webhook_events (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_id TEXT,
+      user_id TEXT,
       webhook_id TEXT,
       event_type TEXT,
       status TEXT,
       payload TEXT,
-      received_at TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (order_id) REFERENCES orders(id)
+      received_at TEXT DEFAULT (datetime('now'))
     );
 
     CREATE TABLE IF NOT EXISTS document_collections (
@@ -64,7 +63,15 @@ export function initDb() {
       raw_response TEXT,
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE INDEX IF NOT EXISTS idx_webhook_events_user_id ON webhook_events(user_id);
+    CREATE INDEX IF NOT EXISTS idx_api_logs_user_id ON api_logs(user_id);
+    CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
   `);
+
+  // Migrate: add user_id column to existing tables if missing
+  try { conn.exec('ALTER TABLE webhook_events ADD COLUMN user_id TEXT'); } catch {}
+  try { conn.exec('ALTER TABLE api_logs ADD COLUMN user_id TEXT'); } catch {}
 }
 
 export function generateId() {
@@ -103,46 +110,44 @@ export function findOrderByUserId(userId) {
   return getDb().prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 1').get(userId) || null;
 }
 
-// --- API Logs ---
-
-export function insertApiLog({ orderId, method, endpoint, requestBody, responseBody, statusCode, durationMs }) {
-  const conn = getDb();
-  const info = conn.prepare(
-    'INSERT INTO api_logs (order_id, method, endpoint, request_body, response_body, status_code, duration_ms) VALUES (?, ?, ?, ?, ?, ?, ?)'
-  ).run(orderId, method, endpoint, requestBody || null, responseBody || null, statusCode || null, durationMs || null);
-  return conn.prepare('SELECT * FROM api_logs WHERE id = ?').get(info.lastInsertRowid);
-}
-
-export function getApiLogs(orderId) {
-  return getDb().prepare('SELECT * FROM api_logs WHERE order_id = ? ORDER BY id ASC').all(orderId);
-}
-
-// --- Webhook Events ---
-
-export function insertWebhookEvent({ orderId, webhookId, eventType, status, payload }) {
-  const conn = getDb();
-  const info = conn.prepare(
-    'INSERT INTO webhook_events (order_id, webhook_id, event_type, status, payload) VALUES (?, ?, ?, ?, ?)'
-  ).run(orderId || null, webhookId || null, eventType || null, status || null, payload ? JSON.stringify(payload) : null);
-  return conn.prepare('SELECT * FROM webhook_events WHERE id = ?').get(info.lastInsertRowid);
-}
-
-export function getWebhookEvents(orderId) {
-  return getDb().prepare('SELECT * FROM webhook_events WHERE order_id = ? ORDER BY id ASC').all(orderId);
-}
-
-export function getAllWebhookEvents() {
-  return getDb().prepare('SELECT * FROM webhook_events ORDER BY id ASC').all();
-}
-
-// --- Orders: list queries ---
-
 export function getOrdersByDemoId(demoId) {
   return getDb().prepare('SELECT * FROM orders WHERE demo_id = ? ORDER BY created_at DESC').all(demoId);
 }
 
 export function getAllOrders() {
   return getDb().prepare('SELECT * FROM orders ORDER BY created_at DESC').all();
+}
+
+// --- API Logs ---
+
+export function insertApiLog({ userId, method, endpoint, requestBody, responseBody, statusCode, durationMs }) {
+  const conn = getDb();
+  const info = conn.prepare(
+    'INSERT INTO api_logs (user_id, method, endpoint, request_body, response_body, status_code, duration_ms) VALUES (?, ?, ?, ?, ?, ?, ?)'
+  ).run(userId || null, method, endpoint, requestBody || null, responseBody || null, statusCode || null, durationMs || null);
+  return conn.prepare('SELECT * FROM api_logs WHERE id = ?').get(info.lastInsertRowid);
+}
+
+export function getApiLogsByUserId(userId) {
+  return getDb().prepare('SELECT * FROM api_logs WHERE user_id = ? ORDER BY id ASC').all(userId);
+}
+
+// --- Webhook Events ---
+
+export function insertWebhookEvent({ userId, webhookId, eventType, status, payload }) {
+  const conn = getDb();
+  const info = conn.prepare(
+    'INSERT INTO webhook_events (user_id, webhook_id, event_type, status, payload) VALUES (?, ?, ?, ?, ?)'
+  ).run(userId || null, webhookId || null, eventType || null, status || null, payload ? JSON.stringify(payload) : null);
+  return conn.prepare('SELECT * FROM webhook_events WHERE id = ?').get(info.lastInsertRowid);
+}
+
+export function getWebhookEventsByUserId(userId) {
+  return getDb().prepare('SELECT * FROM webhook_events WHERE user_id = ? ORDER BY id ASC').all(userId);
+}
+
+export function getAllWebhookEvents() {
+  return getDb().prepare('SELECT * FROM webhook_events ORDER BY id ASC').all();
 }
 
 // --- Document Collections ---

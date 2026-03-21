@@ -61,6 +61,15 @@ export function createApp({ dirName, demoId, port, jsonLimit = '1mb' }) {
     res.json(db.getWebhookEvents(req.params.id));
   });
 
+  // Webhooks and API logs by user_id
+  app.get('/api/users/:userId/webhooks', (req, res) => {
+    res.json(db.getWebhookEventsByUserId(req.params.userId));
+  });
+
+  app.get('/api/users/:userId/logs', (req, res) => {
+    res.json(db.getApiLogsByUserId(req.params.userId));
+  });
+
   // Webhook receiver — verifies HMAC, matches to order (by user_id or order_id), stores event
   app.post('/api/webhooks/truv', (req, res) => {
     const sigMatch = verifyWebhookSignature(req.rawBody, API_SECRET, req.headers['x-webhook-sign']);

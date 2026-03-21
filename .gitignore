@@ -13,4 +13,5 @@ node_modules
 c-sharp/[Oo]ut/
 quickstart.db
 quickstart.db-wal
-quickstart.db-shm
+quickstart.db-shmdist/
+demos/*/dist/

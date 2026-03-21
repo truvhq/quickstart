@@ -4,11 +4,8 @@
   "type": "module",
   "description": "Truv API Quickstart — 5 standalone demo apps",
   "scripts": {
-    "application": "node application/server.js",
-    "follow-up": "node follow-up/server.js",
-    "employee-portal": "node employee-portal/server.js",
-    "upload-documents": "node upload-documents/server.js",
-    "choice-connect": "node choice-connect/server.js"
+    "start": "node server.js",
+    "dev": "npx vite"
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0",
@@ -17,5 +14,12 @@
     "express": "^4.21.2",
     "node-fetch": "^3.3.2",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.5",
+    "@tailwindcss/vite": "^4.2.2",
+    "preact": "^10.29.0",
+    "tailwindcss": "^4.2.2",
+    "vite": "^8.0.1"
   }
 }
