@@ -5,7 +5,7 @@ import { createApp } from '../../shared/createApp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { app, truv, db, apiLogger, start, API_PRODUCT_TYPE } = createApp({
-  dirName: __dirname, demoId: 'choice-connect', port: 3005, webhookMatch: 'order_id',
+  dirName: __dirname, demoId: 'choice-connect', port: 3005,
 });
 
 // Create user + bridge token

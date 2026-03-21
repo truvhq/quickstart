@@ -303,6 +303,17 @@
         self.render();
       } catch (_) {}
     });
+    this._sseSource.addEventListener('webhook', function (e) {
+      try {
+        var wh = JSON.parse(e.data);
+        var whId = wh.webhook_id || wh.id || JSON.stringify(wh);
+        if (self._seenWebhookIds[whId]) return;
+        self._seenWebhookIds[whId] = true;
+        self.webhooks.push(wh);
+        if (self.onWebhook) self.onWebhook(wh);
+        self.render();
+      } catch (_) {}
+    });
   };
 
   QuickstartPanel.prototype.connectGlobalSSE = function (filterFn) {
@@ -331,7 +342,16 @@
       fetch(API_BASE + '/api/orders/' + orderId + '/webhooks').then(function (r) { return r.json(); })
     ]).then(function (results) {
       self.apiLogs = results[0] || [];
-      self.webhooks = results[1] || [];
+      // Merge fetched webhooks with any already received via SSE (dedup by id)
+      var fetched = results[1] || [];
+      for (var i = 0; i < fetched.length; i++) {
+        var wh = fetched[i];
+        var whId = wh.webhook_id || wh.id || JSON.stringify(wh);
+        if (!self._seenWebhookIds[whId]) {
+          self._seenWebhookIds[whId] = true;
+          self.webhooks.push(wh);
+        }
+      }
       self.render();
       return { logs: self.apiLogs, webhooks: self.webhooks };
     });

@@ -5,7 +5,7 @@ import { createApp } from '../../shared/createApp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { app, truv, db, apiLogger, start, API_PRODUCT_TYPE, TEMPLATE_ID } = createApp({
-  dirName: __dirname, demoId: 'follow-up', port: 3002, webhookMatch: 'order_id',
+  dirName: __dirname, demoId: 'follow-up', port: 3002,
 });
 
 // List orders for this demo
@@ -47,7 +47,7 @@ app.post('/api/orders', async (req, res) => {
       statusCode: result.statusCode, durationMs: result.durationMs,
     });
 
-    res.json({ order_id: orderId, truv_order_id: truvData.id, bridge_token: truvData.bridge_token, status: truvData.status });
+    res.json({ order_id: orderId, truv_order_id: truvData.id, user_id: truvData.user_id, bridge_token: truvData.bridge_token, status: truvData.status });
   } catch (err) { console.error('POST /api/orders error:', err); res.status(500).json({ error: 'Internal server error' }); }
 });
 

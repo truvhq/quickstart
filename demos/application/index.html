@@ -22,25 +22,11 @@
       --success-bg: #ecfdf5;
     }
 
-    /* Header */
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .header-logo { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; }
-    .header-title { font-size: 16px; font-weight: 600; }
-    .header-badge { font-size: 12px; color: var(--text-secondary); background: #f3f4f6; padding: 4px 10px; border-radius: 12px; }
-
     /* Layout */
     .app-panel { justify-content: center; padding: 40px 32px; }
     .app-panel.no-pad { padding: 0; }
     .app-content { width: 100%; max-width: 520px; transition: max-width 0.2s; height: 100%; }
     .app-content.full-width { max-width: 100%; }
-
-    /* API panel — pill-style tabs */
-    .api-panel { min-width: 0; overflow: hidden; }
-    .api-panel-tabs { padding: 16px 20px; gap: 2px; border-bottom: 1px solid var(--border); }
-    .api-panel-tabs button { flex: none; padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-radius: 6px; border-bottom: none; transition: all 0.15s; }
-    .api-panel-tabs button:hover { color: var(--text-secondary); background: #f3f4f6; }
-    .api-panel-tabs button.active { color: var(--primary); background: var(--primary-light); border-bottom: none; }
-    .api-tab-content { padding: 16px 20px; }
 
     /* Form */
     .form-row { display: grid; gap: 16px; margin-bottom: 16px; }
@@ -68,54 +54,18 @@
     .bridge-wrapper { width: 100%; height: 100%; border: none; border-radius: 0; overflow: hidden; position: relative; background: #fff; zoom: 0.85; }
     .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
 
-    /* Waiting screen */
-    .waiting-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; }
-    .waiting-ring { border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1.2s linear infinite; }
-    .webhook-pill { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f3f4f6; border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; animation: fadeIn 0.3s ease; }
-    .webhook-pill .wp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .webhook-pill .wp-dot.green { background: var(--success); }
-    .webhook-pill .wp-dot.yellow { background: var(--warning); }
-    .webhook-pill .wp-dot.blue { background: #3b82f6; }
-    .webhook-pill .wp-text { flex: 1; font-weight: 500; }
-    .webhook-pill .wp-time { font-size: 11px; color: var(--text-muted); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Results */
-    .results-grid { display: grid; gap: 0; margin-bottom: 20px; }
-    .result-row { display: grid; grid-template-columns: 180px 1fr; border-bottom: 1px solid var(--border-light); }
-    .result-label { padding: 12px 0; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
-    .result-value { padding: 12px 0; font-size: 13px; font-weight: 600; }
-    .result-section { margin-bottom: 24px; }
-    .result-section h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
-    .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .status-completed { background: var(--success-bg); color: var(--success); border: 1px solid #a7f3d0; }
-    .status-pending { background: var(--warning-bg); color: var(--warning); }
-
-    /* Guide blocks — styled for rich content */
-    .guide-block { margin-bottom: 12px; padding: 16px; background: #f3f4f6; border-radius: var(--radius-sm); }
-    .guide-block h4 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
-    .guide-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
-    .guide-detail p { margin: 8px 0; }
-    .guide-detail pre { background: #1a1a2e; color: #e2e8f0; padding: 10px 12px; border-radius: 6px; font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; overflow-x: auto; white-space: pre; margin: 8px 0; line-height: 1.5; }
-    .guide-detail code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; font-size: 11px; font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; }
-    .guide-detail pre code { background: none; padding: 0; }
-    .guide-detail ul, .guide-detail ol { margin: 8px 0; padding-left: 20px; }
-    .guide-detail li { margin: 4px 0; }
-    .guide-detail h5 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); margin: 12px 0 4px; }
-    .guide-detail a { color: var(--primary); font-weight: 500; }
-
     /* Headings */
     h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
     .subtitle { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 28px; }
-
-    /* Log entries — monospace endpoints */
-    .api-log-endpoint { font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; }
-    .api-log-body pre { font-family: 'SF Mono', SFMono-Regular, Menlo, monospace; background: #f3f4f6; padding: 10px; border-radius: 6px; max-height: 200px; overflow-y: auto; }
 
     /* Tunnel info */
     .tunnel-info { background: #eff6ff; border: 1px solid #bfdbfe; }
     .tunnel-info span { color: #1e40af; font-weight: 600; }
     .tunnel-info a { color: #2563eb; }
+
+    /* Bridge back link */
+    .bridge-back { position: absolute; top: 12px; left: 16px; z-index: 10; font-size: 13px; font-weight: 500; color: var(--primary); cursor: pointer; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); }
+    .bridge-back:hover { background: var(--primary-light); }
 
     /* Small spinner for buttons */
     .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
@@ -173,7 +123,8 @@
       </div>
 
       <!-- Step 1: Bridge -->
-      <div id="stepBridge" class="hidden" style="width:100%;height:100%;">
+      <div id="stepBridge" class="hidden" style="width:100%;height:100%;position:relative;">
+        <a class="bridge-back" onclick="backToForm()">&larr; Back</a>
         <div class="bridge-wrapper" id="bridgeContainer"></div>
       </div>
 
@@ -291,8 +242,21 @@ function goStep(n) {
 
   if (n === 1) setTimeout(initBridge, 100);
   if (n === 2) { waitingStartedAt = Date.now(); updateWaitingFeed(); }
-  if (n === 3 && !state.orderData) setTimeout(fetchOrderData, 100);
-  if (n === 3 && state.orderData) renderResults();
+  if (n === 3) {
+    if (state.orderData) { renderResults(); }
+    else {
+      var c = document.getElementById('stepResults');
+      c.textContent = '';
+      var w = document.createElement('div');
+      w.style.cssText = 'text-align:center;padding:60px;';
+      var r = document.createElement('div');
+      r.className = 'waiting-ring';
+      r.style.cssText = 'width:40px;height:40px;margin:0 auto 12px;';
+      w.appendChild(r);
+      c.appendChild(w);
+      setTimeout(fetchOrderData, 100);
+    }
+  }
 }
 
 // --- Step 1: Submit form ---
@@ -342,14 +306,23 @@ function initBridge() {
     onLoad: function() { panel.addBridgeEvent('onLoad', null); },
     onEvent: function(eventType, payload, source) {
       panel.addBridgeEvent('onEvent', { eventType: eventType, source: source });
-      if (source === 'order' && eventType === 'COMPLETED') {
-        setTimeout(async function() { await panel.fetchLogs(state.orderId); goStep(2); }, 1500);
-      }
     },
-    onSuccess: function() { panel.addBridgeEvent('onSuccess', null); },
+    onSuccess: function() {
+      panel.addBridgeEvent('onSuccess', null);
+      setTimeout(async function() { await panel.fetchLogs(state.orderId); goStep(2); }, 1500);
+    },
     onClose: function() { panel.addBridgeEvent('onClose', null); },
   });
   if (bridgeInstance) bridgeInstance.open();
+}
+
+function backToForm() {
+  if (bridgeInstance) { try { bridgeInstance.close(); } catch(e) {} bridgeInstance = null; }
+  document.getElementById('bridgeContainer').textContent = '';
+  state.bridgeToken = null;
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Continue';
+  goStep(0);
 }
 
 // --- Step 3: Waiting ---
@@ -706,6 +679,9 @@ function makeSubheading(text) {
 }
 
 function resetApp() {
+  bridgeInstance = null;
+  advancePending = false;
+  waitingStartedAt = null;
   state = { step: 0, orderId: null, truvOrderId: null, userId: null, bridgeToken: null, productType: state.productType, orderData: null };
   document.getElementById('firstName').value = '';
   document.getElementById('lastName').value = '';

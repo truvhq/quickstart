@@ -99,10 +99,6 @@ export function updateOrder(orderId, fields) {
   getDb().prepare(`UPDATE orders SET ${sets} WHERE id = ?`).run(...vals);
 }
 
-export function findOrderByTruvId(truvOrderId) {
-  return getDb().prepare('SELECT * FROM orders WHERE truv_order_id = ?').get(truvOrderId) || null;
-}
-
 export function findOrderByUserId(userId) {
   return getDb().prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 1').get(userId) || null;
 }

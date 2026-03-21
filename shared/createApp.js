@@ -13,7 +13,7 @@ import { verifyWebhookSignature } from './webhooks.js';
 import { createSseHandler } from './sse.js';
 import { setupWebhook, teardownWebhook } from './webhook-setup.js';
 
-export function createApp({ dirName, demoId, port, webhookMatch = 'user_id', jsonLimit = '1mb' }) {
+export function createApp({ dirName, demoId, port, jsonLimit = '1mb' }) {
   const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE, TEMPLATE_ID } = process.env;
 
   if (!API_CLIENT_ID || !API_SECRET) {
@@ -67,19 +67,13 @@ export function createApp({ dirName, demoId, port, webhookMatch = 'user_id', jso
 
     const payload = req.body;
     let orderId = null;
-    if (webhookMatch === 'user_id' && payload.user_id) {
+    if (payload.user_id) {
       const order = db.findOrderByUserId(payload.user_id);
       if (order) {
         orderId = order.id;
         if (payload.event_type === 'order-status-updated' && payload.status === 'completed') {
           db.updateOrder(orderId, { status: 'completed' });
         }
-      }
-    } else if (webhookMatch === 'order_id' && payload.order_id) {
-      const order = db.findOrderByTruvId(payload.order_id);
-      if (order) {
-        orderId = order.id;
-        if (payload.status) db.updateOrder(orderId, { status: payload.status });
       }
     }
 

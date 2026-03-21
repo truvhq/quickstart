@@ -8,11 +8,10 @@
   <link rel="stylesheet" href="/shared/styles.css" />
   <script src="https://cdn.truv.com/bridge.js"></script>
   <style>
-    /* Header sub-components (not in shared CSS) */
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .header-logo { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; }
-    .header-title { font-size: 16px; font-weight: 600; }
-    .header-badge { font-size: 12px; color: var(--text-secondary); background: var(--bg-input); padding: 4px 10px; border-radius: 12px; }
+    /* White background, full-width layout */
+    :root { --bg: #ffffff; }
+    .app-panel { justify-content: center; padding: 40px 32px; }
+    .screen-container { max-width: 640px; }
 
     /* Task cards */
     .task-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; background: var(--bg-white); }
@@ -25,8 +24,16 @@
     .task-desc { font-size: 12px; color: var(--text-secondary); }
     .task-status { flex-shrink: 0; }
 
-    /* Bridge embed */
-    .bridge-wrapper { width: 100%; height: 700px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; position: relative; background: #fff; margin-top: 16px; }
+    /* Bridge embed — full width, fills panel */
+    .app-panel.bridge-mode { padding: 0; }
+    .bridge-screen { width: 100%; height: 100%; display: flex; flex-direction: column; }
+    .bridge-topbar { padding: 14px 24px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .bridge-topbar .back-link { margin: 0; font-size: 13px; white-space: nowrap; }
+    .bridge-topbar .divider { width: 1px; height: 20px; background: var(--border); }
+    .bridge-topbar h2 { font-size: 15px; font-weight: 600; margin: 0; white-space: nowrap; }
+    .bridge-topbar .creds { margin: 0; margin-left: auto; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .bridge-topbar .creds code { background: var(--bg-input); padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+    .bridge-wrapper { flex: 1; overflow: hidden; position: relative; background: #fff; zoom: 0.85; }
     .bridge-wrapper iframe { width: 100% !important; height: 100% !important; border: none; }
     .bridge-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-secondary); font-size: 14px; }
   </style>
@@ -48,7 +55,64 @@
 
 <script src="/shared/panel.js"></script>
 <script>
-var panel = new QuickstartPanel({ tabs: ['api', 'bridge', 'webhooks'] });
+// --- Guide steps (developer-authored static HTML) ---
+var STEPS = [
+  {
+    title: 'Select a task',
+    guide: '<p>Choose a verification task from the list. Each task creates a separate order via your backend:</p>'
+      + '<pre>POST /v1/orders/\n{\n  "products": ["income"],\n  "template_id": "..."\n}</pre>'
+      + '<p>The response contains a <code>bridge_token</code> to open Bridge and an order <code>id</code> for tracking.</p>'
+      + '<h5>Follow-up flow</h5><ul>'
+      + '<li>Each task maps to a different <code>product_type</code> (employment, income, assets)</li>'
+      + '<li>Tasks are independent — complete them in any order</li>'
+      + '<li>The Bridge widget handles the full verification inline</li></ul>'
+      + '<p><a href="https://docs.truv.com/reference/create-an-order" target="_blank">API Reference \u2192</a></p>',
+  },
+  {
+    title: 'Bridge verification',
+    guide: '<p>The Bridge widget is initialized with:</p>'
+      + '<pre>TruvBridge.init({\n  bridgeToken: "...",\n  isOrder: true,\n  position: { type: "inline", container: el }\n})</pre>'
+      + '<p>Bridge fires events as the user progresses:</p><ul>'
+      + '<li><code>onLoad</code> — widget ready</li>'
+      + '<li><code>onEvent(LOAD, OPEN, LINK_CREATED, ...)</code> — user actions</li>'
+      + '<li><code>onSuccess</code> — single task completed, advance to webhooks</li>'
+      + '<li><code>onClose</code> — user dismissed the widget</li></ul>'
+      + '<p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p>'
+      + '<p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs \u2192</a></p>',
+  },
+  {
+    title: 'Webhook processing',
+    guide: '<p>Truv sends webhooks to your registered URL as the verification progresses. Events arrive in this order:</p><ol>'
+      + '<li><code>task-status-updated</code> — login \u2192 parse \u2192 done</li>'
+      + '<li><code>link-connected</code> — payroll link established</li>'
+      + '<li><code>profile-created</code>, <code>employment-created</code>, <code>income-created</code></li>'
+      + '<li><code>order-status-updated</code> (status: completed) — all done</li></ol>'
+      + '<p>All webhooks include <code>user_id</code> for matching. Verify the <code>X-Webhook-Sign</code> header with HMAC-SHA256.</p>'
+      + '<pre>const sig = crypto\n  .createHmac(\'sha256\', API_SECRET)\n  .update(rawBody)\n  .digest(\'hex\');</pre>'
+      + '<p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs \u2192</a></p>',
+  },
+  {
+    title: 'Retrieve results',
+    guide: '<p>Once the task completes, fetch the full results:</p>'
+      + '<pre>GET /v1/orders/{order_id}/</pre>'
+      + '<p>The response includes nested <code>employers[]</code> with:</p><ul>'
+      + '<li><strong>Profile</strong> — name, SSN, DOB, address</li>'
+      + '<li><strong>Employment</strong> — title, start date, income</li>'
+      + '<li><strong>Pay Statements</strong> — gross/net pay, earnings, deductions</li>'
+      + '<li><strong>Bank Accounts</strong> — direct deposit routing info</li></ul>'
+      + '<p>After reviewing results, return to the task list to complete remaining verifications.</p>'
+      + '<p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference \u2192</a></p>',
+  },
+];
+
+// --- Panel ---
+var panel = new QuickstartPanel({
+  tabs: ['guide', 'api', 'bridge', 'webhooks'],
+  steps: STEPS,
+  onWebhook: function(wh) {
+    if (state.screen === 'waiting') updateWaitingFeed();
+  }
+});
 
 var TASKS = [
   { id: 'documents', name: 'Upload Documents', desc: 'Verify employment documents', product: 'employment', icon: '\uD83D\uDCC4', iconClass: 'employment' },
@@ -62,28 +126,49 @@ var state = {
   activeTask: null,
   taskStatus: {},
   orderId: null,
+  userId: null,
   bridgeToken: null,
+  orderData: null,
 };
 
 // Initialize all tasks as pending
 TASKS.forEach(function (t) { state.taskStatus[t.id] = 'pending'; });
 
+var bridgeInstance = null;
+var waitingStartedAt = null;
+var advancePending = false;
+var WAITING_MIN_MS = 10000;
+
 function render() {
   var appPanel = document.getElementById('appPanel');
   appPanel.replaceChildren();
-  var sc = el('div', { className: 'screen-container' });
 
-  if (state.screen === 'tasks') sc.appendChild(buildTaskList());
-  else sc.appendChild(buildBridgeScreen());
-
-  appPanel.appendChild(sc);
+  if (state.screen === 'bridge') {
+    appPanel.className = 'app-panel bridge-mode';
+    appPanel.appendChild(buildBridgeScreen());
+  } else if (state.screen === 'waiting') {
+    appPanel.className = 'app-panel';
+    var sc = el('div', { className: 'screen-container' });
+    sc.appendChild(buildWaitingScreen());
+    appPanel.appendChild(sc);
+  } else if (state.screen === 'results') {
+    appPanel.className = 'app-panel';
+    var sc = el('div', { className: 'screen-container' });
+    sc.appendChild(buildResultsScreen());
+    appPanel.appendChild(sc);
+  } else {
+    appPanel.className = 'app-panel';
+    var sc = el('div', { className: 'screen-container' });
+    sc.appendChild(buildTaskList());
+    appPanel.appendChild(sc);
+  }
 }
 
 // --- Task List ---
 function buildTaskList() {
-  var card = el('div', { className: 'screen-card' });
-  card.appendChild(el('h2', null, 'Complete Your Application'));
-  card.appendChild(el('p', { className: 'desc' }, 'You have pending tasks to finish your application. Complete each verification step below.'));
+  var root = el('div');
+  root.appendChild(el('h2', null, 'Complete Your Application'));
+  root.appendChild(el('p', { className: 'desc' }, 'You have pending tasks to finish your application. Complete each verification step below.'));
 
   TASKS.forEach(function (task) {
     var status = state.taskStatus[task.id];
@@ -102,10 +187,10 @@ function buildTaskList() {
       taskCard.appendChild(el('button', { className: 'btn btn-primary btn-sm', onclick: function () { startTask(task); } }, 'Start'));
     }
 
-    card.appendChild(taskCard);
+    root.appendChild(taskCard);
   });
 
-  return card;
+  return root;
 }
 
 async function startTask(task) {
@@ -120,35 +205,33 @@ async function startTask(task) {
     if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); return; }
 
     state.orderId = data.order_id;
+    state.userId = data.user_id;
     state.bridgeToken = data.bridge_token;
+    state.orderData = null;
     panel.connectSSE(state.orderId);
-    panel.fetchLogs(state.orderId);
+    await panel.fetchLogs(state.orderId);
     state.screen = 'bridge';
+    panel.setStep(1);
     render();
   } catch (e) { console.error(e); }
 }
 
 // --- Bridge ---
-var bridgeInstance = null;
-
 function buildBridgeScreen() {
   var task = state.activeTask;
-  var card = el('div', { className: 'screen-card' });
+  var screen = el('div', { className: 'bridge-screen' });
 
-  card.appendChild(el('div', { className: 'back-link', onclick: returnToTasks }, [
-    el('span', null, '\u2190'),
-    el('span', null, 'Back to tasks'),
+  var topbar = el('div', { className: 'bridge-topbar' });
+  topbar.appendChild(el('div', { className: 'back-link', onclick: returnToTasks }, [
+    el('span', null, '\u2190'), el('span', null, 'Back to tasks'),
   ]));
-
-  card.appendChild(el('h2', null, task.name));
-  card.appendChild(el('p', { className: 'desc' }, 'Use sandbox credentials: goodlogin / goodpassword'));
+  screen.appendChild(topbar);
 
   var wrapper = el('div', { className: 'bridge-wrapper', id: 'bridgeContainer' });
-  wrapper.appendChild(el('div', { className: 'bridge-loading' }, [el('div', { className: 'spinner' }), el('span', null, 'Loading Bridge...')]));
-  card.appendChild(wrapper);
+  screen.appendChild(wrapper);
 
   setTimeout(initBridge, 100);
-  return card;
+  return screen;
 }
 
 function initBridge() {
@@ -159,30 +242,281 @@ function initBridge() {
     position: { type: 'inline', container: document.getElementById('bridgeContainer') },
     onLoad: function () {
       panel.addBridgeEvent('onLoad', null);
-      var l = document.querySelector('.bridge-loading');
-      if (l) l.style.display = 'none';
     },
     onEvent: function (eventType, payload, source) {
       panel.addBridgeEvent('onEvent', { eventType: eventType, source: source });
-      if (source === 'order' && eventType === 'COMPLETED') {
-        state.taskStatus[state.activeTask.id] = 'completed';
-        setTimeout(returnToTasks, 2000);
-      }
     },
-    onSuccess: function () { panel.addBridgeEvent('onSuccess', null); },
+    onSuccess: function () {
+      panel.addBridgeEvent('onSuccess', null);
+      state.taskStatus[state.activeTask.id] = 'completed';
+      setTimeout(async function() {
+        await panel.fetchLogs(state.orderId);
+        goWaiting();
+      }, 1500);
+    },
     onClose: function () { panel.addBridgeEvent('onClose', null); },
   });
   if (bridgeInstance) bridgeInstance.open();
 }
 
+// --- Waiting screen ---
+function goWaiting() {
+  bridgeInstance = null;
+  state.screen = 'waiting';
+  waitingStartedAt = Date.now();
+  advancePending = false;
+  panel.setStep(2);
+  render();
+  updateWaitingFeed();
+}
+
+function buildWaitingScreen() {
+  var root = el('div', { className: 'waiting-screen' });
+  var ringWrap = document.createElement('div');
+  ringWrap.style.cssText = 'width:72px;height:72px;margin-bottom:28px;';
+  var ring = document.createElement('div');
+  ring.className = 'waiting-ring';
+  ring.style.cssText = 'width:72px;height:72px;';
+  ringWrap.appendChild(ring);
+  root.appendChild(ringWrap);
+
+  root.appendChild(el('h2', { style: 'margin-bottom:8px;' }, 'Waiting for webhooks'));
+  root.appendChild(el('p', { style: 'font-size:14px;color:var(--text-secondary);line-height:1.6;max-width:400px;margin-bottom:36px;' },
+    'Truv sends webhook events as the verification progresses. Watch them arrive in real time.'));
+
+  var feed = document.createElement('div');
+  feed.id = 'webhookFeed';
+  feed.style.cssText = 'text-align:left;width:100%;max-width:420px;';
+  root.appendChild(feed);
+  return root;
+}
+
+function updateWaitingFeed() {
+  if (state.screen !== 'waiting') return;
+  var feed = document.getElementById('webhookFeed');
+  if (!feed) return;
+
+  if (panel.webhooks.length === 0) {
+    feed.textContent = 'No webhooks received yet...';
+    feed.style.textAlign = 'center';
+    feed.style.fontSize = '13px';
+    feed.style.color = 'var(--text-muted)';
+  } else {
+    feed.style.textAlign = 'left';
+    feed.style.fontSize = '';
+    feed.style.color = '';
+    feed.textContent = '';
+    var reversed = panel.webhooks.slice().reverse();
+    for (var i = 0; i < reversed.length; i++) {
+      var w = reversed[i];
+      var payload = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+      var eventType = payload.event_type || w.event_type || 'unknown';
+      var status = payload.status || w.status || '';
+      var ts = payload.event_created_at || payload.updated_at || w.received_at || '';
+      var timeStr = ts ? new Date(ts).toLocaleTimeString() : '';
+      var dotColor = status === 'completed' || status === 'done' ? 'green' : status === 'pending' ? 'yellow' : 'blue';
+
+      var pill = document.createElement('div');
+      pill.className = 'webhook-pill';
+      var dot = document.createElement('div');
+      dot.className = 'wp-dot ' + dotColor;
+      pill.appendChild(dot);
+      var text = document.createElement('span');
+      text.className = 'wp-text';
+      text.textContent = eventType.replace(/-/g, ' ');
+      pill.appendChild(text);
+      var time = document.createElement('span');
+      time.className = 'wp-time';
+      time.textContent = timeStr;
+      pill.appendChild(time);
+      feed.appendChild(pill);
+    }
+  }
+
+  // Auto-advance once order is completed (with minimum display time)
+  if (advancePending) return;
+  var elapsed = Date.now() - waitingStartedAt;
+  var isCompleted = panel.webhooks.some(function(w) {
+    var p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+    return p.event_type === 'order-status-updated' && p.status === 'completed';
+  });
+  if (isCompleted) {
+    advancePending = true;
+    var delay = Math.max(1000, WAITING_MIN_MS - elapsed + 1000);
+    setTimeout(function() { goResults(); }, delay);
+  }
+}
+
+// --- Results screen ---
+function goResults() {
+  waitingStartedAt = null;
+  advancePending = false;
+  state.screen = 'results';
+  panel.setStep(3);
+
+  if (state.orderData) {
+    render();
+  } else {
+    render();
+    fetchOrderData();
+  }
+}
+
+async function fetchOrderData() {
+  if (!state.orderId) return;
+  try {
+    var resp = await fetch(API_BASE + '/api/orders/' + encodeURIComponent(state.orderId));
+    state.orderData = await resp.json();
+    await panel.fetchLogs(state.orderId);
+    render();
+  } catch (e) { console.error(e); }
+}
+
+function buildResultsScreen() {
+  var root = el('div');
+
+  if (!state.orderData) {
+    // Loading spinner
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'text-align:center;padding:60px;';
+    var ring = document.createElement('div');
+    ring.className = 'waiting-ring';
+    ring.style.cssText = 'width:40px;height:40px;margin:0 auto 12px;';
+    wrap.appendChild(ring);
+    root.appendChild(wrap);
+    return root;
+  }
+
+  var data = state.orderData;
+  var raw = data.raw_response || {};
+  var task = state.activeTask;
+
+  root.appendChild(el('h2', null, 'Verification Results'));
+  root.appendChild(el('p', { style: 'font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:28px;' },
+    (task ? task.name : 'Task') + ' \u2022 Order ' + (data.truv_order_id || '') + ' \u2022 ' + (data.status || '')));
+
+  var employers = raw.employers || [];
+  for (var ei = 0; ei < employers.length; ei++) {
+    var emp = employers[ei];
+    var employment = (emp.employments && emp.employments[0]) || {};
+    var profile = employment.profile || {};
+    var company = employment.company || {};
+    var stmts = employment.statements || [];
+    var annualSummary = employment.annual_income_summary || [];
+
+    // Employer header
+    var empHeader = document.createElement('div');
+    empHeader.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px 0;border-bottom:2px solid var(--border);';
+    var empInfo = document.createElement('div');
+    var empName = document.createElement('div');
+    empName.style.cssText = 'font-size:18px;font-weight:700;';
+    empName.textContent = emp.company_name || company.name || 'Employer';
+    empInfo.appendChild(empName);
+    empHeader.appendChild(empInfo);
+    var empStatus = document.createElement('span');
+    empStatus.className = 'status-badge status-completed';
+    empStatus.style.marginLeft = 'auto';
+    empStatus.textContent = emp.status || '-';
+    empHeader.appendChild(empStatus);
+    root.appendChild(empHeader);
+
+    // Profile section
+    if (profile.first_name) {
+      var sec = makeSection('Profile');
+      var g = document.createElement('div'); g.className = 'results-grid';
+      addRow(g, 'Full Name', profile.full_name || (profile.first_name + ' ' + profile.last_name));
+      if (profile.email) addRow(g, 'Email', profile.email);
+      if (profile.date_of_birth) addRow(g, 'Date of Birth', profile.date_of_birth);
+      if (profile.ssn) addRow(g, 'SSN', profile.ssn.replace(/^(\d{3})(\d{2})(\d{4})$/, '$1-$2-$3'));
+      sec.appendChild(g); root.appendChild(sec);
+    }
+
+    // Employment section
+    if (employment.job_title) {
+      var sec2 = makeSection('Employment');
+      var g2 = document.createElement('div'); g2.className = 'results-grid';
+      addRow(g2, 'Job Title', employment.job_title);
+      addRow(g2, 'Status', employment.is_active ? 'Active' : 'Inactive');
+      addRow(g2, 'Start Date', employment.start_date || '-');
+      if (employment.income) addRow(g2, 'Annual Income', '$' + Number(employment.income).toLocaleString(undefined, { minimumFractionDigits: 2 }));
+      sec2.appendChild(g2); root.appendChild(sec2);
+    }
+
+    // Pay Statements summary
+    if (stmts.length > 0) {
+      var sec3 = makeSection('Pay Statements (' + stmts.length + ' total)');
+      var recent = stmts.slice(0, 3);
+      recent.forEach(function(st) {
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:13px;';
+        var left = document.createElement('span');
+        left.style.fontWeight = '600';
+        left.textContent = 'Pay Date: ' + st.pay_date;
+        row.appendChild(left);
+        var right = document.createElement('span');
+        right.style.color = 'var(--text-secondary)';
+        right.textContent = 'Gross: $' + Number(st.gross_pay).toLocaleString(undefined, { minimumFractionDigits: 2 });
+        row.appendChild(right);
+        sec3.appendChild(row);
+      });
+      root.appendChild(sec3);
+    }
+  }
+
+  if (employers.length === 0) {
+    var sec4 = makeSection('Order Details');
+    var g4 = document.createElement('div'); g4.className = 'results-grid';
+    addRow(g4, 'Order ID', data.truv_order_id || '-');
+    addRow(g4, 'Status', data.status || '-');
+    sec4.appendChild(g4); root.appendChild(sec4);
+  }
+
+  // Actions
+  var actions = document.createElement('div');
+  actions.style.cssText = 'display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);';
+  var backBtn = document.createElement('button');
+  backBtn.className = 'btn btn-primary';
+  backBtn.textContent = 'Back to Tasks';
+  backBtn.onclick = returnToTasks;
+  actions.appendChild(backBtn);
+  root.appendChild(actions);
+
+  return root;
+}
+
+function makeSection(title) {
+  var sec = document.createElement('div'); sec.className = 'result-section';
+  var h3 = document.createElement('h3'); h3.textContent = title;
+  sec.appendChild(h3); return sec;
+}
+
+function addRow(grid, label, value) {
+  var row = document.createElement('div'); row.className = 'result-row';
+  var l = document.createElement('div'); l.className = 'result-label'; l.textContent = label;
+  var v = document.createElement('div'); v.className = 'result-value'; v.textContent = String(value);
+  row.appendChild(l); row.appendChild(v); grid.appendChild(row);
+}
+
 function returnToTasks() {
+  bridgeInstance = null;
+  advancePending = false;
+  waitingStartedAt = null;
   state.screen = 'tasks';
   state.activeTask = null;
   state.orderId = null;
+  state.userId = null;
   state.bridgeToken = null;
+  state.orderData = null;
+  panel.setStep(0);
   render();
 }
 
+// --- Init ---
+panel.connectGlobalSSE(function(wh) {
+  var payload = typeof wh.payload === 'string' ? JSON.parse(wh.payload) : (wh.payload || {});
+  if (state.userId && payload.user_id && payload.user_id !== state.userId) return false;
+  return true;
+});
 render();
 </script>
 </body>

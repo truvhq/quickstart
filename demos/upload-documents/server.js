@@ -6,7 +6,7 @@ import { createApp } from '../../shared/createApp.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { app, truv, db, apiLogger, start } = createApp({
   dirName: __dirname, demoId: 'upload-documents', port: 3004,
-  webhookMatch: 'none', jsonLimit: '100mb',
+  jsonLimit: '100mb',
 });
 
 // Create document collection

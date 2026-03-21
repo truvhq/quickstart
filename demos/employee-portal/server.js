@@ -5,7 +5,7 @@ import { createApp } from '../../shared/createApp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { app, truv, db, apiLogger, start, API_PRODUCT_TYPE, TEMPLATE_ID } = createApp({
-  dirName: __dirname, demoId: 'employee-portal', port: 3003, webhookMatch: 'order_id',
+  dirName: __dirname, demoId: 'employee-portal', port: 3003,
 });
 
 // List ALL orders (cross-demo)
