@@ -4,7 +4,7 @@ import path from 'path';
 import { createApp } from '../../shared/createApp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const { app, truv, db, apiLogger, start, API_PRODUCT_TYPE, TEMPLATE_ID } = createApp({
+const { app, truv, db, apiLogger, start, API_PRODUCT_TYPE, getTemplateId } = createApp({
   dirName: __dirname, demoId: 'application', port: 3001,
 });
 
@@ -17,7 +17,7 @@ app.post('/api/orders', async (req, res) => {
       first_name: data.first_name, last_name: data.last_name,
       email: data.email, phone: data.phone, ssn: data.ssn,
       product_type: data.product_type || API_PRODUCT_TYPE,
-      template_id: TEMPLATE_ID,
+      template_id: getTemplateId(data.product_type || API_PRODUCT_TYPE),
     };
 
     const result = await truv.createOrder(params);
@@ -57,7 +57,21 @@ app.get('/api/orders/:id', async (req, res) => {
     }
 
     const raw = order.raw_response ? JSON.parse(order.raw_response) : {};
-    res.json({ order_id: order.id, truv_order_id: order.truv_order_id, status: order.status, bridge_token: order.bridge_token, share_url: order.share_url, raw_response: raw });
+
+    // Fetch reports if available
+    let voa_report = null, voie_report = null;
+    if (raw.voa_report_id && raw.user_id) {
+      const r = await truv.getVoaReport(raw.user_id, raw.voa_report_id);
+      apiLogger.logApiCall({ orderId: order.id, method: 'GET', endpoint: `/v1/users/${raw.user_id}/assets/reports/${raw.voa_report_id}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
+      if (r.statusCode < 400) voa_report = r.data;
+    }
+    if (raw.voie_report_id && raw.user_id) {
+      const r = await truv.getVoieReport(raw.user_id, raw.voie_report_id);
+      apiLogger.logApiCall({ orderId: order.id, method: 'GET', endpoint: `/v1/users/${raw.user_id}/reports/${raw.voie_report_id}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
+      if (r.statusCode < 400) voie_report = r.data;
+    }
+
+    res.json({ order_id: order.id, truv_order_id: order.truv_order_id, status: order.status, bridge_token: order.bridge_token, share_url: order.share_url, raw_response: raw, voa_report, voie_report });
   } catch (err) { console.error('GET /api/orders/:id error:', err); res.status(500).json({ error: 'Internal server error' }); }
 });
 

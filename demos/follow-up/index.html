@@ -10,7 +10,7 @@
   <style>
     /* White background, full-width layout */
     :root { --bg: #ffffff; }
-    .app-panel { justify-content: center; padding: 40px 32px; }
+    .app-panel { padding: 40px 32px; }
     .screen-container { max-width: 640px; }
 
     /* Task cards */
@@ -54,6 +54,7 @@
 </div>
 
 <script src="/shared/panel.js"></script>
+<script src="/shared/results.js"></script>
 <script>
 // --- Guide steps (developer-authored static HTML) ---
 var STEPS = [
@@ -376,7 +377,6 @@ function buildResultsScreen() {
   var root = el('div');
 
   if (!state.orderData) {
-    // Loading spinner
     var wrap = document.createElement('div');
     wrap.style.cssText = 'text-align:center;padding:60px;';
     var ring = document.createElement('div');
@@ -395,81 +395,7 @@ function buildResultsScreen() {
   root.appendChild(el('p', { style: 'font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:28px;' },
     (task ? task.name : 'Task') + ' \u2022 Order ' + (data.truv_order_id || '') + ' \u2022 ' + (data.status || '')));
 
-  var employers = raw.employers || [];
-  for (var ei = 0; ei < employers.length; ei++) {
-    var emp = employers[ei];
-    var employment = (emp.employments && emp.employments[0]) || {};
-    var profile = employment.profile || {};
-    var company = employment.company || {};
-    var stmts = employment.statements || [];
-    var annualSummary = employment.annual_income_summary || [];
-
-    // Employer header
-    var empHeader = document.createElement('div');
-    empHeader.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px 0;border-bottom:2px solid var(--border);';
-    var empInfo = document.createElement('div');
-    var empName = document.createElement('div');
-    empName.style.cssText = 'font-size:18px;font-weight:700;';
-    empName.textContent = emp.company_name || company.name || 'Employer';
-    empInfo.appendChild(empName);
-    empHeader.appendChild(empInfo);
-    var empStatus = document.createElement('span');
-    empStatus.className = 'status-badge status-completed';
-    empStatus.style.marginLeft = 'auto';
-    empStatus.textContent = emp.status || '-';
-    empHeader.appendChild(empStatus);
-    root.appendChild(empHeader);
-
-    // Profile section
-    if (profile.first_name) {
-      var sec = makeSection('Profile');
-      var g = document.createElement('div'); g.className = 'results-grid';
-      addRow(g, 'Full Name', profile.full_name || (profile.first_name + ' ' + profile.last_name));
-      if (profile.email) addRow(g, 'Email', profile.email);
-      if (profile.date_of_birth) addRow(g, 'Date of Birth', profile.date_of_birth);
-      if (profile.ssn) addRow(g, 'SSN', profile.ssn.replace(/^(\d{3})(\d{2})(\d{4})$/, '$1-$2-$3'));
-      sec.appendChild(g); root.appendChild(sec);
-    }
-
-    // Employment section
-    if (employment.job_title) {
-      var sec2 = makeSection('Employment');
-      var g2 = document.createElement('div'); g2.className = 'results-grid';
-      addRow(g2, 'Job Title', employment.job_title);
-      addRow(g2, 'Status', employment.is_active ? 'Active' : 'Inactive');
-      addRow(g2, 'Start Date', employment.start_date || '-');
-      if (employment.income) addRow(g2, 'Annual Income', '$' + Number(employment.income).toLocaleString(undefined, { minimumFractionDigits: 2 }));
-      sec2.appendChild(g2); root.appendChild(sec2);
-    }
-
-    // Pay Statements summary
-    if (stmts.length > 0) {
-      var sec3 = makeSection('Pay Statements (' + stmts.length + ' total)');
-      var recent = stmts.slice(0, 3);
-      recent.forEach(function(st) {
-        var row = document.createElement('div');
-        row.style.cssText = 'display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:13px;';
-        var left = document.createElement('span');
-        left.style.fontWeight = '600';
-        left.textContent = 'Pay Date: ' + st.pay_date;
-        row.appendChild(left);
-        var right = document.createElement('span');
-        right.style.color = 'var(--text-secondary)';
-        right.textContent = 'Gross: $' + Number(st.gross_pay).toLocaleString(undefined, { minimumFractionDigits: 2 });
-        row.appendChild(right);
-        sec3.appendChild(row);
-      });
-      root.appendChild(sec3);
-    }
-  }
-
-  if (employers.length === 0) {
-    var sec4 = makeSection('Order Details');
-    var g4 = document.createElement('div'); g4.className = 'results-grid';
-    addRow(g4, 'Order ID', data.truv_order_id || '-');
-    addRow(g4, 'Status', data.status || '-');
-    sec4.appendChild(g4); root.appendChild(sec4);
-  }
+  renderOrderResults(root, data);
 
   // Actions
   var actions = document.createElement('div');
@@ -482,19 +408,6 @@ function buildResultsScreen() {
   root.appendChild(actions);
 
   return root;
-}
-
-function makeSection(title) {
-  var sec = document.createElement('div'); sec.className = 'result-section';
-  var h3 = document.createElement('h3'); h3.textContent = title;
-  sec.appendChild(h3); return sec;
-}
-
-function addRow(grid, label, value) {
-  var row = document.createElement('div'); row.className = 'result-row';
-  var l = document.createElement('div'); l.className = 'result-label'; l.textContent = label;
-  var v = document.createElement('div'); v.className = 'result-value'; v.textContent = String(value);
-  row.appendChild(l); row.appendChild(v); grid.appendChild(row);
 }
 
 function returnToTasks() {

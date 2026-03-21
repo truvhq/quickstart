@@ -14,7 +14,8 @@ import { createSseHandler } from './sse.js';
 import { setupWebhook, teardownWebhook } from './webhook-setup.js';
 
 export function createApp({ dirName, demoId, port, jsonLimit = '1mb' }) {
-  const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE, TEMPLATE_ID } = process.env;
+  const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE,
+    TEMPLATE_ID_INCOME, TEMPLATE_ID_EMPLOYMENT, TEMPLATE_ID_ASSETS, TEMPLATE_ID_IDENTITY } = process.env;
 
   if (!API_CLIENT_ID || !API_SECRET) {
     console.error('Missing API_CLIENT_ID or API_SECRET in .env');
@@ -37,6 +38,7 @@ export function createApp({ dirName, demoId, port, jsonLimit = '1mb' }) {
   const sharedDir = path.resolve(dirName, '..', '..', 'shared');
   app.get('/shared/styles.css', (_req, res) => res.sendFile(path.join(sharedDir, 'styles.css')));
   app.get('/shared/panel.js', (_req, res) => res.sendFile(path.join(sharedDir, 'panel.js')));
+  app.get('/shared/results.js', (_req, res) => res.sendFile(path.join(sharedDir, 'results.js')));
 
   // Serve index.html
   app.get('/', (_req, res) => res.sendFile(path.join(dirName, 'index.html')));
@@ -112,5 +114,15 @@ export function createApp({ dirName, demoId, port, jsonLimit = '1mb' }) {
     });
   }
 
-  return { app, truv, db, apiLogger, start, API_PRODUCT_TYPE, TEMPLATE_ID };
+  function getTemplateId(productType) {
+    const map = {
+      income: TEMPLATE_ID_INCOME,
+      employment: TEMPLATE_ID_EMPLOYMENT,
+      assets: TEMPLATE_ID_ASSETS,
+      identity: TEMPLATE_ID_IDENTITY,
+    };
+    return map[productType] || undefined;
+  }
+
+  return { app, truv, db, apiLogger, start, API_PRODUCT_TYPE, getTemplateId };
 }

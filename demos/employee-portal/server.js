@@ -4,7 +4,7 @@ import path from 'path';
 import { createApp } from '../../shared/createApp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const { app, truv, db, apiLogger, start, API_PRODUCT_TYPE, TEMPLATE_ID } = createApp({
+const { app, truv, db, apiLogger, start, API_PRODUCT_TYPE, getTemplateId } = createApp({
   dirName: __dirname, demoId: 'employee-portal', port: 3003,
 });
 
@@ -29,7 +29,7 @@ app.post('/api/orders', async (req, res) => {
       first_name: data.first_name, last_name: data.last_name,
       email: data.email, phone: data.phone, ssn: data.ssn,
       product_type: data.product_type || API_PRODUCT_TYPE,
-      template_id: TEMPLATE_ID,
+      template_id: getTemplateId(data.product_type || API_PRODUCT_TYPE),
     };
 
     const result = await truv.createOrder(params);

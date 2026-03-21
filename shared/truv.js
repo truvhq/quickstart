@@ -90,7 +90,7 @@ export class TruvClient {
     if (params.template_id) payload.template_id = params.template_id;
 
     // Sandbox employer — use "Home Depot" with credentials goodlogin/goodpassword
-    if (['deposit_switch', 'pll', 'employment', 'income', 'assets'].includes(productType)) {
+    if (['deposit_switch', 'pll', 'employment', 'income'].includes(productType)) {
       payload.employers = [{ company_name: 'Home Depot' }];
     }
 
@@ -141,6 +141,16 @@ export class TruvClient {
 
   async getLinkReport(linkId, productType) {
     return this._request('GET', `links/${linkId}/${productType}/report`);
+  }
+
+  // --- Reports ---
+
+  async getVoaReport(userId, reportId) {
+    return this._request('GET', `users/${userId}/assets/reports/${reportId}/`);
+  }
+
+  async getVoieReport(userId, reportId) {
+    return this._request('GET', `users/${userId}/reports/${reportId}/`);
   }
 
   // --- Document Collections API ---
