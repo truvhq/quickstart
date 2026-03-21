@@ -342,15 +342,13 @@
       fetch(API_BASE + '/api/orders/' + orderId + '/webhooks').then(function (r) { return r.json(); })
     ]).then(function (results) {
       self.apiLogs = results[0] || [];
-      // Merge fetched webhooks with any already received via SSE (dedup by id)
-      var fetched = results[1] || [];
-      for (var i = 0; i < fetched.length; i++) {
-        var wh = fetched[i];
+      self.webhooks = results[1] || [];
+      // Rebuild seen set from fetched data so SSE dedup stays in sync
+      self._seenWebhookIds = {};
+      for (var i = 0; i < self.webhooks.length; i++) {
+        var wh = self.webhooks[i];
         var whId = wh.webhook_id || wh.id || JSON.stringify(wh);
-        if (!self._seenWebhookIds[whId]) {
-          self._seenWebhookIds[whId] = true;
-          self.webhooks.push(wh);
-        }
+        self._seenWebhookIds[whId] = true;
       }
       self.render();
       return { logs: self.apiLogs, webhooks: self.webhooks };
