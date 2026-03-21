@@ -1,53 +1,18 @@
 import { useState, useRef, useEffect } from 'preact/hooks';
 import { Layout, OrderResults, WaitingScreen, usePanel, API_BASE } from '@shared/ui/index.js';
+import { navigate } from '../App.jsx';
 
 const STEPS = [
-  {
-    title: 'Collect applicant info',
-    guide: '<p>The form collects applicant PII and sends it to your backend. The server calls:</p>'
-      + '<pre>POST /v1/orders/\n{\n  "first_name": "...",\n  "last_name": "...",\n  "products": ["income"],\n  "employers": [{ "company_name": "Home Depot" }]\n}</pre>'
-      + '<p>The response contains a <code>bridge_token</code> used to initialize the Bridge widget, and an order <code>id</code> for polling results.</p>'
-      + '<h5>Key fields</h5><ul>'
-      + '<li><code>bridge_token</code> — single-use token to open Bridge</li>'
-      + '<li><code>user_id</code> — identifies the user across webhooks</li>'
-      + '<li><code>share_url</code> — shareable link for the applicant</li></ul>'
-      + '<p><a href="https://docs.truv.com/reference/create-an-order" target="_blank">API Reference →</a></p>',
-  },
-  {
-    title: 'Bridge verification',
-    guide: '<p>The Bridge widget is initialized with:</p>'
-      + '<pre>TruvBridge.init({\n  bridgeToken: "...",\n  isOrder: true,\n  position: { type: "inline", container: el }\n})</pre>'
-      + '<p>Bridge fires events as the user progresses:</p><ul>'
-      + '<li><code>onLoad</code> — widget ready</li>'
-      + '<li><code>onSuccess</code> — verification task completed</li>'
-      + '<li><code>onClose</code> — user dismissed the widget</li></ul>'
-      + '<p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p>'
-      + '<p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs →</a></p>',
-  },
-  {
-    title: 'Webhook processing',
-    guide: '<p>Truv sends webhooks as the verification progresses:</p><ol>'
-      + '<li><code>order-created</code> — order is pending</li>'
-      + '<li><code>task-status-updated</code> — login → parse → done</li>'
-      + '<li><code>link-connected</code> — payroll link established</li>'
-      + '<li><code>order-status-updated</code> (completed) — all done</li></ol>'
-      + '<p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs →</a></p>',
-  },
-  {
-    title: 'Retrieve results',
-    guide: '<p>Once completed, fetch the full results:</p>'
-      + '<pre>GET /v1/orders/{order_id}/</pre>'
-      + '<p>The response includes <code>employers[]</code> with profile, employment, pay statements, W-2s, and bank accounts.</p>'
-      + '<p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference →</a></p>',
-  },
+  { title: 'Collect applicant info', guide: '<p>The form collects applicant PII and sends it to your backend.</p><pre>POST /v1/orders/</pre><p><a href="https://docs.truv.com/reference/create-an-order" target="_blank">API Reference →</a></p>' },
+  { title: 'Bridge verification', guide: '<p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p><p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs →</a></p>' },
+  { title: 'Webhook processing', guide: '<p>Truv sends webhooks as the verification progresses.</p><p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs →</a></p>' },
+  { title: 'Retrieve results', guide: '<p>Fetch the full results:</p><pre>GET /v1/orders/{order_id}/</pre><p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference →</a></p>' },
 ];
 
 const WAITING_MIN_MS = 10000;
 
-export function ApplicationDemo() {
-  const [screen, setScreen] = useState('form');
+export function ApplicationDemo({ screen }) {
   const [orderId, setOrderId] = useState(null);
-  const [userId, setUserId] = useState(null);
   const [bridgeToken, setBridgeToken] = useState(null);
   const [orderData, setOrderData] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -56,6 +21,11 @@ export function ApplicationDemo() {
   const advancePendingRef = useRef(false);
 
   const { panel, setCurrentStep, startPolling, addBridgeEvent, reset } = usePanel();
+
+  useEffect(() => {
+    const stepMap = { '': 0, 'bridge': 1, 'waiting': 2, 'results': 3 };
+    setCurrentStep(stepMap[screen] ?? 0);
+  }, [screen]);
 
   // Auto-advance from waiting
   useEffect(() => {
@@ -72,11 +42,10 @@ export function ApplicationDemo() {
     }
   }, [panel.webhooks, screen]);
 
-  // Init Bridge when container mounts
-  const bridgeRef = useRef(null);
-  function bridgeContainerRef(el) {
-    if (!el || !bridgeToken || !window.TruvBridge || bridgeRef.current) return;
-    bridgeRef.current = window.TruvBridge.init({
+  // Init Bridge when bridge container mounts
+  function bridgeContainer(el) {
+    if (!el || !bridgeToken || !window.TruvBridge) return;
+    const b = window.TruvBridge.init({
       bridgeToken, isOrder: true,
       position: { type: 'inline', container: el },
       onLoad: () => addBridgeEvent('onLoad', null),
@@ -85,14 +54,13 @@ export function ApplicationDemo() {
         if (type === 'COMPLETED' && source === 'order') {
           waitingStartRef.current = Date.now();
           advancePendingRef.current = false;
-          setCurrentStep(2);
-          setScreen('waiting');
+          navigate('application/waiting');
         }
       },
       onSuccess: () => addBridgeEvent('onSuccess', null),
       onClose: () => addBridgeEvent('onClose', null),
     });
-    bridgeRef.current.open();
+    b.open();
   }
 
   async function handleSubmit(formData) {
@@ -105,21 +73,17 @@ export function ApplicationDemo() {
       });
       const data = await resp.json();
       if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); setSubmitting(false); return; }
-
       setOrderId(data.order_id);
-      setUserId(data.user_id);
       setBridgeToken(data.bridge_token);
       startPolling(data.user_id);
-      setCurrentStep(1);
-      setScreen('bridge');
+      navigate('application/bridge');
     } catch (e) { console.error(e); }
     setSubmitting(false);
   }
 
   async function goResults() {
     advancePendingRef.current = false;
-    setCurrentStep(3);
-    setScreen('results');
+    navigate('application/results');
     if (!orderId) return;
     try {
       const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
@@ -128,29 +92,42 @@ export function ApplicationDemo() {
   }
 
   function resetApp() {
-    bridgeRef.current = null;
-    advancePendingRef.current = false;
     reset();
-    setScreen('form');
     setOrderId(null);
-    setUserId(null);
     setBridgeToken(null);
     setOrderData(null);
     setSubmitting(false);
+    navigate('application');
   }
 
   const isBridge = screen === 'bridge';
 
   return (
     <Layout title="Truv Quickstart" badge="Application" steps={STEPS} panel={panel} flush={isBridge}>
-      {isBridge ? (
-        <div ref={bridgeContainerRef} class="w-full h-full overflow-hidden bg-white [&_iframe]:w-full [&_iframe]:!h-full [&_iframe]:border-none" style="zoom: 0.85;" />
-      ) : (
+      {screen === 'bridge' && (
+        <div ref={bridgeContainer} key={bridgeToken} class="w-full h-full overflow-hidden bg-white [&_iframe]:w-full [&_iframe]:!h-full [&_iframe]:border-none" style="zoom: 0.85;" />
+      )}
+      {screen === 'waiting' && (
+        <div class="max-w-lg mx-auto"><WaitingScreen webhooks={panel.webhooks} /></div>
+      )}
+      {screen === 'results' && (
         <div class="max-w-lg mx-auto">
-          {screen === 'form' && <ApplicationForm onSubmit={handleSubmit} submitting={submitting} />}
-          {screen === 'waiting' && <WaitingScreen webhooks={panel.webhooks} />}
-          {screen === 'results' && <ResultsView orderData={orderData} onReset={resetApp} />}
+          {orderData ? (
+            <div>
+              <h2 class="text-2xl font-bold tracking-tight mb-1.5">Verification Results</h2>
+              <p class="text-sm text-gray-500 mb-7">Order {orderData.truv_order_id || ''} • {orderData.status || ''}</p>
+              <OrderResults data={orderData} />
+              <div class="flex gap-3 mt-6 pt-5 border-t border-gray-200">
+                <button class="px-5 py-2.5 text-sm font-semibold border border-gray-200 rounded-lg hover:border-primary hover:text-primary" onClick={resetApp}>New Application</button>
+              </div>
+            </div>
+          ) : (
+            <div class="text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>
+          )}
         </div>
+      )}
+      {!screen && (
+        <div class="max-w-lg mx-auto"><ApplicationForm onSubmit={handleSubmit} submitting={submitting} /></div>
       )}
     </Layout>
   );
@@ -193,22 +170,5 @@ function ApplicationForm({ onSubmit, submitting }) {
         {submitting ? <span class="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Continue'}
       </button>
     </form>
-  );
-}
-
-
-function ResultsView({ orderData, onReset }) {
-  if (!orderData) return <div class="text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>;
-
-  const raw = orderData.raw_response || {};
-  return (
-    <div>
-      <h2 class="text-2xl font-bold tracking-tight mb-1.5">Verification Results</h2>
-      <p class="text-sm text-gray-500 mb-7">Order {orderData.truv_order_id || ''} • {raw.verification_type || ''} • {orderData.status || ''}</p>
-      <OrderResults data={orderData} />
-      <div class="flex gap-3 mt-6 pt-5 border-t border-gray-200">
-        <button class="px-5 py-2.5 text-sm font-semibold border border-gray-200 rounded-lg hover:border-primary hover:text-primary" onClick={onReset}>New Application</button>
-      </div>
-    </div>
   );
 }

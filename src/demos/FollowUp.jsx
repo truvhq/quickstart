@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'preact/hooks';
 import { Layout, OrderResults, WaitingScreen, usePanel, API_BASE } from '@shared/ui/index.js';
+import { navigate } from '../App.jsx';
 
 const STEPS = [
   {
@@ -17,35 +18,18 @@ const STEPS = [
     title: 'Bridge verification',
     guide: '<p>The Bridge widget is initialized with:</p>'
       + '<pre>TruvBridge.init({\n  bridgeToken: "...",\n  isOrder: true,\n  position: { type: "inline", container: el }\n})</pre>'
-      + '<p>Bridge fires events as the user progresses:</p><ul>'
-      + '<li><code>onLoad</code> — widget ready</li>'
-      + '<li><code>onEvent(LOAD, OPEN, LINK_CREATED, ...)</code> — user actions</li>'
-      + '<li><code>onSuccess</code> — single task completed, advance to webhooks</li>'
-      + '<li><code>onClose</code> — user dismissed the widget</li></ul>'
       + '<p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p>'
       + '<p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs →</a></p>',
   },
   {
     title: 'Webhook processing',
-    guide: '<p>Truv sends webhooks to your registered URL as the verification progresses. Events arrive in this order:</p><ol>'
-      + '<li><code>task-status-updated</code> — login → parse → done</li>'
-      + '<li><code>link-connected</code> — payroll link established</li>'
-      + '<li><code>profile-created</code>, <code>employment-created</code>, <code>income-created</code></li>'
-      + '<li><code>order-status-updated</code> (status: completed) — all done</li></ol>'
-      + '<p>All webhooks include <code>user_id</code> for matching. Verify the <code>X-Webhook-Sign</code> header with HMAC-SHA256.</p>'
-      + '<pre>const sig = crypto\n  .createHmac(\'sha256\', API_SECRET)\n  .update(rawBody)\n  .digest(\'hex\');</pre>'
+    guide: '<p>Truv sends webhooks as the verification progresses.</p>'
       + '<p><a href="https://docs.truv.com/docs/webhooks" target="_blank">Webhooks Docs →</a></p>',
   },
   {
     title: 'Retrieve results',
-    guide: '<p>Once the task completes, fetch the full results:</p>'
+    guide: '<p>Once completed, fetch the full results:</p>'
       + '<pre>GET /v1/orders/{order_id}/</pre>'
-      + '<p>The response includes nested <code>employers[]</code> with:</p><ul>'
-      + '<li><strong>Profile</strong> — name, SSN, DOB, address</li>'
-      + '<li><strong>Employment</strong> — title, start date, income</li>'
-      + '<li><strong>Pay Statements</strong> — gross/net pay, earnings, deductions</li>'
-      + '<li><strong>Bank Accounts</strong> — direct deposit routing info</li></ul>'
-      + '<p>After reviewing results, return to the task list to complete remaining verifications.</p>'
       + '<p><a href="https://docs.truv.com/reference/get-an-order" target="_blank">API Reference →</a></p>',
   },
 ];
@@ -59,8 +43,7 @@ const TASKS = [
 
 const WAITING_MIN_MS = 10000;
 
-export function FollowUpDemo() {
-  const [screen, setScreen] = useState('tasks');
+export function FollowUpDemo({ screen }) {
   const [activeTask, setActiveTask] = useState(null);
   const [taskStatus, setTaskStatus] = useState({});
   const [orderId, setOrderId] = useState(null);
@@ -73,17 +56,21 @@ export function FollowUpDemo() {
 
   const { panel, setCurrentStep, startPolling, addBridgeEvent, reset } = usePanel();
 
+  // Set step based on screen
+  useEffect(() => {
+    const stepMap = { '': 0, 'bridge': 1, 'waiting': 2, 'results': 3 };
+    setCurrentStep(stepMap[screen] ?? 0);
+  }, [screen]);
+
   // Auto-advance from waiting when order completes
   useEffect(() => {
     if (screen !== 'waiting') return;
     if (advancePendingRef.current) return;
-
     const isCompleted = panel.webhooks.some(w => {
       const p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
       return (p.event_type === 'order-status-updated' && p.status === 'completed')
         || (w.event_type === 'order-status-updated' && w.status === 'completed');
     });
-
     if (isCompleted) {
       advancePendingRef.current = true;
       const elapsed = Date.now() - (waitingStartRef.current || 0);
@@ -92,11 +79,10 @@ export function FollowUpDemo() {
     }
   }, [panel.webhooks, screen]);
 
-  // Init Bridge when container mounts
-  const bridgeRef = useRef(null);
-  function bridgeContainerRef(el) {
-    if (!el || !bridgeToken || !window.TruvBridge || bridgeRef.current) return;
-    bridgeRef.current = window.TruvBridge.init({
+  // Init Bridge when bridge screen mounts
+  function bridgeContainer(el) {
+    if (!el || !bridgeToken || !window.TruvBridge) return;
+    const b = window.TruvBridge.init({
       bridgeToken, isOrder: true,
       position: { type: 'inline', container: el },
       onLoad: () => addBridgeEvent('onLoad', null),
@@ -110,7 +96,7 @@ export function FollowUpDemo() {
       onSuccess: () => addBridgeEvent('onSuccess', null),
       onClose: () => addBridgeEvent('onClose', null),
     });
-    bridgeRef.current.open();
+    b.open();
   }
 
   async function startTask(task) {
@@ -119,7 +105,7 @@ export function FollowUpDemo() {
       const resp = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_type: task.product }),
+        body: JSON.stringify({ product_type: task.product, demo_id: 'follow-up' }),
       });
       const data = await resp.json();
       if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); return; }
@@ -129,59 +115,51 @@ export function FollowUpDemo() {
       setBridgeToken(data.bridge_token);
       setOrderData(null);
       startPolling(data.user_id);
-      setCurrentStep(1);
-      setScreen('bridge');
+      navigate('follow-up/bridge');
     } catch (e) { console.error(e); }
   }
 
   function goWaiting() {
-    bridgeRef.current = null;
     waitingStartRef.current = Date.now();
     advancePendingRef.current = false;
-    setCurrentStep(2);
-    setScreen('waiting');
+    navigate('follow-up/waiting');
   }
 
   async function goResults() {
-    waitingStartRef.current = null;
     advancePendingRef.current = false;
-    setCurrentStep(3);
-    setScreen('results');
-
+    navigate('follow-up/results');
     if (!orderId) return;
     try {
       const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
-      const data = await resp.json();
-      setOrderData(data);
-      await fetchLogs(orderId);
+      setOrderData(await resp.json());
     } catch (e) { console.error(e); }
   }
 
   function returnToTasks() {
-    bridgeRef.current = null;
-    advancePendingRef.current = false;
-    waitingStartRef.current = null;
-    setScreen('tasks');
+    reset();
     setActiveTask(null);
     setOrderId(null);
     setUserId(null);
     setBridgeToken(null);
     setOrderData(null);
-    reset();
+    navigate('follow-up');
   }
 
   const isBridge = screen === 'bridge';
 
   return (
     <Layout title="Truv Quickstart" badge="Follow-up" steps={STEPS} panel={panel} flush={isBridge}>
-      {isBridge ? (
-        <div ref={bridgeContainerRef} class="w-full h-full overflow-hidden bg-white [&_iframe]:w-full [&_iframe]:!h-full [&_iframe]:border-none" style="zoom: 0.85;" />
-      ) : (
-        <div class="max-w-2xl mx-auto">
-          {screen === 'tasks' && <TaskList tasks={TASKS} taskStatus={taskStatus} onStart={startTask} />}
-          {screen === 'waiting' && <WaitingScreen webhooks={panel.webhooks} />}
-          {screen === 'results' && <ResultsScreen task={activeTask} orderData={orderData} onBack={returnToTasks} />}
-        </div>
+      {screen === 'bridge' && (
+        <div ref={bridgeContainer} key={bridgeToken} class="w-full h-full overflow-hidden bg-white [&_iframe]:w-full [&_iframe]:!h-full [&_iframe]:border-none" style="zoom: 0.85;" />
+      )}
+      {screen === 'waiting' && (
+        <div class="max-w-2xl mx-auto"><WaitingScreen webhooks={panel.webhooks} /></div>
+      )}
+      {screen === 'results' && (
+        <div class="max-w-2xl mx-auto"><ResultsScreen task={activeTask} orderData={orderData} onBack={returnToTasks} /></div>
+      )}
+      {!screen && (
+        <div class="max-w-2xl mx-auto"><TaskList tasks={TASKS} taskStatus={taskStatus} onStart={startTask} /></div>
       )}
     </Layout>
   );
@@ -191,9 +169,7 @@ function TaskList({ tasks, taskStatus, onStart }) {
   return (
     <div>
       <h2 class="text-2xl font-bold tracking-tight mb-1.5">Complete Your Application</h2>
-      <p class="text-sm text-gray-500 leading-relaxed mb-7">
-        You have pending tasks to finish your application. Complete each verification step below.
-      </p>
+      <p class="text-sm text-gray-500 leading-relaxed mb-7">Complete each verification step below.</p>
       {tasks.map(task => {
         const completed = taskStatus[task.id] === 'completed';
         return (
@@ -215,30 +191,15 @@ function TaskList({ tasks, taskStatus, onStart }) {
   );
 }
 
-
 function ResultsScreen({ task, orderData, onBack }) {
-  if (!orderData) {
-    return (
-      <div class="text-center py-15">
-        <div class="w-10 h-10 border-3 border-border border-t-primary rounded-full animate-spin mx-auto mb-3" />
-      </div>
-    );
-  }
-
-  const raw = orderData.raw_response || {};
+  if (!orderData) return <div class="text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>;
   return (
     <div>
       <h2 class="text-2xl font-bold tracking-tight mb-1.5">Verification Results</h2>
-      <p class="text-sm text-gray-500 leading-relaxed mb-7">
-        {task?.name || 'Task'} • Order {orderData.truv_order_id || ''} • {orderData.status || ''}
-      </p>
-
+      <p class="text-sm text-gray-500 mb-7">{task?.name || 'Task'} • Order {orderData.truv_order_id || ''} • {orderData.status || ''}</p>
       <OrderResults data={orderData} />
-
-      <div class="flex gap-3 mt-6 pt-5 border-t border-border">
-        <button class="px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-lg hover:bg-primary-hover" onClick={onBack}>
-          Back to Tasks
-        </button>
+      <div class="flex gap-3 mt-6 pt-5 border-t border-gray-200">
+        <button class="px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-lg hover:bg-primary-hover" onClick={onBack}>Back to Tasks</button>
       </div>
     </div>
   );

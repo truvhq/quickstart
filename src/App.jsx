@@ -6,8 +6,7 @@ import { ChoiceConnectDemo } from './demos/ChoiceConnect.jsx';
 import { EmployeePortalDemo } from './demos/EmployeePortal.jsx';
 import { UploadDocumentsDemo } from './demos/UploadDocuments.jsx';
 
-const ROUTES = {
-  '': Home,
+const DEMOS = {
   'application': ApplicationDemo,
   'follow-up': FollowUpDemo,
   'choice-connect': ChoiceConnectDemo,
@@ -15,15 +14,29 @@ const ROUTES = {
   'upload-documents': UploadDocumentsDemo,
 };
 
+function parseHash() {
+  const hash = window.location.hash.slice(1); // e.g. "follow-up/bridge"
+  const [demo, ...rest] = hash.split('/');
+  return { demo: demo || '', screen: rest.join('/') || '' };
+}
+
+export function navigate(path) {
+  window.location.hash = path;
+}
+
 export function App() {
-  const [route, setRoute] = useState(window.location.hash.slice(1) || '');
+  const [route, setRoute] = useState(parseHash);
 
   useEffect(() => {
-    const onHash = () => setRoute(window.location.hash.slice(1) || '');
+    const onHash = () => setRoute(parseHash());
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  const Component = ROUTES[route] || Home;
-  return <Component />;
+  if (!route.demo) return <Home />;
+
+  const Component = DEMOS[route.demo];
+  if (!Component) return <Home />;
+
+  return <Component key={route.demo} screen={route.screen} />;
 }
