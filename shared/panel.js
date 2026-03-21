@@ -234,6 +234,10 @@
       content.appendChild(info);
     }
 
+    content.appendChild(el('div', { style: 'margin-bottom:12px;font-size:12px;' }, [
+      el('a', { href: 'https://dashboard.truv.com/app/development/webhooks', target: '_blank', style: 'color:var(--primary);font-weight:500;' }, 'See webhook config')
+    ]));
+
     if (!this.webhooks.length) {
       content.appendChild(el('div', { className: 'empty-state' }, 'No webhooks received yet.'));
       return;
