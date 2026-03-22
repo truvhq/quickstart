@@ -11,57 +11,14 @@ const STEPS = [
 
 const WAITING_MIN_MS = 10000;
 
-export function ApplicationDemo({ screen }) {
-  const [orderId, setOrderId] = useState(null);
-  const [bridgeToken, setBridgeToken] = useState(null);
-  const [orderData, setOrderData] = useState(null);
+export function ApplicationDemo({ screen, param }) {
   const [submitting, setSubmitting] = useState(false);
-
-  const waitingStartRef = useRef(null);
-  const advancePendingRef = useRef(false);
-
   const { panel, setCurrentStep, startPolling, addBridgeEvent, reset } = usePanel();
 
   useEffect(() => {
     const stepMap = { '': 0, 'bridge': 1, 'waiting': 2, 'results': 3 };
     setCurrentStep(stepMap[screen] ?? 0);
   }, [screen]);
-
-  // Auto-advance from waiting
-  useEffect(() => {
-    if (screen !== 'waiting' || advancePendingRef.current) return;
-    const isCompleted = panel.webhooks.some(w => {
-      const p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
-      return (p.event_type === 'order-status-updated' && p.status === 'completed')
-        || (w.event_type === 'order-status-updated' && w.status === 'completed');
-    });
-    if (isCompleted) {
-      advancePendingRef.current = true;
-      const delay = Math.max(1000, WAITING_MIN_MS - (Date.now() - waitingStartRef.current) + 1000);
-      setTimeout(() => goResults(), delay);
-    }
-  }, [panel.webhooks, screen]);
-
-  // Init Bridge when bridge container mounts
-  function bridgeContainer(el) {
-    if (!el || !bridgeToken || !window.TruvBridge) return;
-    const b = window.TruvBridge.init({
-      bridgeToken, isOrder: true,
-      position: { type: 'inline', container: el },
-      onLoad: () => addBridgeEvent('onLoad', null),
-      onEvent: (type, _, source) => {
-        addBridgeEvent('onEvent', { eventType: type, source });
-        if (type === 'COMPLETED' && source === 'order') {
-          waitingStartRef.current = Date.now();
-          advancePendingRef.current = false;
-          navigate('application/waiting');
-        }
-      },
-      onSuccess: () => addBridgeEvent('onSuccess', null),
-      onClose: () => addBridgeEvent('onClose', null),
-    });
-    b.open();
-  }
 
   async function handleSubmit(formData) {
     setSubmitting(true);
@@ -73,31 +30,9 @@ export function ApplicationDemo({ screen }) {
       });
       const data = await resp.json();
       if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); setSubmitting(false); return; }
-      setOrderId(data.order_id);
-      setBridgeToken(data.bridge_token);
-      startPolling(data.user_id);
-      navigate('application/bridge');
+      navigate(`application/bridge/${data.order_id}`);
     } catch (e) { console.error(e); }
     setSubmitting(false);
-  }
-
-  async function goResults() {
-    advancePendingRef.current = false;
-    navigate('application/results');
-    if (!orderId) return;
-    try {
-      const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
-      setOrderData(await resp.json());
-    } catch (e) { console.error(e); }
-  }
-
-  function resetApp() {
-    reset();
-    setOrderId(null);
-    setBridgeToken(null);
-    setOrderData(null);
-    setSubmitting(false);
-    navigate('application');
   }
 
   const isBridge = screen === 'bridge';
@@ -105,31 +40,140 @@ export function ApplicationDemo({ screen }) {
   return (
     <Layout title="Truv Quickstart" badge="Application" steps={STEPS} panel={panel} flush={isBridge}>
       {screen === 'bridge' && (
-        <div ref={bridgeContainer} key={bridgeToken} class="w-full h-full overflow-hidden bg-white [&_iframe]:w-full [&_iframe]:!h-full [&_iframe]:border-none" style="zoom: 0.85;" />
+        <AppBridgeScreen
+          orderId={param}
+          addBridgeEvent={addBridgeEvent}
+          startPolling={startPolling}
+        />
       )}
       {screen === 'waiting' && (
-        <div class="max-w-lg mx-auto"><WaitingScreen webhooks={panel.webhooks} /></div>
+        <AppWaitingScreen
+          orderId={param}
+          webhooks={panel.webhooks}
+          startPolling={startPolling}
+        />
       )}
       {screen === 'results' && (
-        <div class="max-w-lg mx-auto">
-          {orderData ? (
-            <div>
-              <h2 class="text-2xl font-bold tracking-tight mb-1.5">Verification Results</h2>
-              <p class="text-sm text-gray-500 mb-7">Order {orderData.truv_order_id || ''} • {orderData.status || ''}</p>
-              <OrderResults data={orderData} />
-              <div class="flex gap-3 mt-6 pt-5 border-t border-gray-200">
-                <button class="px-5 py-2.5 text-sm font-semibold border border-gray-200 rounded-lg hover:border-primary hover:text-primary" onClick={resetApp}>New Application</button>
-              </div>
-            </div>
-          ) : (
-            <div class="text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>
-          )}
-        </div>
+        <AppResultsScreen
+          orderId={param}
+          onBack={() => { reset(); navigate('application'); }}
+        />
       )}
       {!screen && (
         <div class="max-w-lg mx-auto"><ApplicationForm onSubmit={handleSubmit} submitting={submitting} /></div>
       )}
     </Layout>
+  );
+}
+
+function AppBridgeScreen({ orderId, addBridgeEvent, startPolling }) {
+  const [bridgeToken, setBridgeToken] = useState(null);
+  const [error, setError] = useState(null);
+  const userIdRef = useRef(null);
+  const containerRef = useRef(null);
+  const bridgeInitRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
+        const data = await resp.json();
+        if (cancelled) return;
+        if (!resp.ok) { setError(data.error || 'Unknown error'); return; }
+        userIdRef.current = data.user_id;
+        setBridgeToken(data.bridge_token);
+        startPolling(data.user_id);
+      } catch (e) { if (!cancelled) setError(e.message); }
+    })();
+    return () => { cancelled = true; };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (!bridgeToken || !containerRef.current || !window.TruvBridge || bridgeInitRef.current) return;
+    bridgeInitRef.current = true;
+    const b = window.TruvBridge.init({
+      bridgeToken, isOrder: true,
+      position: { type: 'inline', container: containerRef.current },
+      onLoad: () => addBridgeEvent('onLoad', null),
+      onEvent: (type, _, source) => {
+        addBridgeEvent('onEvent', { eventType: type, source });
+        if (type === 'COMPLETED' && source === 'order') {
+          navigate(`application/waiting/${orderId}`);
+        }
+      },
+      onSuccess: () => addBridgeEvent('onSuccess', null),
+      onClose: () => addBridgeEvent('onClose', null),
+    });
+    b.open();
+    return () => { try { b.close(); } catch {} };
+  }, [bridgeToken]);
+
+  if (error) return <div class="text-center py-15 text-red-600">{error}</div>;
+  if (!bridgeToken) return <div class="text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>;
+
+  return (
+    <div ref={containerRef} class="w-full h-full overflow-hidden bg-white [&_iframe]:w-full [&_iframe]:!h-full [&_iframe]:border-none" style="zoom: 0.85;" />
+  );
+}
+
+function AppWaitingScreen({ orderId, webhooks, startPolling }) {
+  const waitingStartRef = useRef(Date.now());
+  const advancePendingRef = useRef(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
+        const data = await resp.json();
+        if (resp.ok && data.user_id) startPolling(data.user_id);
+      } catch {}
+    })();
+  }, [orderId]);
+
+  useEffect(() => {
+    if (advancePendingRef.current) return;
+    const isCompleted = webhooks.some(w => {
+      const p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+      return (p.event_type === 'order-status-updated' && p.status === 'completed')
+        || (w.event_type === 'order-status-updated' && w.status === 'completed');
+    });
+    if (isCompleted) {
+      advancePendingRef.current = true;
+      const delay = Math.max(1000, WAITING_MIN_MS - (Date.now() - waitingStartRef.current) + 1000);
+      setTimeout(() => navigate(`application/results/${orderId}`), delay);
+    }
+  }, [webhooks, orderId]);
+
+  return <div class="max-w-lg mx-auto"><WaitingScreen webhooks={webhooks} /></div>;
+}
+
+function AppResultsScreen({ orderId, onBack }) {
+  const [orderData, setOrderData] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}/report`);
+        if (resp.ok) setOrderData(await resp.json());
+        else setError('Failed to load results');
+      } catch (e) { console.error(e); setError(e.message); }
+    })();
+  }, [orderId]);
+
+  if (error) return <div class="max-w-lg mx-auto text-center py-15 text-red-600">{error}</div>;
+  if (!orderData) return <div class="max-w-lg mx-auto text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>;
+
+  return (
+    <div class="max-w-lg mx-auto">
+      <h2 class="text-2xl font-bold tracking-tight mb-1.5">Verification Results</h2>
+      <p class="text-sm text-gray-500 mb-7">Order {orderData.truv_order_id || ''} • {orderData.status || ''}</p>
+      <OrderResults data={orderData} />
+      <div class="flex gap-3 mt-6 pt-5 border-t border-gray-200">
+        <button class="px-5 py-2.5 text-sm font-semibold border border-gray-200 rounded-lg hover:border-primary hover:text-primary" onClick={onBack}>New Application</button>
+      </div>
+    </div>
   );
 }
 

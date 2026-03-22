@@ -85,6 +85,9 @@ app.post('/api/orders', async (req, res) => {
       first_name: data.first_name, last_name: data.last_name,
       email: data.email, phone: data.phone, ssn: data.ssn,
       product_type: productType, template_id: getTemplateId(productType),
+      products: data.products,
+      external_user_id: data.external_user_id,
+      employer: data.employer,
     };
 
     const result = await truv.createOrder(params);
@@ -93,9 +96,63 @@ app.post('/api/orders', async (req, res) => {
 
     const userId = truvData.user_id;
     db.createOrder({ orderId, truvOrderId: truvData.id, userId, demoId: data.demo_id || 'default', bridgeToken: truvData.bridge_token, shareUrl: truvData.share_url, status: truvData.status || 'created', rawResponse: truvData });
-    apiLogger.logApiCall({ userId, method: 'POST', endpoint: '/v1/orders/', requestBody: params, responseBody: truvData, statusCode: result.statusCode, durationMs: result.durationMs });
+    db.updateOrder(orderId, { product_type: data.products ? data.products.join(',') : productType });
+    apiLogger.logApiCall({ userId, method: 'POST', endpoint: '/v1/orders/', requestBody: result.requestBody, responseBody: truvData, statusCode: result.statusCode, durationMs: result.durationMs });
 
     res.json({ order_id: orderId, truv_order_id: truvData.id, user_id: userId, bridge_token: truvData.bridge_token, status: truvData.status });
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Internal server error' }); }
+});
+
+// POST to create report (once), GET to fetch. Uses reports table for persistence.
+const REPORT_CONFIG = {
+  income:      { type: 'voie',            create: (t, uid) => t.createVoieReport(uid, false),        get: (t, uid, rid) => t.getVoieReport(uid, rid),             postPath: uid => `/v1/users/${uid}/reports/`,                   getPath: (uid, rid) => `/v1/users/${uid}/reports/${rid}/` },
+  employment:  { type: 'voe',             create: (t, uid) => t.createVoieReport(uid, true),         get: (t, uid, rid) => t.getVoieReport(uid, rid),             postPath: uid => `/v1/users/${uid}/reports/`,                   getPath: (uid, rid) => `/v1/users/${uid}/reports/${rid}/` },
+  assets:      { type: 'assets',          create: (t, uid) => t.createAssetsReport(uid),             get: (t, uid, rid) => t.getAssetsReport(uid, rid),           postPath: uid => `/v1/users/${uid}/assets/reports/`,            getPath: (uid, rid) => `/v1/users/${uid}/assets/reports/${rid}/` },
+  income_insights: { type: 'income_insights', create: (t, uid) => t.createIncomeInsightsReport(uid), get: (t, uid, rid) => t.getIncomeInsightsReport(uid, rid),   postPath: uid => `/v1/users/${uid}/income_insights/reports/`,   getPath: (uid, rid) => `/v1/users/${uid}/income_insights/reports/${rid}/` },
+};
+
+async function fetchReport(orderId, userId, configKey) {
+  const cfg = REPORT_CONFIG[configKey];
+  if (!cfg) return null;
+  let row = db.getReport(orderId, cfg.type);
+
+  // Step 1: Create if not exists
+  if (!row || !row.truv_report_id) {
+    const cr = await cfg.create(truv, userId);
+    apiLogger.logApiCall({ userId, method: 'POST', endpoint: cfg.postPath(userId), requestBody: cr.requestBody, responseBody: cr.data, statusCode: cr.statusCode, durationMs: cr.durationMs });
+    if (cr.statusCode >= 400 || !cr.data?.report_id) return null;
+    row = db.upsertReport({ orderId, reportType: cfg.type, truvReportId: cr.data.report_id, status: 'created', response: cr.data });
+  }
+
+  // Step 2: GET the report
+  const gr = await cfg.get(truv, userId, row.truv_report_id);
+  apiLogger.logApiCall({ userId, method: 'GET', endpoint: cfg.getPath(userId, row.truv_report_id), requestBody: gr.requestBody, responseBody: gr.data, statusCode: gr.statusCode, durationMs: gr.durationMs });
+  if (gr.statusCode < 400) {
+    db.upsertReport({ orderId, reportType: cfg.type, truvReportId: row.truv_report_id, status: 'ready', response: gr.data });
+    return gr.data;
+  }
+  return null;
+}
+
+app.get('/api/orders/:id/report', async (req, res) => {
+  try {
+    const order = db.getOrder(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    const userId = order.user_id;
+    const productTypes = (order.product_type || 'income').split(',');
+    let voie_report = null, voa_report = null, income_insights_report = null;
+
+    const fetches = [];
+    if (productTypes.includes('income')) fetches.push(fetchReport(order.id, userId, 'income').then(r => { voie_report = r; }).catch(e => console.error('Income report error:', e.message)));
+    if (productTypes.includes('employment')) fetches.push(fetchReport(order.id, userId, 'employment').then(r => { voie_report = r; }).catch(e => console.error('Employment report error:', e.message)));
+    if (productTypes.includes('assets')) {
+      fetches.push(fetchReport(order.id, userId, 'assets').then(r => { voa_report = r; }).catch(e => console.error('Assets report error:', e.message)));
+      fetches.push(fetchReport(order.id, userId, 'income_insights').then(r => { income_insights_report = r; }).catch(e => console.error('Income insights error:', e.message)));
+    }
+    await Promise.all(fetches);
+
+    res.json({ order_id: order.id, truv_order_id: order.truv_order_id, user_id: userId, product_type: order.product_type, status: order.status, voie_report, voa_report, income_insights_report });
   } catch (err) { console.error(err); res.status(500).json({ error: 'Internal server error' }); }
 });
 
@@ -127,6 +184,55 @@ app.get('/api/orders/:id', async (req, res) => {
       apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/users/${userId}/reports/${raw.voie_report_id}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
       if (r.statusCode < 400) voie_report = r.data;
     }
+
+    res.json({ order_id: order.id, truv_order_id: order.truv_order_id, user_id: userId, status: order.status, bridge_token: order.bridge_token, share_url: order.share_url, raw_response: raw, voa_report, voie_report });
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Internal server error' }); }
+});
+
+app.get('/api/users/:userId/report', async (req, res) => {
+  try {
+    let order = db.findOrderByUserId(req.params.userId);
+    if (!order) return res.status(404).json({ error: 'No order found for user' });
+
+    const userId = order.user_id;
+
+    // Fetch order from Truv for raw_response / status
+    if (order.truv_order_id) {
+      const result = await truv.getOrder(order.truv_order_id);
+      apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/orders/${order.truv_order_id}/`, responseBody: result.data, statusCode: result.statusCode, durationMs: result.durationMs });
+      if (result.statusCode >= 400) return res.status(result.statusCode).json({ error: 'Truv API error', details: result.data });
+      db.updateOrder(order.id, { status: result.data.status || order.status, raw_response: result.data });
+      order = db.getOrder(order.id);
+    }
+
+    const raw = order.raw_response ? JSON.parse(order.raw_response) : {};
+
+    // Create reports via POST, then fetch via GET
+    let voie_report = null, voa_report = null;
+
+    // Income insights report
+    try {
+      const incomeCreate = await truv.createIncomeInsightsReport(userId);
+      apiLogger.logApiCall({ userId, method: 'POST', endpoint: `/v1/users/${userId}/income_insights/reports/`, responseBody: incomeCreate.data, statusCode: incomeCreate.statusCode, durationMs: incomeCreate.durationMs });
+      const reportId = incomeCreate.data?.report_id;
+      if (incomeCreate.statusCode < 400 && reportId) {
+        const r = await truv.getIncomeInsightsReport(userId, reportId);
+        apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/users/${userId}/income_insights/reports/${reportId}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
+        if (r.statusCode < 400) voie_report = r.data;
+      }
+    } catch (e) { console.error('Income insights report error:', e.message); }
+
+    // Assets report
+    try {
+      const assetsCreate = await truv.createAssetsReport(userId);
+      apiLogger.logApiCall({ userId, method: 'POST', endpoint: `/v1/users/${userId}/assets/reports/`, responseBody: assetsCreate.data, statusCode: assetsCreate.statusCode, durationMs: assetsCreate.durationMs });
+      const reportId = assetsCreate.data?.report_id;
+      if (assetsCreate.statusCode < 400 && reportId) {
+        const r = await truv.getAssetsReport(userId, reportId);
+        apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/users/${userId}/assets/reports/${reportId}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
+        if (r.statusCode < 400) voa_report = r.data;
+      }
+    } catch (e) { console.error('Assets report error:', e.message); }
 
     res.json({ order_id: order.id, truv_order_id: order.truv_order_id, user_id: userId, status: order.status, bridge_token: order.bridge_token, share_url: order.share_url, raw_response: raw, voa_report, voie_report });
   } catch (err) { console.error(err); res.status(500).json({ error: 'Internal server error' }); }

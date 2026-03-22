@@ -33,7 +33,7 @@ export class TruvClient {
     }
 
     console.log(`TRUV: ${method.toUpperCase()} ${url} — ${response.status} (${durationMs}ms)`);
-    return { statusCode: response.status, data, durationMs };
+    return { statusCode: response.status, data, durationMs, requestBody: json || null };
   }
 
   // --- Users API ---
@@ -79,18 +79,21 @@ export class TruvClient {
     const productType = params.product_type || 'income';
     const payload = {
       order_number: `qs-${uuidv4()}`, // Replace with your internal order/application ID
+      external_user_id: params.external_user_id || `qs-${uuidv4()}`,
       first_name: params.first_name || 'John',
       last_name: params.last_name || 'Johnson',
       email: params.email || 'j.johnson@example.com',
-      products: [productType],
+      products: params.products || [productType],
     };
 
     if (params.phone) payload.phone = params.phone;
     if (params.ssn) payload.social_security_number = params.ssn;
     if (params.template_id) payload.template_id = params.template_id;
 
-    // Sandbox employer — use "Home Depot" with credentials goodlogin/goodpassword
-    if (['deposit_switch', 'pll', 'employment', 'income'].includes(productType)) {
+    // Employer — sandbox credentials: goodlogin/goodpassword
+    if (params.employer) {
+      payload.employers = [{ company_name: params.employer }];
+    } else if (['deposit_switch', 'pll', 'employment', 'income'].includes(productType)) {
       payload.employers = [{ company_name: 'Home Depot' }];
     }
 
@@ -145,12 +148,38 @@ export class TruvClient {
 
   // --- Reports ---
 
-  async getVoaReport(userId, reportId) {
-    return this._request('GET', `users/${userId}/assets/reports/${reportId}/`);
+  // VOIE/VOE report: is_voe=false → income+employment, is_voe=true → employment only
+  async createVoieReport(userId, isVoe = false) {
+    return this._request('POST', `users/${userId}/reports/`, { json: { is_voe: isVoe } });
   }
 
   async getVoieReport(userId, reportId) {
     return this._request('GET', `users/${userId}/reports/${reportId}/`);
+  }
+
+  // Assets report
+  async createAssetsReport(userId) {
+    return this._request('POST', `users/${userId}/assets/reports/`);
+  }
+
+  async getAssetsReport(userId, reportId) {
+    return this._request('GET', `users/${userId}/assets/reports/${reportId}/`);
+  }
+
+  // Income insights report
+  async createIncomeInsightsReport(userId) {
+    return this._request('POST', `users/${userId}/income_insights/reports/`, {
+      json: { days_requested: 60, consumer_report_permissible_purpose: 'EXTENSION_OF_CREDIT' },
+    });
+  }
+
+  async getIncomeInsightsReport(userId, reportId) {
+    return this._request('GET', `users/${userId}/income_insights/reports/${reportId}/`);
+  }
+
+  // Legacy
+  async getVoaReport(userId, reportId) {
+    return this._request('GET', `users/${userId}/assets/reports/${reportId}/`);
   }
 
   // --- Document Collections API ---

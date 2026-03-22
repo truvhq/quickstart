@@ -55,6 +55,18 @@ export function initDb() {
       received_at TEXT DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS reports (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id TEXT NOT NULL,
+      report_type TEXT NOT NULL,
+      truv_report_id TEXT,
+      status TEXT DEFAULT 'pending',
+      response TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_reports_order_id ON reports(order_id);
+
     CREATE TABLE IF NOT EXISTS document_collections (
       id TEXT PRIMARY KEY,
       truv_collection_id TEXT,
@@ -69,9 +81,10 @@ export function initDb() {
     CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
   `);
 
-  // Migrate: add user_id column to existing tables if missing
+  // Migrate: add columns to existing tables if missing
   try { conn.exec('ALTER TABLE webhook_events ADD COLUMN user_id TEXT'); } catch {}
   try { conn.exec('ALTER TABLE api_logs ADD COLUMN user_id TEXT'); } catch {}
+  try { conn.exec('ALTER TABLE orders ADD COLUMN product_type TEXT'); } catch {}
 }
 
 export function generateId() {
@@ -92,7 +105,7 @@ export function getOrder(orderId) {
   return getDb().prepare('SELECT * FROM orders WHERE id = ?').get(orderId) || null;
 }
 
-const ORDER_ALLOWED_COLS = new Set(['status', 'raw_response', 'bridge_token', 'share_url']);
+const ORDER_ALLOWED_COLS = new Set(['status', 'raw_response', 'bridge_token', 'share_url', 'product_type']);
 
 export function updateOrder(orderId, fields) {
   const keys = Object.keys(fields).filter(k => ORDER_ALLOWED_COLS.has(k));
@@ -148,6 +161,34 @@ export function getWebhookEventsByUserId(userId) {
 
 export function getAllWebhookEvents() {
   return getDb().prepare('SELECT * FROM webhook_events ORDER BY id ASC').all();
+}
+
+// --- Reports ---
+
+export function upsertReport({ orderId, reportType, truvReportId, status, response }) {
+  const conn = getDb();
+  const existing = conn.prepare('SELECT id FROM reports WHERE order_id = ? AND report_type = ?').get(orderId, reportType);
+  if (existing) {
+    const sets = [];
+    const vals = [];
+    if (truvReportId) { sets.push('truv_report_id = ?'); vals.push(truvReportId); }
+    if (status) { sets.push('status = ?'); vals.push(status); }
+    if (response !== undefined) { sets.push('response = ?'); vals.push(typeof response === 'object' ? JSON.stringify(response) : response); }
+    if (sets.length) { vals.push(existing.id); conn.prepare(`UPDATE reports SET ${sets.join(', ')} WHERE id = ?`).run(...vals); }
+    return conn.prepare('SELECT * FROM reports WHERE id = ?').get(existing.id);
+  }
+  const info = conn.prepare(
+    'INSERT INTO reports (order_id, report_type, truv_report_id, status, response) VALUES (?, ?, ?, ?, ?)'
+  ).run(orderId, reportType, truvReportId || null, status || 'pending', response ? (typeof response === 'object' ? JSON.stringify(response) : response) : null);
+  return conn.prepare('SELECT * FROM reports WHERE id = ?').get(info.lastInsertRowid);
+}
+
+export function getReport(orderId, reportType) {
+  return getDb().prepare('SELECT * FROM reports WHERE order_id = ? AND report_type = ?').get(orderId, reportType) || null;
+}
+
+export function getReportsByOrderId(orderId) {
+  return getDb().prepare('SELECT * FROM reports WHERE order_id = ? ORDER BY id ASC').all(orderId);
 }
 
 // --- Document Collections ---

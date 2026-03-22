@@ -15,9 +15,9 @@ const DEMOS = {
 };
 
 function parseHash() {
-  const hash = window.location.hash.slice(1); // e.g. "follow-up/bridge"
-  const [demo, ...rest] = hash.split('/');
-  return { demo: demo || '', screen: rest.join('/') || '' };
+  const hash = window.location.hash.slice(1); // e.g. "follow-up/bridge/income"
+  const [demo, screen, ...rest] = hash.split('/');
+  return { demo: demo || '', screen: screen || '', param: rest.join('/') || '' };
 }
 
 export function navigate(path) {
@@ -38,5 +38,5 @@ export function App() {
   const Component = DEMOS[route.demo];
   if (!Component) return <Home />;
 
-  return <Component key={route.demo} screen={route.screen} />;
+  return <Component key={route.demo} screen={route.screen} param={route.param} />;
 }
