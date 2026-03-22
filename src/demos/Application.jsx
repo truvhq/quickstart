@@ -77,7 +77,7 @@ function AppBridgeScreen({ orderId, addBridgeEvent, startPolling }) {
     let cancelled = false;
     (async () => {
       try {
-        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}/info`);
         const data = await resp.json();
         if (cancelled) return;
         if (!resp.ok) { setError(data.error || 'Unknown error'); return; }
@@ -124,7 +124,7 @@ function AppWaitingScreen({ orderId, webhooks, startPolling }) {
   useEffect(() => {
     (async () => {
       try {
-        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}/info`);
         const data = await resp.json();
         if (resp.ok && data.user_id) startPolling(data.user_id);
       } catch {}

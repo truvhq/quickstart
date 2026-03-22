@@ -82,18 +82,19 @@ export class TruvClient {
       external_user_id: params.external_user_id || `qs-${uuidv4()}`,
       first_name: params.first_name || 'John',
       last_name: params.last_name || 'Johnson',
-      email: params.email || 'j.johnson@example.com',
       products: params.products || [productType],
     };
 
+    if (params.email) payload.email = params.email;
     if (params.phone) payload.phone = params.phone;
     if (params.ssn) payload.social_security_number = params.ssn;
     if (params.template_id) payload.template_id = params.template_id;
 
     // Employer — sandbox credentials: goodlogin/goodpassword
+    const needsEmployer = payload.products.some(p => ['deposit_switch', 'pll', 'employment', 'income'].includes(p));
     if (params.employer) {
       payload.employers = [{ company_name: params.employer }];
-    } else if (['deposit_switch', 'pll', 'employment', 'income'].includes(productType)) {
+    } else if (needsEmployer) {
       payload.employers = [{ company_name: 'Home Depot' }];
     }
 

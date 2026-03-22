@@ -32,10 +32,10 @@ const STEPS = [
 ];
 
 const TASKS = [
-  { id: 'income', name: 'Verify Income', desc: 'Home Depot', product: 'income', employer: 'Home Depot', icon: '💰', iconBg: 'bg-green-100' },
-  { id: 'employment', name: 'Verify Employment', desc: 'Walmart', product: 'employment', employer: 'Walmart', icon: '📋', iconBg: 'bg-blue-100' },
-  { id: 'assets', name: 'Verify Assets', desc: 'Bank accounts & transactions', product: 'assets', employer: null, icon: '🏦', iconBg: 'bg-amber-100' },
-  { id: 'assets-income', name: 'Assets + Income', desc: 'Combined order', products: ['assets', 'income'], product: 'assets', employer: null, icon: '📊', iconBg: 'bg-purple-100' },
+  { id: 'income', name: 'Verify Income', desc: 'Home Depot', products: ['income'], employer: 'Home Depot', icon: '💰', iconBg: 'bg-green-100' },
+  { id: 'employment', name: 'Verify Employment', desc: 'Home Depot', products: ['employment'], employer: 'Home Depot', icon: '📋', iconBg: 'bg-blue-100' },
+  { id: 'assets', name: 'Verify Assets', desc: 'Bank accounts & transactions', products: ['assets'], employer: null, icon: '🏦', iconBg: 'bg-amber-100' },
+  { id: 'assets-income', name: 'Assets + Income', desc: 'Combined order', products: ['income', 'assets'], employer: 'Home Depot', icon: '📊', iconBg: 'bg-purple-100' },
 ];
 
 const WAITING_MIN_MS = 10000;
@@ -59,8 +59,7 @@ export function FollowUpDemo({ screen, param }) {
     const results = {};
     for (const task of TASKS) {
       try {
-        const body = { product_type: task.product, demo_id: 'follow-up', external_user_id: applicationId.trim() };
-        if (task.products) body.products = task.products;
+        const body = { products: task.products, demo_id: 'follow-up', external_user_id: applicationId.trim() };
         if (task.employer) body.employer = task.employer;
         const resp = await fetch(`${API_BASE}/api/orders`, {
           method: 'POST',
@@ -189,7 +188,7 @@ function BridgeScreen({ orderId, addBridgeEvent, startPolling, onCompleted }) {
     let cancelled = false;
     (async () => {
       try {
-        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}/info`);
         const data = await resp.json();
         if (cancelled) return;
         if (!resp.ok) { setError(data.error || 'Unknown error'); return; }
@@ -236,7 +235,7 @@ function WaitingScreenWrapper({ orderId, webhooks, startPolling }) {
   useEffect(() => {
     (async () => {
       try {
-        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}/info`);
         const data = await resp.json();
         if (resp.ok && data.user_id) startPolling(data.user_id);
       } catch {}

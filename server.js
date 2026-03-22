@@ -92,7 +92,10 @@ app.post('/api/orders', async (req, res) => {
 
     const result = await truv.createOrder(params);
     const truvData = result.data;
-    if (result.statusCode >= 400) return res.status(result.statusCode).json({ error: 'Truv API error', details: truvData });
+    if (result.statusCode >= 400) {
+      console.error('Order creation failed:', JSON.stringify({ request: result.requestBody, response: truvData }));
+      return res.status(result.statusCode).json({ error: 'Truv API error', details: truvData });
+    }
 
     const userId = truvData.user_id;
     db.createOrder({ orderId, truvOrderId: truvData.id, userId, demoId: data.demo_id || 'default', bridgeToken: truvData.bridge_token, shareUrl: truvData.share_url, status: truvData.status || 'created', rawResponse: truvData });
@@ -116,15 +119,19 @@ async function fetchReport(orderId, userId, configKey) {
   if (!cfg) return null;
   let row = db.getReport(orderId, cfg.type);
 
-  // Step 1: Create if not exists
+  // POST to create — response contains the full report data
   if (!row || !row.truv_report_id) {
     const cr = await cfg.create(truv, userId);
     apiLogger.logApiCall({ userId, method: 'POST', endpoint: cfg.postPath(userId), requestBody: cr.requestBody, responseBody: cr.data, statusCode: cr.statusCode, durationMs: cr.durationMs });
     if (cr.statusCode >= 400 || !cr.data?.report_id) return null;
-    row = db.upsertReport({ orderId, reportType: cfg.type, truvReportId: cr.data.report_id, status: 'created', response: cr.data });
+    db.upsertReport({ orderId, reportType: cfg.type, truvReportId: cr.data.report_id, status: 'ready', response: cr.data });
+    return cr.data;
   }
 
-  // Step 2: GET the report
+  // Already created — GET to refresh
+  const stored = row.response ? JSON.parse(row.response) : null;
+  if (stored) return stored;
+
   const gr = await cfg.get(truv, userId, row.truv_report_id);
   apiLogger.logApiCall({ userId, method: 'GET', endpoint: cfg.getPath(userId, row.truv_report_id), requestBody: gr.requestBody, responseBody: gr.data, statusCode: gr.statusCode, durationMs: gr.durationMs });
   if (gr.statusCode < 400) {
@@ -154,6 +161,13 @@ app.get('/api/orders/:id/report', async (req, res) => {
 
     res.json({ order_id: order.id, truv_order_id: order.truv_order_id, user_id: userId, product_type: order.product_type, status: order.status, voie_report, voa_report, income_insights_report });
   } catch (err) { console.error(err); res.status(500).json({ error: 'Internal server error' }); }
+});
+
+// Lightweight — DB only, no Truv API call
+app.get('/api/orders/:id/info', (req, res) => {
+  const order = db.getOrder(req.params.id);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  res.json({ order_id: order.id, truv_order_id: order.truv_order_id, user_id: order.user_id, bridge_token: order.bridge_token, status: order.status, product_type: order.product_type });
 });
 
 app.get('/api/orders/:id', async (req, res) => {
