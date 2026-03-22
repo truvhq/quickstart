@@ -162,6 +162,7 @@ function CompanySearch({ value, onChange }) {
 function ApplicationForm({ onSubmit, submitting }) {
   const [agree, setAgree] = useState(true);
   const [employer, setEmployer] = useState({ name: '', id: null });
+  const [productType, setProductType] = useState('income');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -173,7 +174,7 @@ function ApplicationForm({ onSubmit, submitting }) {
       email: fd.get('email') || undefined,
       phone: fd.get('phone') || undefined,
       ssn: fd.get('ssn') || undefined,
-      product_type: 'income',
+      product_type: productType,
       employer: employer.name,
     });
   };
@@ -190,6 +191,14 @@ function ApplicationForm({ onSubmit, submitting }) {
         <label class="text-sm font-medium mb-1.5 block">Employer</label>
         <CompanySearch value={employer.name} onChange={setEmployer} />
         <p class="text-xs text-gray-400 mt-1">Search uses <code>GET /v1/company-mappings-search/</code></p>
+      </div>
+      <div class="mb-4">
+        <label class="text-sm font-medium mb-1.5 block">Product</label>
+        <select value={productType} onChange={e => setProductType(e.target.value)} class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:border-primary focus:outline-none">
+          <option value="income">Income</option>
+          <option value="employment">Employment</option>
+          <option value="assets">Assets</option>
+        </select>
       </div>
       <div class="mb-4"><label class="text-sm font-medium mb-1.5 block">Email</label><input name="email" type="email" placeholder="joe@example.com" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-primary focus:outline-none" /></div>
       <div class="grid grid-cols-2 gap-4 mb-4">

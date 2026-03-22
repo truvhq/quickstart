@@ -328,60 +328,26 @@ function IncomeInsightsReport({ report }) {
 // --- Main Entry ---
 
 export function OrderResults({ data }) {
-  const raw = data?.raw_response || {};
-  const productType = raw.verification_type || (raw.products && raw.products[0]) || '';
+  const hasVoie = data?.voie_report?.links?.length > 0;
+  const hasAssets = data?.voa_report?.links?.length > 0;
+  const hasInsights = !!data?.income_insights_report;
+  const hasAny = hasVoie || hasAssets || hasInsights;
 
-  // VOIE/VOE report (income or employment)
-  if (data?.voie_report?.links?.length > 0) {
-    return <VoieReport report={data.voie_report} />;
-  }
-
-  // Assets report
-  if (data?.voa_report?.links?.length > 0) {
-    return (
-      <div>
-        <AssetsReport report={data.voa_report} />
-        {data.income_insights_report && <IncomeInsightsReport report={data.income_insights_report} />}
-      </div>
-    );
-  }
-
-  // Income insights only
-  if (data?.income_insights_report) {
-    return <IncomeInsightsReport report={data.income_insights_report} />;
-  }
-
-  // Fallback: raw order data
-  const employers = raw.employers || [];
-  const financialAccounts = raw.financial_accounts || [];
-
-  if (!employers.length && !financialAccounts.length) {
+  if (!hasAny) {
     return (
       <Section title="Order Details">
         <Row label="Order ID" value={data?.truv_order_id || '-'} />
         <Row label="Status" value={data?.status || '-'} />
-        <Row label="Product" value={productType || '-'} />
+        <Row label="Product" value={data?.product_type || '-'} />
       </Section>
     );
   }
 
   return (
     <div>
-      {employers.map((emp, i) => (
-        <div key={i}>
-          <ProviderHeader name={emp.company_name || 'Employer'} status={emp.status} />
-          {emp.employments?.map((employment, j) => {
-            const profile = employment.profile || {};
-            return (
-              <div key={j}>
-                {profile.first_name && <Row label="Name" value={profile.full_name || `${profile.first_name} ${profile.last_name}`} />}
-                {employment.job_title && <Row label="Job Title" value={employment.job_title} />}
-                {employment.income && <Row label="Income" value={$(employment.income)} />}
-              </div>
-            );
-          })}
-        </div>
-      ))}
+      {hasVoie && <VoieReport report={data.voie_report} />}
+      {hasAssets && <AssetsReport report={data.voa_report} />}
+      {hasInsights && <IncomeInsightsReport report={data.income_insights_report} />}
     </div>
   );
 }
