@@ -98,6 +98,7 @@ app.post('/api/orders', async (req, res) => {
       products: data.products,
       external_user_id: data.external_user_id,
       employer: data.employer,
+      company_mapping_id: data.company_mapping_id,
     };
 
     const result = await truv.createOrder(params);

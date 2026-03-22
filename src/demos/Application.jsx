@@ -18,7 +18,7 @@ const STEPS = [
 const WAITING_MIN_MS = 10000;
 
 export function ApplicationDemo({ screen, param }) {
-  const [started, setStarted] = useState(false);
+  const [productType, setProductType] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const { panel, setCurrentStep, startPolling, addBridgeEvent, reset } = usePanel();
 
@@ -57,10 +57,10 @@ export function ApplicationDemo({ screen, param }) {
       )}
       {!screen && (
         <div class="max-w-lg mx-auto">
-          {!started ? (
-            <IntroScreen onStart={() => setStarted(true)} />
+          {!productType ? (
+            <IntroScreen onStart={setProductType} />
           ) : (
-            <ApplicationForm onSubmit={handleSubmit} submitting={submitting} />
+            <ApplicationForm onSubmit={handleSubmit} submitting={submitting} productType={productType} />
           )}
         </div>
       )}
@@ -69,24 +69,33 @@ export function ApplicationDemo({ screen, param }) {
 }
 
 function IntroScreen({ onStart }) {
+  const [selected, setSelected] = useState('income');
   return (
     <div>
       <h2 class="text-2xl font-bold tracking-tight mb-1.5">Application</h2>
       <p class="text-sm text-gray-500 leading-relaxed mb-7">
-        Collect applicant details, search for their employer, and verify income through Bridge.
+        Collect applicant details, search for their employer, and verify through Bridge.
       </p>
 
       <div class="border border-border rounded-xl p-5 bg-white mb-6">
         <h3 class="text-sm font-semibold mb-3">How it works</h3>
         <ol class="text-sm text-gray-600 space-y-2 list-decimal list-inside">
-          <li>Applicant enters their info and searches for their employer</li>
+          <li>Select a product type and enter applicant info</li>
           <li>An order is created via <code class="text-xs bg-gray-100 px-1 py-0.5 rounded">POST /v1/orders/</code></li>
           <li>Bridge opens inline — use <code class="text-xs bg-gray-100 px-1 py-0.5 rounded">goodlogin</code> / <code class="text-xs bg-gray-100 px-1 py-0.5 rounded">goodpassword</code></li>
           <li>Webhooks stream in, then reports are fetched</li>
         </ol>
       </div>
 
-      <button onClick={onStart} class="w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover">
+      <div class="mb-6">
+        <label class="text-sm font-medium mb-1.5 block">Product</label>
+        <select value={selected} onChange={e => setSelected(e.target.value)} class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:border-primary focus:outline-none">
+          <option value="income">Income</option>
+          <option value="employment">Employment</option>
+        </select>
+      </div>
+
+      <button onClick={() => onStart(selected)} class="w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover">
         Start Application
       </button>
     </div>
@@ -159,10 +168,9 @@ function CompanySearch({ value, onChange }) {
   );
 }
 
-function ApplicationForm({ onSubmit, submitting }) {
+function ApplicationForm({ onSubmit, submitting, productType }) {
   const [agree, setAgree] = useState(true);
   const [employer, setEmployer] = useState({ name: '', id: null });
-  const [productType, setProductType] = useState('income');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -176,6 +184,7 @@ function ApplicationForm({ onSubmit, submitting }) {
       ssn: fd.get('ssn') || undefined,
       product_type: productType,
       employer: employer.name,
+      company_mapping_id: employer.id,
     });
   };
 
@@ -191,14 +200,6 @@ function ApplicationForm({ onSubmit, submitting }) {
         <label class="text-sm font-medium mb-1.5 block">Employer</label>
         <CompanySearch value={employer.name} onChange={setEmployer} />
         <p class="text-xs text-gray-400 mt-1">Search uses <code>GET /v1/company-mappings-search/</code></p>
-      </div>
-      <div class="mb-4">
-        <label class="text-sm font-medium mb-1.5 block">Product</label>
-        <select value={productType} onChange={e => setProductType(e.target.value)} class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:border-primary focus:outline-none">
-          <option value="income">Income</option>
-          <option value="employment">Employment</option>
-          <option value="assets">Assets</option>
-        </select>
       </div>
       <div class="mb-4"><label class="text-sm font-medium mb-1.5 block">Email</label><input name="email" type="email" placeholder="joe@example.com" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-primary focus:outline-none" /></div>
       <div class="grid grid-cols-2 gap-4 mb-4">

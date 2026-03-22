@@ -99,7 +99,9 @@ export class TruvClient {
     if (params.template_id) payload.template_id = params.template_id;
 
     // Employer — sandbox credentials: goodlogin/goodpassword
-    if (params.employer) {
+    if (params.company_mapping_id) {
+      payload.employers = [{ company_mapping_id: params.company_mapping_id }];
+    } else if (params.employer) {
       payload.employers = [{ company_name: params.employer }];
     }
 
