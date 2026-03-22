@@ -73,6 +73,14 @@ export class TruvClient {
     return this._request('POST', `users/${userId}/tokens/`, { json: payload });
   }
 
+  // --- Company Search ---
+
+  async searchCompanies(query, productType) {
+    const params = new URLSearchParams({ query });
+    if (productType) params.set('product_type', productType);
+    return this._request('GET', `company-mappings-search/?${params}`);
+  }
+
   // --- Orders API ---
 
   async createOrder(params = {}) {
@@ -91,11 +99,8 @@ export class TruvClient {
     if (params.template_id) payload.template_id = params.template_id;
 
     // Employer — sandbox credentials: goodlogin/goodpassword
-    const needsEmployer = payload.products.some(p => ['deposit_switch', 'pll', 'employment', 'income'].includes(p));
     if (params.employer) {
       payload.employers = [{ company_name: params.employer }];
-    } else if (needsEmployer) {
-      payload.employers = [{ company_name: 'Home Depot' }];
     }
 
     // Sandbox test account for deposit_switch and pll products

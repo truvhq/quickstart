@@ -1,173 +1,234 @@
-import { useState, useEffect } from 'preact/hooks';
-import { Layout, OrderResults, usePanel, API_BASE } from '@shared/ui/index.js';
+import { useState, useRef, useEffect } from 'preact/hooks';
+import { Layout, OrderResults, WaitingScreen, usePanel, API_BASE } from '@shared/ui/index.js';
+import { navigate } from '../App.jsx';
 
 const STEPS = [
-  { title: 'Dashboard', guide: '<p>View all verification orders across demos. Click any order to inspect details.</p><p><code>GET /api/orders</code> returns all orders from the shared database.</p>' },
-  { title: 'Create order', guide: '<p>Create a new verification order with applicant details:</p><pre>POST /v1/orders/\n{\n  "first_name": "...",\n  "products": ["income"]\n}</pre>' },
-  { title: 'Order details', guide: '<p>Fetch order results and reports:</p><pre>GET /v1/orders/{order_id}/</pre><p>Share the order URL with applicants for self-service verification.</p>' },
+  { title: 'Employee list', guide: '<p>View employees and their verification status. Request new verifications or reverify existing ones.</p><pre>POST /v1/orders/\n{\n  "first_name": "...",\n  "products": ["income"]\n}</pre>' },
+  { title: 'Bridge verification', guide: '<p>Sandbox credentials: <code>goodlogin</code> / <code>goodpassword</code></p><p><a href="https://docs.truv.com/docs/bridge-overview" target="_blank">Bridge Docs →</a></p>' },
+  { title: 'Webhook processing', guide: '<p>Truv sends webhooks as the verification progresses.</p>' },
+  { title: 'View results', guide: '<p>Fetch reports by product type:</p><pre>POST /v1/users/{user_id}/reports/\nPOST /v1/users/{user_id}/assets/reports/</pre>' },
 ];
 
-export function EmployeePortalDemo() {
-  const [screen, setScreen] = useState('dashboard');
-  const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [orderData, setOrderData] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+const EMPLOYEES = [
+  { id: 'existing', firstName: 'John', lastName: 'Doe', email: 'john.doe@homedepot.com', phone: '555-0101', products: ['income'], employer: 'Home Depot', existing: true },
+  { id: 'income', firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@homedepot.com', phone: '555-0102', products: ['income'], employer: 'Home Depot' },
+  { id: 'assets', firstName: 'Bob', lastName: 'Wilson', email: 'bob.wilson@chase.com', phone: '555-0103', products: ['assets'], employer: null },
+  { id: 'combined', firstName: 'Alice', lastName: 'Brown', email: 'alice.brown@homedepot.com', phone: '555-0104', products: ['income', 'assets'], employer: 'Home Depot' },
+];
 
-  const { panel, setCurrentStep, startPolling, reset } = usePanel();
+const WAITING_MIN_MS = 10000;
 
-  useEffect(() => { fetchOrders(); }, []);
+export function EmployeePortalDemo({ screen, param }) {
+  const [employeeOrders, setEmployeeOrders] = useState({});
+  const [creating, setCreating] = useState(null);
+  const activeEmployeeRef = useRef(null);
+  const { panel, setCurrentStep, startPolling, addBridgeEvent, reset } = usePanel();
 
-  async function fetchOrders() {
+  useEffect(() => {
+    const stepMap = { '': 0, 'bridge': 1, 'waiting': 2, 'results': 3 };
+    setCurrentStep(stepMap[screen] ?? 0);
+  }, [screen]);
+
+  // Create the "existing" order on mount
+  useEffect(() => {
+    const emp = EMPLOYEES.find(e => e.existing);
+    if (!emp || employeeOrders[emp.id]) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const body = { products: emp.products, demo_id: 'employee-portal', first_name: emp.firstName, last_name: emp.lastName, email: emp.email, phone: emp.phone };
+        if (emp.employer) body.employer = emp.employer;
+        const resp = await fetch(`${API_BASE}/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await resp.json();
+        if (!cancelled && resp.ok) setEmployeeOrders(prev => ({ ...prev, [emp.id]: data }));
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  async function handleRequest(emp) {
+    setCreating(emp.id);
     try {
-      const resp = await fetch(`${API_BASE}/api/orders`);
-      setOrders(await resp.json());
-    } catch (e) { console.error(e); }
-  }
-
-  async function createOrder(formData) {
-    setSubmitting(true);
-    try {
-      const resp = await fetch(`${API_BASE}/api/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, demo_id: 'employee-portal' }),
-      });
+      const body = { products: emp.products, demo_id: 'employee-portal', first_name: emp.firstName, last_name: emp.lastName, email: emp.email, phone: emp.phone };
+      if (emp.employer) body.employer = emp.employer;
+      const resp = await fetch(`${API_BASE}/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await resp.json();
-      if (!resp.ok) { alert('Error: ' + (data.error || 'Unknown')); setSubmitting(false); return; }
-
-      if (data.user_id) startPolling(data.user_id);
-      await fetchOrders();
-      setSubmitting(false);
-      viewOrder(data.order_id);
-    } catch (e) { console.error(e); setSubmitting(false); }
-  }
-
-  async function viewOrder(orderId) {
-    setCurrentStep(2);
-    setScreen('detail');
-    try {
-      const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}`);
-      const data = await resp.json();
-      setSelectedOrder(orderId);
-      setOrderData(data);
-      if (data.raw_response?.user_id) startPolling(data.raw_response.user_id);
+      if (resp.ok) {
+        setEmployeeOrders(prev => ({ ...prev, [emp.id]: data }));
+        activeEmployeeRef.current = emp.id;
+        navigate(`employee-portal/bridge/${data.order_id}`);
+      }
     } catch (e) { console.error(e); }
+    setCreating(null);
   }
 
-  function goBack() {
-    reset();
-    setScreen('dashboard');
-    setSelectedOrder(null);
-    setOrderData(null);
-    setCurrentStep(0);
-    fetchOrders();
+  function handleStart(emp) {
+    const order = employeeOrders[emp.id];
+    if (order) {
+      activeEmployeeRef.current = emp.id;
+      navigate(`employee-portal/bridge/${order.order_id}`);
+    } else {
+      handleRequest(emp);
+    }
   }
+
+  const isBridge = screen === 'bridge';
 
   return (
-    <Layout title="Truv Quickstart" badge="Employee Portal" steps={STEPS} panel={panel}>
-      <div class="max-w-3xl mx-auto">
-        {screen === 'dashboard' && (
-          <div>
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-2xl font-bold tracking-tight">Orders</h2>
-              <button onClick={() => { setCurrentStep(1); setScreen('create'); }} class="px-4 py-2 text-sm font-semibold bg-primary text-white rounded-lg hover:bg-primary-hover">Create Order</button>
-            </div>
-            {orders.length === 0 ? (
-              <p class="text-sm text-gray-400 text-center py-12">No orders yet. Create one to get started.</p>
-            ) : (
-              <table class="w-full">
-                <thead>
-                  <tr class="border-b border-gray-200">
-                    {['Order ID', 'Source', 'Status', 'Created'].map(h => <th key={h} class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">{h}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map(o => (
-                    <tr key={o.order_id} class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer" onClick={() => viewOrder(o.order_id)}>
-                      <td class="px-3 py-2.5 text-sm font-mono">{o.order_id}</td>
-                      <td class="px-3 py-2.5 text-sm text-gray-500">{o.demo_id || '-'}</td>
-                      <td class="px-3 py-2.5"><span class={`text-xs font-semibold px-2 py-0.5 rounded ${o.status === 'completed' ? 'text-success bg-success-bg' : 'text-warning bg-warning-bg'}`}>{o.status}</span></td>
-                      <td class="px-3 py-2.5 text-sm text-gray-400">{o.created_at ? new Date(o.created_at).toLocaleString() : ''}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        )}
-
-        {screen === 'create' && (
-          <div>
-            <div class="text-sm cursor-pointer text-gray-500 hover:text-primary mb-4" onClick={goBack}>← Back to orders</div>
-            <h2 class="text-2xl font-bold tracking-tight mb-1.5">Create Order</h2>
-            <p class="text-sm text-gray-500 mb-7">Enter applicant details to create a verification order.</p>
-            <CreateForm onSubmit={createOrder} submitting={submitting} />
-          </div>
-        )}
-
-        {screen === 'detail' && (
-          <div>
-            <div class="text-sm cursor-pointer text-gray-500 hover:text-primary mb-4" onClick={goBack}>← Back to orders</div>
-            {orderData ? (
-              <div>
-                <h2 class="text-2xl font-bold tracking-tight mb-1.5">Order Details</h2>
-                <p class="text-sm text-gray-500 mb-7">Order {orderData.truv_order_id || selectedOrder} • {orderData.status || ''}</p>
-                {orderData.share_url && (
-                  <div class="flex items-center gap-2 mb-6 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <span class="text-xs text-gray-500 shrink-0">Share URL:</span>
-                    <input readOnly value={orderData.share_url} class="flex-1 text-xs font-mono bg-transparent border-none outline-none text-gray-700" />
-                    <button onClick={() => navigator.clipboard.writeText(orderData.share_url)} class="text-xs text-primary font-medium shrink-0">Copy</button>
+    <Layout title="Truv Quickstart" badge="Employee Portal" steps={STEPS} panel={panel} flush={isBridge}>
+      {screen === 'bridge' && (
+        <BridgeScreen orderId={param} addBridgeEvent={addBridgeEvent} startPolling={startPolling} />
+      )}
+      {screen === 'waiting' && (
+        <WaitingScreenWrapper orderId={param} webhooks={panel.webhooks} startPolling={startPolling} />
+      )}
+      {screen === 'results' && (
+        <ResultsScreen orderId={param} onBack={() => { reset(); navigate('employee-portal'); }} />
+      )}
+      {!screen && (
+        <div class="max-w-3xl mx-auto">
+          <h2 class="text-2xl font-bold tracking-tight mb-1.5">Employee Verifications</h2>
+          <p class="text-sm text-gray-500 leading-relaxed mb-7">Manage verification requests for your employees.</p>
+          <div class="space-y-3">
+            {EMPLOYEES.map(emp => {
+              const order = employeeOrders[emp.id];
+              const isCreating = creating === emp.id;
+              const productLabel = emp.products.join(' + ');
+              return (
+                <div key={emp.id} class="flex items-center gap-4 border border-border rounded-xl px-5 py-4 bg-white">
+                  <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-500 shrink-0">
+                    {emp.firstName[0]}{emp.lastName[0]}
                   </div>
-                )}
-                <OrderResults data={orderData} />
-              </div>
-            ) : (
-              <div class="text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>
-            )}
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-semibold">{emp.firstName} {emp.lastName}</div>
+                    <div class="text-xs text-gray-500 truncate">{emp.email} • {productLabel}</div>
+                  </div>
+                  {emp.existing && order ? (
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-semibold text-success bg-success-bg px-2 py-1 rounded">Existing</span>
+                      <button class="px-3 py-1.5 text-xs font-medium border border-primary text-primary rounded-lg hover:bg-primary hover:text-white" onClick={() => handleRequest(emp)}>
+                        {isCreating ? <span class="inline-block w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> : 'Reverify'}
+                      </button>
+                    </div>
+                  ) : order ? (
+                    <button class="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary-hover" onClick={() => handleStart(emp)}>Start</button>
+                  ) : (
+                    <button class="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary-hover disabled:opacity-40" disabled={isCreating} onClick={() => handleRequest(emp)}>
+                      {isCreating ? <span class="inline-block w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Request'}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </Layout>
   );
 }
 
-function CreateForm({ onSubmit, submitting }) {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    onSubmit({
-      first_name: fd.get('first_name') || undefined,
-      last_name: fd.get('last_name') || undefined,
-      email: fd.get('email') || undefined,
-      phone: fd.get('phone') || undefined,
-      ssn: fd.get('ssn') || undefined,
-      product_type: fd.get('product_type'),
+function BridgeScreen({ orderId, addBridgeEvent, startPolling }) {
+  const [bridgeToken, setBridgeToken] = useState(null);
+  const [error, setError] = useState(null);
+  const containerRef = useRef(null);
+  const bridgeInitRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}/info`);
+        const data = await resp.json();
+        if (cancelled) return;
+        if (!resp.ok) { setError(data.error || 'Unknown error'); return; }
+        setBridgeToken(data.bridge_token);
+        startPolling(data.user_id);
+      } catch (e) { if (!cancelled) setError(e.message); }
+    })();
+    return () => { cancelled = true; };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (!bridgeToken || !containerRef.current || !window.TruvBridge || bridgeInitRef.current) return;
+    bridgeInitRef.current = true;
+    const b = window.TruvBridge.init({
+      bridgeToken, isOrder: true,
+      position: { type: 'inline', container: containerRef.current },
+      onLoad: () => addBridgeEvent('onLoad', null),
+      onEvent: (type, _, source) => {
+        addBridgeEvent('onEvent', { eventType: type, source });
+        if (type === 'COMPLETED' && source === 'order') navigate(`employee-portal/waiting/${orderId}`);
+      },
+      onSuccess: () => addBridgeEvent('onSuccess', null),
+      onClose: () => addBridgeEvent('onClose', null),
     });
-  };
+    b.open();
+    return () => { try { b.close(); } catch {} };
+  }, [bridgeToken]);
+
+  if (error) return <div class="text-center py-15 text-red-600">{error}</div>;
+  if (!bridgeToken) return <div class="text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>;
+
+  return <div ref={containerRef} class="w-full h-full overflow-hidden bg-white [&_iframe]:w-full [&_iframe]:!h-full [&_iframe]:border-none" style="zoom: 0.85;" />;
+}
+
+function WaitingScreenWrapper({ orderId, webhooks, startPolling }) {
+  const waitingStartRef = useRef(Date.now());
+  const advancePendingRef = useRef(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}/info`);
+        const data = await resp.json();
+        if (resp.ok && data.user_id) startPolling(data.user_id);
+      } catch {}
+    })();
+  }, [orderId]);
+
+  useEffect(() => {
+    if (advancePendingRef.current) return;
+    const isCompleted = webhooks.some(w => {
+      const p = typeof w.payload === 'string' ? JSON.parse(w.payload) : (w.payload || {});
+      return (p.event_type === 'order-status-updated' && p.status === 'completed')
+        || (w.event_type === 'order-status-updated' && w.status === 'completed');
+    });
+    if (isCompleted) {
+      advancePendingRef.current = true;
+      const elapsed = Date.now() - waitingStartRef.current;
+      const delay = Math.max(1000, WAITING_MIN_MS - elapsed + 1000);
+      setTimeout(() => navigate(`employee-portal/results/${orderId}`), delay);
+    }
+  }, [webhooks, orderId]);
+
+  return <div class="max-w-2xl mx-auto"><WaitingScreen webhooks={webhooks} /></div>;
+}
+
+function ResultsScreen({ orderId, onBack }) {
+  const [orderData, setOrderData] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderId)}/report`);
+        if (resp.ok) setOrderData(await resp.json());
+        else setError('Failed to load results');
+      } catch (e) { console.error(e); setError(e.message); }
+    })();
+  }, [orderId]);
+
+  if (error) return <div class="max-w-2xl mx-auto text-center py-15 text-red-600">{error}</div>;
+  if (!orderData) return <div class="max-w-2xl mx-auto text-center py-15"><div class="w-10 h-10 border-3 border-gray-200 border-t-primary rounded-full animate-spin mx-auto" /></div>;
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div><label class="text-sm font-medium mb-1.5 block">First name</label><input name="first_name" placeholder="John" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-primary focus:outline-none" /></div>
-        <div><label class="text-sm font-medium mb-1.5 block">Last name</label><input name="last_name" placeholder="Doe" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-primary focus:outline-none" /></div>
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-2xl font-bold tracking-tight mb-1.5">Verification Results</h2>
+      <p class="text-sm text-gray-500 mb-7">Order {orderData.truv_order_id || ''} • {orderData.status || ''}</p>
+      <OrderResults data={orderData} />
+      <div class="flex gap-3 mt-6 pt-5 border-t border-gray-200">
+        <button class="px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-lg hover:bg-primary-hover" onClick={onBack}>Back to Employees</button>
       </div>
-      <div class="mb-4"><label class="text-sm font-medium mb-1.5 block">Email</label><input name="email" type="email" placeholder="john@example.com" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-primary focus:outline-none" /></div>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div><label class="text-sm font-medium mb-1.5 block">Phone</label><input name="phone" type="tel" placeholder="123456789" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-primary focus:outline-none" /></div>
-        <div><label class="text-sm font-medium mb-1.5 block">SSN (last 4)</label><input name="ssn" placeholder="6789" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:border-primary focus:outline-none" /></div>
-      </div>
-      <div class="mb-6">
-        <label class="text-sm font-medium mb-1.5 block">Product</label>
-        <select name="product_type" class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:border-primary focus:outline-none">
-          <option value="income">Income</option>
-          <option value="employment">Employment</option>
-          <option value="assets">Assets</option>
-        </select>
-      </div>
-      <button type="submit" disabled={submitting} class="w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover disabled:opacity-40">
-        {submitting ? 'Creating...' : 'Create Order'}
-      </button>
-    </form>
+    </div>
   );
 }

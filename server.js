@@ -35,6 +35,16 @@ app.use('/shared', express.static(path.join(__dirname, 'shared')));
 
 app.get('/api/config', (_req, res) => res.json({ product_type: API_PRODUCT_TYPE }));
 
+// --- Company search ---
+app.get('/api/companies', async (req, res) => {
+  try {
+    const query = req.query.q;
+    if (!query) return res.json([]);
+    const result = await truv.searchCompanies(query, req.query.product_type);
+    res.json(result.data || []);
+  } catch (err) { console.error(err); res.json([]); }
+});
+
 // --- Webhook receiver ---
 app.post('/api/webhooks/truv', (req, res) => {
   const sigMatch = verifyWebhookSignature(req.rawBody, API_SECRET, req.headers['x-webhook-sign']);
