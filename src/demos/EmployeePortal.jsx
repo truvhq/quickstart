@@ -10,10 +10,10 @@ const STEPS = [
 ];
 
 const EMPLOYEES = [
-  { id: 'existing', firstName: 'John', lastName: 'Doe', email: 'john.doe@homedepot.com', phone: '555-0101', products: ['income'], employer: 'Home Depot', existing: true },
-  { id: 'income', firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@homedepot.com', phone: '555-0102', products: ['income'], employer: 'Home Depot' },
-  { id: 'assets', firstName: 'Bob', lastName: 'Wilson', email: 'bob.wilson@chase.com', phone: '555-0103', products: ['assets'], employer: null },
-  { id: 'combined', firstName: 'Alice', lastName: 'Brown', email: 'alice.brown@homedepot.com', phone: '555-0104', products: ['income', 'assets'], employer: 'Home Depot' },
+  { id: 'existing', firstName: 'John', lastName: 'Doe', phone: '555-0101', products: ['income'], employer: 'Home Depot', existing: true },
+  { id: 'income', firstName: 'Jane', lastName: 'Smith', phone: '555-0102', products: ['income'], employer: 'Home Depot' },
+  { id: 'assets', firstName: 'Bob', lastName: 'Wilson', phone: '555-0103', products: ['assets'], employer: null },
+  { id: 'combined', firstName: 'Alice', lastName: 'Brown', phone: '555-0104', products: ['income', 'assets'], employer: 'Home Depot' },
 ];
 
 const WAITING_MIN_MS = 10000;
@@ -36,7 +36,7 @@ export function EmployeePortalDemo({ screen, param }) {
     let cancelled = false;
     (async () => {
       try {
-        const body = { products: emp.products, demo_id: 'employee-portal', first_name: emp.firstName, last_name: emp.lastName, email: emp.email, phone: emp.phone };
+        const body = { products: emp.products, demo_id: 'employee-portal', first_name: emp.firstName, last_name: emp.lastName, phone: emp.phone };
         if (emp.employer) body.employer = emp.employer;
         const resp = await fetch(`${API_BASE}/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         const data = await resp.json();
@@ -49,7 +49,7 @@ export function EmployeePortalDemo({ screen, param }) {
   async function handleRequest(emp) {
     setCreating(emp.id);
     try {
-      const body = { products: emp.products, demo_id: 'employee-portal', first_name: emp.firstName, last_name: emp.lastName, email: emp.email, phone: emp.phone };
+      const body = { products: emp.products, demo_id: 'employee-portal', first_name: emp.firstName, last_name: emp.lastName, phone: emp.phone };
       if (emp.employer) body.employer = emp.employer;
       const resp = await fetch(`${API_BASE}/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await resp.json();
@@ -101,7 +101,7 @@ export function EmployeePortalDemo({ screen, param }) {
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="text-sm font-semibold">{emp.firstName} {emp.lastName}</div>
-                    <div class="text-xs text-gray-500 truncate">{emp.email} • {productLabel}</div>
+                    <div class="text-xs text-gray-500 truncate">{emp.phone} • {productLabel}</div>
                   </div>
                   {emp.existing && order ? (
                     <div class="flex items-center gap-2">

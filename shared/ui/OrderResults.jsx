@@ -198,6 +198,57 @@ function TransactionRow({ txn }) {
   );
 }
 
+function AccountCard({ acct }) {
+  const [showTxns, setShowTxns] = useState(false);
+  const bal = acct.balances || {};
+  const txns = acct.transactions || [];
+  const acctType = (acct.type || '').charAt(0) + (acct.type || '').slice(1).toLowerCase();
+
+  return (
+    <div class="border border-border rounded-lg mb-4 overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 bg-border-light">
+        <div class="font-semibold text-sm">{acctType} {acct.mask}</div>
+        {bal.balance != null && <div class="text-sm font-semibold">{$(bal.balance)}</div>}
+      </div>
+      <div class="px-4 py-3">
+        {bal.available_balance != null && <Row label="Available" value={$(bal.available_balance)} />}
+        {acct.routing_number && <Row label="Routing" value={acct.routing_number} />}
+        {acct.days_available && <Row label="Days of Data" value={String(acct.days_available)} />}
+        {acct.owners?.length > 0 && <Row label="Owner" value={acct.owners.map(o => o.full_name || '').join(', ')} />}
+        {acct.nsf != null && <Row label="NSF Count" value={String(acct.nsf)} />}
+        {acct.summary && (
+          <>
+            {acct.summary.avg_30 && <Row label="30-Day Avg" value={$(acct.summary.avg_30)} />}
+            {acct.summary.avg_60 && <Row label="60-Day Avg" value={$(acct.summary.avg_60)} />}
+          </>
+        )}
+
+        {txns.length > 0 && (
+          <div class="mt-3">
+            <button class="text-xs text-primary font-medium" onClick={() => setShowTxns(!showTxns)}>
+              {showTxns ? 'Hide' : 'Show'} {txns.length} transactions
+            </button>
+            {showTxns && (
+              <table class="w-full mt-2 border-collapse">
+                <thead><tr class="border-b-2 border-border text-xs text-gray-500">
+                  <th class="text-left px-2 py-1">Date</th>
+                  <th class="text-left px-2 py-1">Description</th>
+                  <th class="text-left px-2 py-1">Category</th>
+                  <th class="text-right px-2 py-1">Amount</th>
+                </tr></thead>
+                <tbody>
+                  {txns.slice(0, 20).map((t, ti) => <TransactionRow key={ti} txn={t} />)}
+                  {txns.length > 20 && <tr><td colSpan="4" class="text-xs text-gray-400 px-2 py-2">+ {txns.length - 20} more</td></tr>}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function AssetsReport({ report }) {
   if (!report?.links?.length) return null;
   const summary = report.summary;
@@ -224,56 +275,7 @@ function AssetsReport({ report }) {
       {report.links.map((link, li) => (
         <div key={li}>
           <ProviderHeader name={link.provider_name || link.provider || 'Bank'} />
-          {link.accounts?.map((acct, ai) => {
-            const [showTxns, setShowTxns] = useState(false);
-            const bal = acct.balances || {};
-            const txns = acct.transactions || [];
-            const acctType = (acct.type || '').charAt(0) + (acct.type || '').slice(1).toLowerCase();
-
-            return (
-              <div key={ai} class="border border-border rounded-lg mb-4 overflow-hidden">
-                <div class="flex items-center justify-between px-4 py-3 bg-border-light">
-                  <div class="font-semibold text-sm">{acctType} {acct.mask}</div>
-                  {bal.balance != null && <div class="text-sm font-semibold">{$(bal.balance)}</div>}
-                </div>
-                <div class="px-4 py-3">
-                  {bal.available_balance != null && <Row label="Available" value={$(bal.available_balance)} />}
-                  {acct.routing_number && <Row label="Routing" value={acct.routing_number} />}
-                  {acct.days_available && <Row label="Days of Data" value={String(acct.days_available)} />}
-                  {acct.owners?.length > 0 && <Row label="Owner" value={acct.owners.map(o => o.full_name || '').join(', ')} />}
-                  {acct.nsf != null && <Row label="NSF Count" value={String(acct.nsf)} />}
-                  {acct.summary && (
-                    <>
-                      {acct.summary.avg_30 && <Row label="30-Day Avg" value={$(acct.summary.avg_30)} />}
-                      {acct.summary.avg_60 && <Row label="60-Day Avg" value={$(acct.summary.avg_60)} />}
-                    </>
-                  )}
-
-                  {txns.length > 0 && (
-                    <div class="mt-3">
-                      <button class="text-xs text-primary font-medium" onClick={() => setShowTxns(!showTxns)}>
-                        {showTxns ? 'Hide' : 'Show'} {txns.length} transactions
-                      </button>
-                      {showTxns && (
-                        <table class="w-full mt-2 border-collapse">
-                          <thead><tr class="border-b-2 border-border text-xs text-gray-500">
-                            <th class="text-left px-2 py-1">Date</th>
-                            <th class="text-left px-2 py-1">Description</th>
-                            <th class="text-left px-2 py-1">Category</th>
-                            <th class="text-right px-2 py-1">Amount</th>
-                          </tr></thead>
-                          <tbody>
-                            {txns.slice(0, 20).map((t, ti) => <TransactionRow key={ti} txn={t} />)}
-                            {txns.length > 20 && <tr><td colSpan="4" class="text-xs text-gray-400 px-2 py-2">+ {txns.length - 20} more</td></tr>}
-                          </tbody>
-                        </table>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+          {link.accounts?.map((acct, ai) => <AccountCard key={ai} acct={acct} />)}
         </div>
       ))}
 

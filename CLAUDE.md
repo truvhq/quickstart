@@ -2,11 +2,11 @@
 
 ## Report fetching pattern
 
-Reports are fetched in two steps — create then poll:
+POST returns full report data directly — store it and return. Only GET if stored response is missing (fallback).
 
-1. **POST** to create the report (returns `report_id` immediately)
-2. **GET** to fetch the report by `report_id` (poll until ready)
-3. Return the report data as results
+1. **POST** to create the report (returns full report data including `report_id`)
+2. Store the response in the DB — this is the primary source of report data
+3. **GET** to fetch the report by `report_id` only if the stored response is missing (fallback)
 
 Report endpoints by product type:
 - **Income** (VOIE): `POST /v1/users/{user_id}/reports/` with `{ is_voe: false }` → `GET /v1/users/{user_id}/reports/{report_id}/`

@@ -11,17 +11,12 @@ import { setupWebhook, teardownWebhook } from './shared/webhook-setup.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
-const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE,
-  TEMPLATE_ID_INCOME, TEMPLATE_ID_EMPLOYMENT, TEMPLATE_ID_ASSETS, TEMPLATE_ID_IDENTITY } = process.env;
+const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE } = process.env;
 
 if (!API_CLIENT_ID || !API_SECRET) { console.error('Missing API_CLIENT_ID or API_SECRET in .env'); process.exit(1); }
 
 const truv = new TruvClient({ clientId: API_CLIENT_ID, secret: API_SECRET });
 db.initDb();
-
-function getTemplateId(productType) {
-  return { income: TEMPLATE_ID_INCOME, employment: TEMPLATE_ID_EMPLOYMENT, assets: TEMPLATE_ID_ASSETS, identity: TEMPLATE_ID_IDENTITY }[productType] || undefined;
-}
 
 const app = express();
 app.use(express.json({ limit: '100mb', verify: (req, _res, buf) => { req.rawBody = buf.toString('utf-8'); } }));
@@ -94,7 +89,7 @@ app.post('/api/orders', async (req, res) => {
     const params = {
       first_name: data.first_name, last_name: data.last_name,
       email: data.email, phone: data.phone, ssn: data.ssn,
-      product_type: productType, template_id: getTemplateId(productType),
+      product_type: productType,
       products: data.products,
       external_user_id: data.external_user_id,
       employer: data.employer,
@@ -198,68 +193,7 @@ app.get('/api/orders/:id', async (req, res) => {
 
     const raw = order.raw_response ? JSON.parse(order.raw_response) : {};
 
-    let voa_report = null, voie_report = null;
-    if (raw.voa_report_id && userId) {
-      const r = await truv.getVoaReport(userId, raw.voa_report_id);
-      apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/users/${userId}/assets/reports/${raw.voa_report_id}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
-      if (r.statusCode < 400) voa_report = r.data;
-    }
-    if (raw.voie_report_id && userId) {
-      const r = await truv.getVoieReport(userId, raw.voie_report_id);
-      apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/users/${userId}/reports/${raw.voie_report_id}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
-      if (r.statusCode < 400) voie_report = r.data;
-    }
-
-    res.json({ order_id: order.id, truv_order_id: order.truv_order_id, user_id: userId, status: order.status, bridge_token: order.bridge_token, share_url: order.share_url, raw_response: raw, voa_report, voie_report });
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Internal server error' }); }
-});
-
-app.get('/api/users/:userId/report', async (req, res) => {
-  try {
-    let order = db.findOrderByUserId(req.params.userId);
-    if (!order) return res.status(404).json({ error: 'No order found for user' });
-
-    const userId = order.user_id;
-
-    // Fetch order from Truv for raw_response / status
-    if (order.truv_order_id) {
-      const result = await truv.getOrder(order.truv_order_id);
-      apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/orders/${order.truv_order_id}/`, responseBody: result.data, statusCode: result.statusCode, durationMs: result.durationMs });
-      if (result.statusCode >= 400) return res.status(result.statusCode).json({ error: 'Truv API error', details: result.data });
-      db.updateOrder(order.id, { status: result.data.status || order.status, raw_response: result.data });
-      order = db.getOrder(order.id);
-    }
-
-    const raw = order.raw_response ? JSON.parse(order.raw_response) : {};
-
-    // Create reports via POST, then fetch via GET
-    let voie_report = null, voa_report = null;
-
-    // Income insights report
-    try {
-      const incomeCreate = await truv.createIncomeInsightsReport(userId);
-      apiLogger.logApiCall({ userId, method: 'POST', endpoint: `/v1/users/${userId}/income_insights/reports/`, responseBody: incomeCreate.data, statusCode: incomeCreate.statusCode, durationMs: incomeCreate.durationMs });
-      const reportId = incomeCreate.data?.report_id;
-      if (incomeCreate.statusCode < 400 && reportId) {
-        const r = await truv.getIncomeInsightsReport(userId, reportId);
-        apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/users/${userId}/income_insights/reports/${reportId}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
-        if (r.statusCode < 400) voie_report = r.data;
-      }
-    } catch (e) { console.error('Income insights report error:', e.message); }
-
-    // Assets report
-    try {
-      const assetsCreate = await truv.createAssetsReport(userId);
-      apiLogger.logApiCall({ userId, method: 'POST', endpoint: `/v1/users/${userId}/assets/reports/`, responseBody: assetsCreate.data, statusCode: assetsCreate.statusCode, durationMs: assetsCreate.durationMs });
-      const reportId = assetsCreate.data?.report_id;
-      if (assetsCreate.statusCode < 400 && reportId) {
-        const r = await truv.getAssetsReport(userId, reportId);
-        apiLogger.logApiCall({ userId, method: 'GET', endpoint: `/v1/users/${userId}/assets/reports/${reportId}/`, responseBody: r.data, statusCode: r.statusCode, durationMs: r.durationMs });
-        if (r.statusCode < 400) voa_report = r.data;
-      }
-    } catch (e) { console.error('Assets report error:', e.message); }
-
-    res.json({ order_id: order.id, truv_order_id: order.truv_order_id, user_id: userId, status: order.status, bridge_token: order.bridge_token, share_url: order.share_url, raw_response: raw, voa_report, voie_report });
+    res.json({ order_id: order.id, truv_order_id: order.truv_order_id, user_id: userId, status: order.status, bridge_token: order.bridge_token, share_url: order.share_url, raw_response: raw });
   } catch (err) { console.error(err); res.status(500).json({ error: 'Internal server error' }); }
 });
 

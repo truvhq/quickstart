@@ -106,7 +106,7 @@ export class TruvClient {
     }
 
     // Sandbox test account for deposit_switch and pll products
-    if (['deposit_switch', 'pll'].includes(productType)) {
+    if (['deposit_switch', 'pll'].includes(productType) && payload.employers) {
       payload.employers[0].account = {
         account_number: '16002600',   // Sandbox test value — replace with real account in production
         account_type: 'checking',
