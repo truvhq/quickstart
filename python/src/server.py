@@ -25,9 +25,9 @@ CORS(app)
 
 secret = os.environ.get("API_SECRET")
 client_id = os.environ.get("API_CLIENT_ID")
-product_type = os.environ.get("API_PRODUCT_TYPE", "employment")
+product_type = os.environ.get("API_PRODUCT_TYPE", "income")
 flask_port = os.environ.get("FLASK_RUN_PORT", 5001)
-is_order = os.environ.get("IS_ORDER", "false").lower() == "true"
+is_order = os.environ.get("IS_ORDER", "true").lower() == "true"
 
 if not secret or not client_id:
     raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID'")
