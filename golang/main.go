@@ -41,12 +41,9 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 // bridgeToken accepts requests for a bridge token and sends the response
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
-	isOrder := os.Getenv("IS_ORDER")
-	if isOrder == "" {
-		isOrder = "true"
-	}
+	isOrder := strings.TrimSpace(os.Getenv("IS_ORDER"))
 
-	if strings.ToLower(isOrder) == "true" {
+	if isOrder == "" || strings.ToLower(isOrder) == "true" {
 		orderData, err := createOrder()
 		if err != nil {
 			log.Println("Error creating order", err)

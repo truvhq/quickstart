@@ -14,5 +14,6 @@ Rails.configuration.to_prepare do
   Truv.client_id = ENV.fetch('API_CLIENT_ID')
   Truv.client_secret = ENV.fetch('API_SECRET')
   Truv.product_type = ENV.fetch('API_PRODUCT_TYPE')
-  Truv.is_order = ENV.fetch('IS_ORDER', 'true').downcase == 'true'
+  is_order_env = ENV.fetch('IS_ORDER', '').strip
+  Truv.is_order = is_order_env.empty? || is_order_env.downcase == 'true'
 end

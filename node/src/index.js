@@ -54,8 +54,8 @@ app.get('/', htmlFile);
 app.get('/getBridgeToken', async (req, res) => {
   // retrieve bridge token
   try {
-    const isOrder = IS_ORDER !== undefined ? IS_ORDER : 'true';
-    if (isOrder.toLowerCase() === 'true') {
+    const isOrder = IS_ORDER === undefined || IS_ORDER.trim() === '' || IS_ORDER.trim().toLowerCase() === 'true';
+    if (isOrder) {
       const order = await createOrder();
       res.json(order);
     } else {

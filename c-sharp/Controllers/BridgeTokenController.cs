@@ -12,9 +12,9 @@ namespace c_sharp.Controllers
         [HttpGet]
         public async Task<string> Get()
         {
-            var isOrder = Environment.GetEnvironmentVariable("IS_ORDER") ?? "true";
+            var isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
 
-            if (isOrder.ToLower() == "true")
+            if (string.IsNullOrWhiteSpace(isOrder) || isOrder.Trim().Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 return await _truv.CreateOrder();
             }
