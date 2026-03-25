@@ -105,7 +105,6 @@ class TruvClient:
             "order_number": f"qs-{uuid4().hex}",
             "first_name": fake.first_name(),
             "last_name": fake.last_name(),
-            "email": fake.email(domain="example.com"),
             "products": [self.product_type]
         }
 

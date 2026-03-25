@@ -61,7 +61,6 @@ type OrderRequest struct {
 	OrderNumber string      `json:"order_number"`
 	FirstName   string      `json:"first_name"`
 	LastName    string      `json:"last_name"`
-	Email       string      `json:"email"`
 	Products    []string    `json:"products"`
 	Employers   []Employer  `json:"employers,omitempty"`
 }

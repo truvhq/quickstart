@@ -186,7 +186,6 @@ const createOrder = async () => {
     order_number: `qs-${uuidv4()}`,
     first_name: 'John',
     last_name: 'Johnson',
-    email: 'j.johnson@example.com',
     products: [API_PRODUCT_TYPE]
   };
 

@@ -41,7 +41,6 @@ class Truv
       "order_number" => "qs-#{uuid}",
       "first_name" => "John",
       "last_name" => "Johnson",
-      "email" => "j.johnson@example.com",
       "products" => [Truv.product_type]
     }
 

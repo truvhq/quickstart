@@ -93,7 +93,6 @@ namespace c_sharp
                 OrderNumber = $"qs-{uuid}",
                 FirstName = "John",
                 LastName = "Johnson",
-                Email = "j.johnson@example.com",
                 Products = new[] { productType }
             };
 
@@ -327,9 +326,6 @@ namespace c_sharp
 
         [JsonPropertyName("last_name")]
         public string LastName { get; set; }
-
-        [JsonPropertyName("email")]
-        public string Email { get; set; }
 
         [JsonPropertyName("products")]
         public string[] Products { get; set; }
