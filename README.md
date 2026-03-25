@@ -20,11 +20,12 @@ API_CLIENT_ID=
 # please set your <Access key>
 API_SECRET=
 
-# optional: set to true to use Embedded Orders API instead of Users API
-IS_ORDER=false
+# IS_ORDER controls bridge token retrieval. Unset, blank, or "true" uses the
+# Orders API; set to "false" to use the Users API instead (case-insensitive).
+IS_ORDER=true
 ```
 
-**Note about Orders API:** Set `IS_ORDER=true` to use the Orders API instead of the Users API for creating bridge tokens. The Orders API allows you to pre-configure employer and account information, which can be useful for certain integration patterns.
+**Note about Orders API:** `IS_ORDER` defaults to the Orders API when unset, blank, or `"true"` (case-insensitive). Set `IS_ORDER=false` to create a user first and request a bridge token for that user.
 
 4. Run all-in-one docker-compose
 ```shell
