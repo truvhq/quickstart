@@ -26,10 +26,10 @@ Once you have your API keys, it's time to run the Truv Go Quickstart app locally
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
     API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or fas>
-    IS_ORDER=<true or false - optional, defaults to true if unset or blank (case-insensitive)>
+    IS_ORDER=<true or false - optional, defaults to true>
     ```
 
-    **Note:** `IS_ORDER` defaults to the Orders API when unset, blank, or `"true"`. Set `IS_ORDER=false` to create a user first and request a bridge token for that user.
+    **Note:** The default flow uses the Orders API, which is best suited for use cases where multiple connections are required from the user. Set `IS_ORDER=false` to use the Users API instead.
 
 5. `make golang_local`
 

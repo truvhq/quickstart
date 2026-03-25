@@ -20,12 +20,11 @@ API_CLIENT_ID=
 # please set your <Access key>
 API_SECRET=
 
-# IS_ORDER controls bridge token retrieval. Unset, blank, or "true" uses the
-# Orders API; set to "false" to use the Users API instead (case-insensitive).
+# optional: set to false to use Users API instead of Embedded Orders API
 IS_ORDER=true
 ```
 
-**Note about Orders API:** `IS_ORDER` defaults to the Orders API when unset, blank, or `"true"` (case-insensitive). Set `IS_ORDER=false` to create a user first and request a bridge token for that user.
+**Note about Orders API:** The default flow uses the Orders API, which is best suited for use cases where multiple connections are required from the user. Set `IS_ORDER=false` to use the Users API instead.
 
 4. Run all-in-one docker-compose
 ```shell
