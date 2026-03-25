@@ -25,9 +25,10 @@ CORS(app)
 
 secret = os.environ.get("API_SECRET")
 client_id = os.environ.get("API_CLIENT_ID")
-product_type = os.environ.get("API_PRODUCT_TYPE", "employment")
+product_type = os.environ.get("API_PRODUCT_TYPE", "income")
 flask_port = os.environ.get("FLASK_RUN_PORT", 5001)
-is_order = os.environ.get("IS_ORDER", "false").lower() == "true"
+_is_order_env = os.environ.get("IS_ORDER", "").strip()
+is_order = _is_order_env == "" or _is_order_env.lower() == "true"
 
 if not secret or not client_id:
     raise Exception("Environment MUST contains 'API_SECRET' and 'API_CLIENT_ID'")
@@ -115,11 +116,15 @@ def webhook():
     """
     signature = generate_webhook_sign(request.data.decode("UTF-8"), secret)
     logging.info("TRUV: Webhook received")
-    logging.info("TRUV: Event type:      %s", request.json["event_type"])
-    logging.info("TRUV: Status:          %s", request.json["status"])
     logging.info(
-        "TRUV: Signature match: %s\n", request.headers["X-WEBHOOK-SIGN"] == signature
+        "TRUV: Signature match: %s", request.headers["X-WEBHOOK-SIGN"] == signature
     )
+    data = request.json
+    logging.info("TRUV: Event type:      %s", data.get("event_type"))
+    if "status" not in data:
+        logging.info("TRUV: No status, skipping\n")
+        return ""
+    logging.info("TRUV: Status:          %s\n", data.get("status"))
     return ""
 
 

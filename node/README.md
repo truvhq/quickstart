@@ -25,10 +25,10 @@ Once you have your API keys, it's time to run the Truv NodeJS Quickstart app loc
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
     API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or pll>
-    IS_ORDER=<true or false - optional, defaults to false>
+    IS_ORDER=<true or false - optional, defaults to true>
     ```
 
-    **Note:** Set `IS_ORDER=true` to use the Orders API instead of the Users API for creating bridge tokens. This is useful for certain integration patterns where you want to pre-configure employer and account information.
+    **Note:** The default flow uses the Orders API, which is best suited for use cases where multiple connections are required from the user. Set `IS_ORDER=false` for a single connection flow, which fits best consumer lending, deposit switching, and financial account aggregation use cases.
 
 5. `make node_local`
 

@@ -13,8 +13,8 @@ namespace c_sharp.Controllers
         public async Task<string> Get()
         {
             var isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
-            
-            if (!string.IsNullOrEmpty(isOrder) && isOrder.ToLower() == "true")
+
+            if (string.IsNullOrWhiteSpace(isOrder) || isOrder.Trim().Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 return await _truv.CreateOrder();
             }

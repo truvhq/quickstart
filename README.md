@@ -20,11 +20,11 @@ API_CLIENT_ID=
 # please set your <Access key>
 API_SECRET=
 
-# optional: set to true to use Embedded Orders API instead of Users API
-IS_ORDER=false
+# optional: set to false to use Users API instead of Embedded Orders API
+IS_ORDER=true
 ```
 
-**Note about Orders API:** Set `IS_ORDER=true` to use the Orders API instead of the Users API for creating bridge tokens. The Orders API allows you to pre-configure employer and account information, which can be useful for certain integration patterns.
+**Note about Orders API:** The default flow uses the Orders API, which is best suited for use cases where multiple connections are required from the user. Set `IS_ORDER=false` for a single connection flow, which fits best consumer lending, deposit switching, and financial account aggregation use cases.
 
 4. Run all-in-one docker-compose
 ```shell
@@ -42,3 +42,13 @@ make [python_docker|ruby_docker|golang_docker|node_docker|csharp_docker]
 * http://localhost:5003 Go
 * http://localhost:5004 Node.Js
 * http://localhost:5005 C#
+
+## Webhooks
+
+To receive Truv webhooks locally, use [ngrok](https://ngrok.com/) to expose your local server:
+
+```shell
+ngrok http <port>
+```
+
+Where `<port>` matches the language you are running (e.g. `5001` for Python, `5004` for Node.js). Copy the forwarding URL and set `https://<your-subdomain>.ngrok.io/webhook` as the webhook URL in the [Truv Dashboard](https://dashboard.truv.com/).

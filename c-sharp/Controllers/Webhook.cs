@@ -22,9 +22,14 @@ namespace c_sharp.Controllers
                 var signature = generateWebhookSign(body, Environment.GetEnvironmentVariable("API_SECRET"));
                 var document = JsonDocument.Parse(body);
                 Console.WriteLine("TRUV: Webhook Received");
-                Console.WriteLine("TRUV: Event type:      {0}", document.RootElement.GetProperty("event_type").GetString());
-                Console.WriteLine("TRUV: Status:          {0}", document.RootElement.GetProperty("status").GetString());
-                Console.WriteLine("TRUV: Signature match: {0}\n", Request.Headers["x-webhook-sign"].ToString() == signature);
+                Console.WriteLine("TRUV: Signature match: {0}", Request.Headers["x-webhook-sign"].ToString() == signature);
+                Console.WriteLine("TRUV: Event type:      {0}", document.RootElement.TryGetProperty("event_type", out var eventType) ? eventType.GetString() : "N/A");
+                if (!document.RootElement.TryGetProperty("status", out var status))
+                {
+                    Console.WriteLine("TRUV: No status, skipping\n");
+                    return String.Empty;
+                }
+                Console.WriteLine("TRUV: Status:          {0}\n", status.GetString());
                 return String.Empty;
             }
         }
