@@ -358,9 +358,14 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	signature := generate_webhook_sign(convertedBody, os.Getenv("API_SECRET"))
 
 	log.Println("TRUV: Webhook received")
+	log.Printf("TRUV: Signature match: %t\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
 	log.Printf("TRUV: Event type:      %s\n", parsedJson.EventType)
-	log.Printf("TRUV: Status:          %s\n", parsedJson.Status)
-	log.Printf("TRUV: Signature match: %t\n\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
+	if parsedJson.Status == "" {
+		log.Println("TRUV: No status, skipping\n")
+		fmt.Fprintf(w, "")
+		return
+	}
+	log.Printf("TRUV: Status:          %s\n\n", parsedJson.Status)
 
 	fmt.Fprintf(w, "")
 }

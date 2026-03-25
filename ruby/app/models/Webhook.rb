@@ -10,9 +10,13 @@ class Webhook
     signature = self.generate_webhook_sign(body, Truv.client_secret)
     jsonParse = JSON.parse(body)
     puts "TRUV: Webhook received"
+    puts "TRUV: Signature match: #{signature == headerSignature}"
     puts "TRUV: Event type: #{jsonParse['event_type']}"
-    puts "TRUV: Status:     #{jsonParse['status']}"
-    puts "TRUV: Signature match: #{signature == headerSignature}\n"
+    if jsonParse['status'].nil?
+      puts "TRUV: No status, skipping\n"
+      return ""
+    end
+    puts "TRUV: Status:     #{jsonParse['status']}\n"
     return ""
   end
 end

@@ -191,9 +191,14 @@ app.post('/webhook', async (req, res) => {
   const body = req.rawBody.toString();
 
   const webhook_sign = generate_webhook_sign(body, API_SECRET);
+  console.log(`TRUV: Signature match: ${webhook_sign === req.headers['x-webhook-sign']}`);
   console.log(`TRUV: Event type:      ${req.body.event_type}`);
-  console.log(`TRUV: Status:          ${req.body.status}`);
-  console.log(`TRUV: Signature match: ${webhook_sign === req.headers['x-webhook-sign']}\n`);
+  if (!req.body.status) {
+    console.log('TRUV: No status, skipping\n');
+    res.status(200).end();
+    return;
+  }
+  console.log(`TRUV: Status:          ${req.body.status}\n`);
 
   res.status(200).end();
 });

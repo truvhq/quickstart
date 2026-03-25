@@ -116,11 +116,15 @@ def webhook():
     """
     signature = generate_webhook_sign(request.data.decode("UTF-8"), secret)
     logging.info("TRUV: Webhook received")
-    logging.info("TRUV: Event type:      %s", request.json["event_type"])
-    logging.info("TRUV: Status:          %s", request.json["status"])
     logging.info(
-        "TRUV: Signature match: %s\n", request.headers["X-WEBHOOK-SIGN"] == signature
+        "TRUV: Signature match: %s", request.headers["X-WEBHOOK-SIGN"] == signature
     )
+    data = request.json
+    logging.info("TRUV: Event type:      %s", data.get("event_type"))
+    if "status" not in data:
+        logging.info("TRUV: No status, skipping\n")
+        return ""
+    logging.info("TRUV: Status:          %s\n", data.get("status"))
     return ""
 
 
