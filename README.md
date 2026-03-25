@@ -42,3 +42,13 @@ make [python_docker|ruby_docker|golang_docker|node_docker|csharp_docker]
 * http://localhost:5003 Go
 * http://localhost:5004 Node.Js
 * http://localhost:5005 C#
+
+## Webhooks
+
+To receive Truv webhooks locally, use [ngrok](https://ngrok.com/) to expose your local server:
+
+```shell
+ngrok http <port>
+```
+
+Where `<port>` matches the language you are running (e.g. `5001` for Python, `5004` for Node.js). Copy the forwarding URL and set `https://<your-subdomain>.ngrok.io/webhook` as the webhook URL in the [Truv Dashboard](https://dashboard.truv.com/).
