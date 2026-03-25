@@ -28,7 +28,7 @@ Once you have your API keys, it's time to run the Truv Python Quickstart app loc
     IS_ORDER=<true or false - optional, defaults to true>
     ```
 
-    **Note:** The default flow uses the Orders API, which is best suited for use cases where multiple connections are required from the user. Set `IS_ORDER=false` to use the Users API instead.
+    **Note:** The default flow uses the Orders API, which is best suited for use cases where multiple connections are required from the user. Set `IS_ORDER=false` for a single connection flow, which fits best consumer lending, deposit switching, and financial account aggregation use cases.
 
 5. `make python_local`
 
