@@ -651,13 +651,9 @@
         // Step 2 - Call your back end to retrieve a bridge token from truv
         const bridgeToken = await apiRequests.getBridgeToken()
 
-        let orderFlag = false
-        if (bridgeToken.id) orderFlag = true
-
         // Step 3 - Initialize the Truv Bridge
         const bridge = TruvBridge.init({
           bridgeToken: bridgeToken.bridge_token,
-          isOrder: orderFlag,
           onLoad: function () {
             console.log("onLoad callback called")
             successClosing = null

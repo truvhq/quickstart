@@ -28,7 +28,12 @@ var accessToken *AccessTokenResponse
 // given in the API_PRODUCT_TYPE environment variable
 func homePage(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
-	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s.html", productType))
+	isOrder := strings.TrimSpace(os.Getenv("IS_ORDER"))
+	prefix := ""
+	if !(isOrder == "" || strings.ToLower(isOrder) == "true") {
+		prefix = "single-connection/"
+	}
+	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s%s.html", prefix, productType))
 	check(err)
 	html := string(dat)
 	

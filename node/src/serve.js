@@ -2,8 +2,9 @@ import { readFileSync } from 'fs';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const { API_PRODUCT_TYPE } = process.env;
+const { API_PRODUCT_TYPE, IS_ORDER } = process.env;
 const validProductTypes = ['employment', 'income', 'pll', 'deposit_switch'];
+const isOrder = IS_ORDER === undefined || IS_ORDER.trim() === '' || IS_ORDER.trim().toLowerCase() === 'true';
 
 if (validProductTypes.indexOf(API_PRODUCT_TYPE) < 0) {
   console.error('Not a Valid Product Type. Please specify an API_PRODUCT_TYPE of the following:');
@@ -11,7 +12,8 @@ if (validProductTypes.indexOf(API_PRODUCT_TYPE) < 0) {
   process.exit(-1);
 }
 
-const html = readFileSync(`../html/${API_PRODUCT_TYPE}.html`)
+const prefix = isOrder ? '' : 'single-connection/';
+const html = readFileSync(`../html/${prefix}${API_PRODUCT_TYPE}.html`)
   .toString()
   .replace('{{ product_type }}', API_PRODUCT_TYPE);
 
