@@ -24,7 +24,7 @@ Once you have your API keys, it's time to run the Truv NodeJS Quickstart app loc
     ```bash
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-    API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or pll>
+    API_PRODUCT_TYPE=<employment, income, deposit_switch or pll>
     IS_ORDER=<true or false - optional, defaults to true>
     ```
 

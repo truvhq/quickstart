@@ -25,7 +25,7 @@ Once you have your API keys, it's time to run the Truv Go Quickstart app locally
     ```bash
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-    API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or fas>
+    API_PRODUCT_TYPE=<employment, income, deposit_switch or pll>
     IS_ORDER=<true or false - optional, defaults to true>
     ```
 
