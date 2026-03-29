@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const { API_PRODUCT_TYPE } = process.env;
-const validProductTypes = ['employment', 'income', 'admin', 'pll', 'deposit_switch'];
+const validProductTypes = ['employment', 'income', 'pll', 'deposit_switch'];
 
 if (validProductTypes.indexOf(API_PRODUCT_TYPE) < 0) {
   console.error('Not a Valid Product Type. Please specify an API_PRODUCT_TYPE of the following:');

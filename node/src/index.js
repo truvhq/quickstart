@@ -7,9 +7,6 @@ import crypto from 'crypto';
 
 import {
   getAccessToken,
-  getEmployeeDirectoryByToken,
-  getPayrollById,
-  requestPayrollReport,
   createRefreshTask,
   getRefreshTask,
   createUser,
@@ -120,39 +117,9 @@ app.get('/createRefreshTask', async (req, res) => {
       case 'income':
         res.json(await getLinkReport(accessTokenResponse.link_id, API_PRODUCT_TYPE));
         break;
-      case 'admin':
-        const accessToken = accessTokenResponse.access_token;
-        const directory = await getEmployeeDirectoryByToken(accessToken);
-        // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-        const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id;
-        const payroll = await getPayrollById(reportId);
-        const data = { directory, payroll };
-        res.json(data);
-        break;
     }
   } catch (e) {
     console.error('error with createRefreshTask');
-    console.error(e);
-    res.status(500).json({ success: false });
-  }
-});
-
-app.get('/getAdminData/:token', async (req, res) => {
-  // retrieve income verification information
-  try {
-    const accessTokenResponse = await getAccessToken(req.params.token);
-    accessToken = accessTokenResponse.access_token;
-
-    const directory = await getEmployeeDirectoryByToken(accessToken);
-
-    // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-    const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id;
-    const payroll = await getPayrollById(reportId);
-
-    const data = { directory, payroll };
-    res.json(data);
-  } catch (e) {
-    console.error('error with getAdminData');
     console.error(e);
     res.status(500).json({ success: false });
   }

@@ -125,57 +125,6 @@ const getLinkReport = async (link_id, product_type) => {
 }
 
 /**
- * Retrieves employee directories from Truv
- * @param {String} access_token
- * @return The response from Truv
- */
-const getEmployeeDirectoryByToken = async (access_token) => {
-  console.log(
-    'TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/links/reports/admin/',
-  );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-  });
-  return await sendRequest('links/reports/admin/', { body });
-};
-
-/**
- * Creates a payroll report in Truv
- * @param {String} access_token
- * @param {String} start_date
- * @param {String} end_date
- * @return The payroll report ID from Truv
- */
-const requestPayrollReport = async (access_token, start_date, end_date) => {
-  console.log(
-    'TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls',
-  );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-    start_date,
-    end_date,
-  });
-  return await sendRequest('administrators/payrolls/', { body });
-};
-
-/**
- * Retrieves a payroll report from Truv
- * @param {String} report_id
- * @return The payroll report ID from Truv
- */
-const getPayrollById = async (report_id) => {
-  console.log(
-    'TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}',
-  );
-  console.log(`TRUV: Report ID - ${report_id}`);
-  return await sendRequest(`administrators/payrolls/${report_id}`, {
-    method: 'GET',
-  });
-};
-
-/**
  * Create an order
  * https://docs.truv.com/reference/orders_create
  * @returns The response from Truv
@@ -239,9 +188,6 @@ const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
 
 export {
   getAccessToken,
-  getEmployeeDirectoryByToken,
-  requestPayrollReport,
-  getPayrollById,
   createRefreshTask,
   getRefreshTask,
   createUser,

@@ -101,32 +101,6 @@ class Truv
     sendRequest("refresh/tasks/#{task_id}/", nil, "GET")
   end
 
-  def self.getEmployeeDirectoryByToken(access_token)
-    if access_token == nil 
-      access_token = Truv.link_token["access_token"]
-    end
-    puts "TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/links/reports/admin/"
-    puts "TRUV: Access Token - #{access_token}"
-    body = { "access_token" => access_token }.to_json
-    sendRequest("links/reports/admin/", body, "POST")
-  end
-
-  def self.requestPayrollReport(access_token, start_date, end_date)
-    if access_token == nil 
-      access_token = Truv.link_token["access_token"]
-    end
-    puts "TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls/"
-    puts "TRUV: Access Token - #{access_token}"
-    body = { "access_token" => access_token, "start_date" => start_date, "end_date" => end_date }.to_json
-    sendRequest("administrators/payrolls/", body, "POST")
-  end
-
-  def self.getPayrollById(report_id)
-    puts "TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}/"
-    puts "TRUV: Report ID - #{report_id}"
-    sendRequest("administrators/payrolls/#{report_id}/", nil, "GET")
-  end
-
   def self.sendRequest(endpoint, body, method)
     uri = URI("https://prod.truv.com/v1/#{endpoint}")
     if method == "POST"

@@ -194,31 +194,6 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 
 	if productType == "employment" || productType == "income" {
 		refreshResponse, err = getLinkReport(accessToken.LinkId, productType)
-	} else if productType == "admin" {
-		directory, err := getEmployeeDirectoryByToken(accessToken.AccessToken)
-		if err != nil {
-			log.Println("Error getting Employee Directory", err)
-			fmt.Fprintf(w, `{ "success": false, "error": "Failed to get employee directory" }`)
-			return
-		}
-		
-		// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-		report, err := requestPayrollReport(accessToken.AccessToken, "2020-01-01", "2020-02-01")
-		if err != nil {
-			log.Println("Error requesting payroll report", err)
-			fmt.Fprintf(w, `{ "success": false, "error": "Failed to request payroll report" }`)
-			return
-		}
-
-		reportId := report.PayrollReportId
-		payroll, err := getPayrollById(reportId)
-		if err != nil {
-			log.Println("Error getting payroll by id", err)
-			fmt.Fprintf(w, `{ "success": false, "error": "Failed to get payroll by ID" }`)
-			return
-		}
-
-		refreshResponse = fmt.Sprintf(`{ "directory": %s, "payroll": %s }`, directory, payroll)
 	}
 	if err != nil {
 		log.Println("Error getting refresh data", err)
@@ -235,43 +210,6 @@ func find(slice []string, val string) (int, bool) {
 		}
 	}
 	return -1, false
-}
-
-// adminData accepts requests for admin data and sends the response
-func adminData(w http.ResponseWriter, r *http.Request) {
-	var err error
-	splitPath := strings.Split(r.URL.Path, "/")
-	token := splitPath[2]
-	accessToken, err := getAccessToken(token)
-	if err != nil {
-		log.Println("Error getting access token", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-		return
-	}
-	directory, err := getEmployeeDirectoryByToken(accessToken.AccessToken)
-	if err != nil {
-		log.Println("Error getting Employee Directory", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-		return
-	}
-	// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-	report, err := requestPayrollReport(accessToken.AccessToken, "2020-01-01", "2020-02-01")
-	if err != nil {
-		log.Println("Error requesting payroll report", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-		return
-	}
-	reportId := report.PayrollReportId
-	payroll, err := getPayrollById(reportId)
-	if err != nil {
-		log.Println("Error getting payroll by id", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-		return
-	}
-
-	data := fmt.Sprintf(`{ "directory": %s, "payroll": %s }`, directory, payroll)
-
-	fmt.Fprintf(w, data)
 }
 
 // getPaycheckLinkedLoanData retrieves pll data
@@ -330,8 +268,8 @@ func checkEnv() {
 		log.Println("No API_PRODUCT_TYPE provided")
 		os.Exit(1)
 	}
-	if productType != "employment" && productType != "income" && productType != "admin" && productType != "pll" && productType != "deposit_switch" {
-		log.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or pll")
+	if productType != "employment" && productType != "income" && productType != "pll" && productType != "deposit_switch" {
+		log.Println("API_PRODUCT_TYPE must be one of employment, income, deposit_switch or pll")
 		os.Exit(1)
 	}
 }
@@ -375,7 +313,6 @@ func handleRequests() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/getBridgeToken", bridgeToken)
 	http.HandleFunc("/getVerifications/", verifications)
-	http.HandleFunc("/getAdminData/", adminData)
 	http.HandleFunc("/getPaycheckLinkedLoanData/", getPaycheckLinkedLoanData)
 	http.HandleFunc("/getDepositSwitchData/", getDepositSwitchData)
 	http.HandleFunc("/createRefreshTask/", refresh)

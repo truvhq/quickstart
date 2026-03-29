@@ -80,20 +80,6 @@ type BridgeTokenRequest struct {
 	Account      *AccountRequest `json:"account,omitempty"`
 }
 
-// PayrollReportRequest defines the body of the request when requesting
-// a payroll report
-type PayrollReportRequest struct {
-	AccessToken string `json:"access_token"`
-	StartDate   string `json:"start_date"`
-	EndDate     string `json:"end_date"`
-}
-
-// PayrollReportResponse defines the body of the response when requesting
-// a payroll report
-type PayrollReportResponse struct {
-	PayrollReportId string `json:"payroll_report_id"`
-}
-
 // getRequest creates an http request with the required HTTP headers
 func getRequest(endpoint string, method string, body []byte) (*http.Request, error) {
 	clientId := os.Getenv("API_CLIENT_ID")
@@ -346,75 +332,3 @@ func getRefreshTask(taskId string) (string, error) {
 	return string(data), nil
 }
 
-// getEmployeeDirectoryByToken uses the given access token to request
-// the associated employee directory info
-func getEmployeeDirectoryByToken(access_token string) (string, error) {
-	log.Println("TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/links/reports/admin/")
-	log.Printf("TRUV: Access Token - %s\n", access_token)
-	accessToken := AccessTokenRequest{AccessToken: access_token}
-	jsonAccessToken, _ := json.Marshal(accessToken)
-	request, err := getRequest("link/reports/admin/", "POST", jsonAccessToken)
-	if err != nil {
-		return "", err
-	}
-
-	res, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return "", err
-	}
-
-	defer res.Body.Close()
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
-
-// requestPayrollReport uses the given access token to request
-// the associated payroll report
-func requestPayrollReport(access_token, start_date, end_date string) (*PayrollReportResponse, error) {
-	log.Println("TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls")
-	log.Printf("TRUV: Access Token - %s\n", access_token)
-	reportRequest := PayrollReportRequest{AccessToken: access_token, StartDate: start_date, EndDate: end_date}
-	jsonReportRequest, _ := json.Marshal(reportRequest)
-	payrollReport := PayrollReportResponse{}
-	request, err := getRequest("administrators/payrolls", "POST", jsonReportRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-	err = json.NewDecoder(res.Body).Decode(&payrollReport)
-	if err != nil {
-		return nil, err
-	}
-	return &payrollReport, nil
-}
-
-// getPayrollById requests the payroll report associated to the given id
-func getPayrollById(reportId string) (string, error) {
-	log.Println("TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}")
-	log.Printf("TRUV: Report ID - %s\n", reportId)
-	request, err := getRequest(fmt.Sprintf("administrators/payrolls/%s", reportId), "GET", nil)
-	if err != nil {
-		return "", err
-	}
-
-	res, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return "", err
-	}
-
-	defer res.Body.Close()
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
