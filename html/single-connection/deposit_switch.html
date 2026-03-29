@@ -66,6 +66,12 @@
         border-radius: 50%;
       }
 
+      .menu-icon {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+      }
+
       .progress-nav {
         display: flex;
         gap: 16px;
@@ -107,6 +113,14 @@
         margin-bottom: 40px;
       }
 
+      .screen-subtitle {
+        font-size: 16px;
+        color: #888;
+        margin-bottom: 32px;
+        text-align: center;
+        max-width: 320px;
+      }
+
       .welcome-subtitle {
         font-size: 14px;
         color: #757575;
@@ -117,9 +131,26 @@
         max-width: 320px;
       }
 
-      .form-group { margin-bottom: 24px; }
-      .form-label { display: block; font-size: 16px; color: var(--text-primary); margin-bottom: 8px; }
-      .form-input { width: 100%; padding: 16px; font-size: 16px; border: none; border-radius: 8px; background: var(--background-input); box-sizing: border-box; }
+      .form-group {
+        margin-bottom: 24px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 16px;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        background: var(--background-input);
+        box-sizing: border-box;
+      }
 
       .button {
         background: var(--primary-blue);
@@ -154,26 +185,100 @@
         width: 100%;
       }
 
-      .button:hover, .button-primary:hover { opacity: 0.9; }
+      .button:hover, .button-primary:hover {
+        opacity: 0.9;
+      }
 
       .spinner-container {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         background: rgba(255, 255, 255, 0.8);
-        display: flex; align-items: center; justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         z-index: 1000;
       }
 
-      .hidden { display: none; }
-      .screen { display: none; }
-      .screen.active { display: flex; flex-direction: column; flex: 1; }
-      #personalInfo.active { display: flex; flex-direction: column; }
+      .hidden {
+        display: none;
+      }
 
-      .data-section { background: var(--background-input); padding: 24px; border-radius: 8px; margin-top: 24px; }
-      .employment-data { margin: 20px 0; }
-      .data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #E0E0E0; }
-      .data-row:last-child { border-bottom: none; }
-      .data-label { color: var(--text-secondary); font-weight: 500; }
-      .data-value { color: var(--text-primary); font-weight: 600; }
+      #switchComplete {
+        margin-top: 0;
+      }
+
+      #switchComplete.hidden {
+        display: none;
+      }
+
+      #depositSwitch .button-container {
+        padding: 0 0 24px 0;
+        background: transparent;
+        margin-top: auto;
+      }
+
+      .data-section {
+        background: var(--background-input);
+        padding: 24px;
+        border-radius: 8px;
+        margin-top: 24px;
+      }
+
+      .review-data-container {
+        width: 100%;
+        max-width: 340px;
+      }
+
+      .review-data-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-top: 1px solid #F0F1F3;
+        color: #888;
+        font-size: 17px;
+      }
+
+      .review-data-row:first-child {
+        padding-top: 16px;
+      }
+
+      .review-data-row span[data-field] {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      pre {
+        background: white;
+        padding: 16px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+
+      @media (max-width: 390px) {
+        .app-container {
+          min-height: 100vh;
+          padding: 48px 16px;
+        }
+      }
+
+      .screen {
+        display: none;
+        flex: 1;
+      }
+
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .screen-center-content {
+        align-items: center;
+        margin-top: 40px;
+      }
 
       #welcomeScreen {
         padding: 0;
@@ -206,6 +311,10 @@
         margin-bottom: 20px;
       }
 
+      .feature-icon {
+        /* Define styles if needed, SVGs are inline */
+      }
+
       .feature-text-container {
         flex: 1;
       }
@@ -230,21 +339,87 @@
         font-weight: 500;
       }
 
-      @media (max-width: 390px) {
-        .app-container { min-height: 100vh; padding: 48px 16px; }
+      .switch-icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 24px;
       }
 
-      /* Order inline embed styles */
-      body.order-flow { margin: 0; height: 100vh; overflow: hidden; }
-      body.order-flow .header, body.order-flow .progress-nav { display: none; }
-      body.order-flow .app-container { height: 100vh; min-height: unset; padding: 0; }
-      #truv-embed { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-      #truv-embed iframe { flex: 1; border: none; }
+      .checkmark-icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 24px;
+      }
+
+      #depositSwitch {
+        text-align: left;
+        justify-content: flex-start;
+        padding: 40px 0 0 0;
+      }
+
+      #depositSwitch .subtitle {
+        margin-bottom: 24px;
+      }
+
+      #depositSwitch .content-wrapper {
+        flex-grow: 1;
+      }
+
+      #depositSwitch .toggle-icon-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 8px;
+        margin-top: 0;
+      }
+
+      #depositSwitch .steps-container {
+        max-width: 340px;
+        margin: 0 auto;
+      }
+
+      #depositSwitch .step-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 4px;
+      }
+
+      #depositSwitch .step-number {
+        width: 28px;
+        height: 28px;
+        border: 1.5px solid var(--primary-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-blue);
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      #depositSwitch .step-text {
+        font-size: 16px;
+        color: #222;
+        font-weight: 500;
+      }
+
+      #depositSwitch .step-divider {
+        height: 1px;
+        background: #F0F1F3;
+        margin-left: 36px;
+        margin-bottom: 4px;
+      }
+
+      .button-container {
+        padding: 0 0 24px 0;
+        background: transparent;
+        margin-top: auto;
+      }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-
+    
     <div class="spinner-container hidden">
       <div class="spinner-border" role="status">
         <span class="sr-only">Loading...</span>
@@ -281,7 +456,7 @@
               </g>
               <!-- Bank name -->
               <text x="28" y="80" fill="#fff" font-size="15" font-family="Inter, Arial, sans-serif" font-weight="600">YourBank</text>
-              <!-- Card number -->
+              <!-- Card number: single text, centered, 4 groups of 4 digits -->
               <text x="130" y="105" fill="#fff" font-size="16" font-family="monospace" letter-spacing="3" text-anchor="middle">1234 5678 9000 0000</text>
               <!-- Name and expiry -->
               <text x="28" y="128" fill="#fff" font-size="11" font-family="Inter, Arial, sans-serif" opacity="0.9">ALEX SMITH</text>
@@ -300,7 +475,7 @@
               <div class="feature-text-container">
                 <div class="feature-title">No impact, no worries</div>
                 <div class="feature-description">Check if you're pre-approved for card offers with no impact to your credit score.</div>
-                <a href="#" class="feature-link">See if I'm pre-approved &nbsp;&rarr;</a>
+                <a href="#" class="feature-link">See if I'm pre-approved &nbsp;→</a>
               </div>
             </div>
             <div class="feature-item">
@@ -308,7 +483,7 @@
               <div class="feature-text-container">
                 <div class="feature-title">Savings starts here</div>
                 <div class="feature-description">Keep your money growing with one of the best savings rates in America.</div>
-                <a href="#" class="feature-link">Compare accounts &nbsp;&rarr;</a>
+                <a href="#" class="feature-link">Compare accounts &nbsp;→</a>
               </div>
             </div>
           </div>
@@ -352,38 +527,54 @@
       </div>
 
       <div id="depositSwitch" class="screen">
-        <div id="truv-embed"></div>
-      </div>
-
-      <div id="switchComplete" class="screen">
-        <div class="data-section">
-          <h3>Please review your data</h3>
-          <div id="accountData" class="employment-data">
-            <div class="data-row">
-              <span class="data-label">Account Type:</span>
-              <span class="data-value" id="accountType"></span>
+        <div class="content-wrapper">
+          <!-- Toggle SVG icon -->
+          <div class="toggle-icon-container">
+            <svg width="48" height="24" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="44" height="20" rx="10" stroke="#4169E1" stroke-width="2" fill="none"/>
+              <circle cx="24" cy="12" r="8" stroke="#4169E1" stroke-width="2" fill="#fff"/>
+            </svg>
+          </div>
+          <h1 class="screen-title">Switch direct deposit</h1>
+          <div class="steps-container">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <span class="step-text">Find your employer</span>
             </div>
-            <div class="data-row">
-              <span class="data-label">Account Number:</span>
-              <span class="data-value" id="accountNumber"></span>
+            <div class="step-divider"></div>
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <span class="step-text">Sign in to your account</span>
             </div>
-            <div class="data-row">
-              <span class="data-label">Routing Number:</span>
-              <span class="data-value" id="routingNumber"></span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">Deposit Type:</span>
-              <span class="data-value" id="depositType"></span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">Deposit Amount:</span>
-              <span class="data-value" id="depositAmount"></span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">Initial Deposit:</span>
-              <span class="data-value" id="initialDeposit"></span>
+            <div class="step-divider"></div>
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <span class="step-text">Confirm pay distribution</span>
             </div>
           </div>
+        </div>
+        <div class="button-container">
+          <button class="button-primary" onclick="bridge.open()">
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <div id="switchComplete" class="screen screen-center-content">
+        <!-- Checkmark icon -->
+        <svg class="checkmark-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="32" fill="#F4F8FF"/>
+          <path d="M20 34L29 43L44 26" stroke="#4169E1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1 class="screen-title">Congratulations!</h1>
+        <div class="screen-subtitle">You will receive all the information to your email address.</div>
+        <div class="review-data-container">
+          <div class="review-data-row">Account type <span id="accountType" data-field="account-type"></span></div>
+          <div class="review-data-row">Account number <span id="accountNumber" data-field="account-number"></span></div>
+          <div class="review-data-row">Routing number <span id="routingNumber" data-field="routing-number"></span></div>
+          <div class="review-data-row">Deposit type <span id="depositType" data-field="deposit-type"></span></div>
+          <div class="review-data-row">Deposit amount <span id="depositAmount" data-field="deposit-amount"></span></div>
+          <div class="review-data-row">Initial deposit <span id="initialDeposit" data-field="initial-deposit"></span></div>
         </div>
       </div>
     </div>
@@ -397,8 +588,10 @@
         } else {
           document.getElementById('mainNav').style.display = '';
         }
-        if (navIndex > currentStep) return;
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        if (navIndex > currentStep) {
+          return;
+        }
+        document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
         document.querySelector('.nav-item.active').classList.remove('active');
         document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
@@ -413,87 +606,112 @@
       function showDepositSwitch() {
         currentStep = 2;
         showScreen('depositSwitch', 2);
-        document.body.classList.add('order-flow')
-        if (window.bridge) bridge.open();
       }
 
       function getApiRequests(apiEndpoint) {
-        const headers = { "Content-Type": "application/json;charset=UTF-8" }
+        const headers = {
+          "Content-Type": "application/json;charset=UTF-8",
+        }
 
         const getBridgeToken = async () => {
-          const response = await fetch(apiEndpoint + `getBridgeToken`, { method: "get", headers }).then(r => r.json())
+          console.log("Requesting a bridge_token from the quickstart back end.")
+          const response = await fetch(apiEndpoint + `getBridgeToken`, {
+            method: "get",
+            headers,
+          }).then((r) => r.json())
           console.table(response)
           return response
         }
 
-        const getOrderData = async (orderId) => {
-          const response = await fetch(apiEndpoint + `getOrderData/${orderId}`, { method: "get", headers }).then(r => r.json())
-          console.table(response)
+        // sends a public_token to quickstart back end so the quickstart
+        // back end can exchange it with Truv for an access_token
+        const getDepositSwitchData = async (public_token) => {
+          const response = await fetch(
+            apiEndpoint + `getDepositSwitchData/${public_token}`,
+            {
+              method: "get",
+              headers,
+            }
+          ).then((r) => r.json())
           return response
         }
 
-        return { getBridgeToken, getOrderData }
+        return {
+          getBridgeToken,
+          getDepositSwitchData,
+        }
       }
 
       const apiRequests = getApiRequests("{{ server_url }}")
 
       ;(async function () {
-        // Step 2 - Call back end to create an order and get bridge token
-        const order = await apiRequests.getBridgeToken()
-        const orderId = order.id
+
+        let successClosing
+
+        // Step 2 - Call your back end to retrieve a bridge token from truv
+        const bridgeToken = await apiRequests.getBridgeToken()
+
+        let orderFlag = false
+        if (bridgeToken.id) orderFlag = true
 
         // Step 3 - Initialize the Truv Bridge
         const bridge = TruvBridge.init({
-          bridgeToken: order.bridge_token,
-          isOrder: true,
-          position: { type: 'inline', container: document.getElementById('truv-embed') },
+          bridgeToken: bridgeToken.bridge_token,
+          isOrder: orderFlag,
           onLoad: function () {
-            console.log("[TruvBridge] onLoad")
+            console.log("onLoad callback called")
+            successClosing = null
           },
-          onEvent: function (eventType, payload, source) {
-            console.log(`[TruvBridge] onEvent: ${eventType}`, { source, payload })
+          onEvent: async function (eventType, payload) {
+            console.log(`onEvent callback called. Event Type: ${eventType}`)
+            if (payload) console.log("onEvent payload:", payload)
+
+            if (eventType === "SUCCESS") {
+              successClosing = true
+
+              const content = document.querySelector(".spinner-container")
+              content.classList.remove("hidden")
+              let depositSwitchData
+              try {
+                console.log("Direct deposit switch has begun with user login. Exchanging public_token for access_token")
+                depositSwitchData = await apiRequests.getDepositSwitchData(payload.public_token)
+              } catch (e) {
+                console.error(e)
+                content.classList.add("hidden")
+                return
+              }
+              content.classList.add("hidden")
+
+              if (!depositSwitchData.deposit_details) {
+                return;
+              }
+              console.log("depositSwitchData: ", depositSwitchData)
+              renderAccountData(depositSwitchData)
+            }
           },
-          onSuccess: function () {
-            console.log("[TruvBridge] onSuccess")
+          onSuccess: async function (public_token, meta) {
+            console.log(
+              `onSuccess callback called. public_token: ${public_token}`
+            )
+            console.log("onSuccess meta: ", meta)
+
+            // Check if public_token is provided, return early if not
+            if (!public_token) {
+              console.log("No public_token received in onSuccess callback");
+              return;
+            }
+            
           },
-          onClose: async function () {
-            console.log("[TruvBridge] onClose")
-            await fetchAndRenderOrderData()
+          onClose: function () {
+            console.log("onClose callback called.")
           },
         })
-
-        async function fetchAndRenderOrderData() {
-          if (window.orderComplete) return
-          window.orderComplete = true
-          document.body.classList.remove('order-flow')
-
-          const content = document.querySelector(".spinner-container")
-          content.classList.remove("hidden")
-
-          let orderData
-          try {
-            orderData = await apiRequests.getOrderData(orderId)
-          } catch (e) {
-            console.error(e)
-            content.classList.add("hidden")
-            showScreen('personalInfo', 1)
-            return
-          }
-          content.classList.add("hidden")
-
-          if (orderData?.employers?.length) {
-            renderOrderData(orderData)
-          } else {
-            showScreen('personalInfo', 1)
-          }
-        }
-
         window.bridge = bridge
       })()
 
-      function renderOrderData(orderData) {
-        const employer = orderData.employers[0]
-        const depositDetails = employer?.employments?.[0]?.deposit_details || {}
+      function renderAccountData(data) {
+        const accountData = data.deposit_details;
+        if (!accountData) return;
 
         // Capitalize helper
         function capitalize(str) {
@@ -502,29 +720,27 @@
 
         // Mask account number except last 4 digits
         function maskAccountNumber(num) {
-          if (!num) return 'N/A';
+          if (!num) return '';
           const str = String(num);
           return '•••• ' + str.slice(-4);
         }
 
-        // Format deposit amount
+        // Format deposit amount (if available)
         function formatAmount(val) {
           if (!val || isNaN(val)) return '';
           return '$' + Number(val).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
 
-        document.getElementById("accountType").textContent = capitalize(depositDetails.account_type) || "N/A";
-        document.getElementById("accountNumber").textContent = maskAccountNumber(depositDetails.account_number);
-        document.getElementById("routingNumber").textContent = depositDetails.routing_number || "N/A";
-        document.getElementById("depositType").textContent = capitalize(depositDetails.deposit_type) || "N/A";
-        document.getElementById("depositAmount").textContent = depositDetails.deposit_value
-          ? formatAmount(depositDetails.deposit_value)
-          : (depositDetails.deposit_type === 'entire' ? 'Entire paycheck' : 'N/A');
-        document.getElementById("initialDeposit").textContent = "Scheduled";
+        document.getElementById('accountType').textContent = capitalize(accountData.account_type);
+        document.getElementById('accountNumber').textContent = maskAccountNumber(accountData.account_number);
+        document.getElementById('routingNumber').textContent = accountData.routing_number;
+        document.getElementById('depositType').textContent = capitalize(accountData.deposit_type);
+        document.getElementById('depositAmount').textContent = accountData.deposit_value ? formatAmount(accountData.deposit_value) : (accountData.deposit_type === 'entire' ? 'Entire paycheck' : '');
+        document.getElementById('initialDeposit').textContent = "Scheduled";
 
         document.getElementById("depositSwitch").classList.remove('active');
         document.getElementById("switchComplete").classList.add('active');
-        currentStep = 3;
+        // Update nav highlighting
         document.querySelector('.nav-item.active').classList.remove('active');
         document.querySelectorAll('.nav-item')[3].classList.add('active');
       }

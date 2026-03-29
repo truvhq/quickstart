@@ -69,20 +69,22 @@ def index():
     """
     Render bridge.js
     """
+    prefix = "" if is_order else "single-connection/"
+
     if product_type == "income":
-        return render_template("income.html")
+        return render_template(f"{prefix}income.html")
 
     elif product_type == "admin":
-        return render_template("admin.html")
+        return render_template(f"{prefix}admin.html")
 
     elif product_type == "deposit_switch":
-        return render_template("deposit_switch.html")
+        return render_template(f"{prefix}deposit_switch.html")
 
     elif product_type == "pll":
-        return render_template("pll.html")
+        return render_template(f"{prefix}pll.html")
 
     else:
-        return render_template("employment.html")
+        return render_template(f"{prefix}employment.html")
 
 
 @app.route("/getBridgeToken", methods=["GET"])
@@ -126,6 +128,14 @@ def webhook():
         return ""
     logging.info("TRUV: Status:          %s\n", data.get("status"))
     return ""
+
+
+@app.route("/getOrderData/<order_id>", methods=["GET"])
+def get_order_data(order_id: str):
+    """
+    API endpoint to retrieve order data by order ID
+    """
+    return api_client.get_order(order_id)
 
 
 @app.route("/getVerifications/<public_token>", methods=["GET"])

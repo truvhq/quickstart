@@ -66,12 +66,6 @@
         border-radius: 50%;
       }
 
-      .menu-icon {
-        width: 24px;
-        height: 24px;
-        cursor: pointer;
-      }
-
       .progress-nav {
         display: flex;
         gap: 16px;
@@ -97,50 +91,16 @@
         color: var(--text-primary);
         margin-bottom: 8px;
       }
-      
-      .screen-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--text-primary);
-        text-align: center;
-        margin-bottom: 18px;
-        margin-top: 0;
-      }
 
       .subtitle {
         font-size: 16px;
         color: var(--text-secondary);
         margin-bottom: 40px;
       }
-      
-      .screen-subtitle {
-        font-size: 16px;
-        color: #888;
-        margin-bottom: 32px;
-        text-align: center;
-        max-width: 320px;
-      }
 
-      .form-group {
-        margin-bottom: 24px;
-      }
-
-      .form-label {
-        display: block;
-        font-size: 16px;
-        color: var(--text-primary);
-        margin-bottom: 8px;
-      }
-
-      .form-input {
-        width: 100%;
-        padding: 16px;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
-        background: var(--background-input);
-        box-sizing: border-box;
-      }
+      .form-group { margin-bottom: 24px; }
+      .form-label { display: block; font-size: 16px; color: var(--text-primary); margin-bottom: 8px; }
+      .form-input { width: 100%; padding: 16px; font-size: 16px; border: none; border-radius: 8px; background: var(--background-input); box-sizing: border-box; }
 
       .button {
         background: var(--primary-blue);
@@ -154,156 +114,43 @@
         cursor: pointer;
         margin-top: auto;
       }
-      
-      .button-primary {
-        width: 100%;
-        max-width: 100%;
-        border-radius: 32px;
-        font-size: 18px;
-        font-weight: 700;
-        background: var(--primary-blue);
-        color: white;
-        border: none;
-        padding: 16px;
-        cursor: pointer;
-        height: 52px; 
-      }
 
-      .button:hover, .button-primary:hover {
-        opacity: 0.9;
-      }
+      .button:hover { opacity: 0.9; }
 
       .spinner-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
         background: rgba(255, 255, 255, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         z-index: 1000;
       }
 
-      .hidden {
-        display: none;
-      }
+      .hidden { display: none; }
+      .screen { display: none; }
+      .screen.active { display: flex; flex-direction: column; flex: 1; }
+      #personalInfo.active { display: flex; flex-direction: column; }
 
-      #employmentComplete {
-        margin-top: 0;
-      }
-
-      #employmentComplete.hidden {
-        display: none;
-      }
-
-      #employmentVerification .button-container {
-        /* Inherits styles */
-      }
-
-      /* Review screen data styles */
-       .review-data-container {
-        width: 100%;
-        max-width: 340px;
-      }
-
-      .review-data-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 0;
-        border-top: 1px solid #F0F1F3;
-        color: #888;
-        font-size: 17px;
-      }
-
-      .review-data-row:first-child {
-          padding-top: 16px;
-      }
-
-      .review-data-row span[data-field] {
-        font-weight: 600;
-        color: var(--text-primary);
-      }
-      
-      .refresh-message {
-          margin-top: 16px;
-          text-align: center;
-          font-size: 14px;
-          color: var(--text-secondary);
-      }
-      
-      .refresh-button {
-          margin-top: 24px; /* Spacing above button */
-      }
-
-      pre {
-        background: white;
-        padding: 16px;
-        border-radius: 4px;
-        overflow-x: auto;
-      }
+      .data-section { background: var(--background-input); padding: 24px; border-radius: 8px; margin-top: 24px; }
+      .employment-data { margin: 20px 0; }
+      .data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #E0E0E0; }
+      .data-row:last-child { border-bottom: none; }
+      .data-label { color: var(--text-secondary); font-weight: 500; }
+      .data-value { color: var(--text-primary); font-weight: 600; }
 
       @media (max-width: 390px) {
-        .app-container {
-          min-height: 100vh;
-          padding: 48px 16px;
-        }
+        .app-container { min-height: 100vh; padding: 48px 16px; }
       }
 
-      .screen {
-        display: none;
-        flex: 1;
-      }
-
-      .screen.active {
-        display: flex;
-        flex-direction: column;
-      }
-      
-      .screen-center-content {
-         align-items: center;
-         margin-top: 40px; 
-      }
-
-      .employment-icon {
-        width: 64px;
-        height: 64px;
-        margin-bottom: 24px;
-      }
-      
-      .checkmark-icon {
-        width: 64px;
-        height: 64px;
-        margin-bottom: 24px;
-      }
-
-      #employmentVerification {
-        text-align: left;
-        justify-content: flex-start; /* Align content to start */
-        padding: 40px 0 0 0;
-      }
-
-      #employmentVerification .subtitle {
-        margin-bottom: 24px;
-      }
-
-      #employmentVerification .content-wrapper {
-         flex-grow: 1;
-      }
-      
-      .button-container {
-        padding: 0 0 24px 0; 
-        background: transparent;
-        margin-top: auto;
-      }
-      
+      /* Order inline embed styles */
+      body.order-flow { margin: 0; height: 100vh; overflow: hidden; }
+      body.order-flow .header, body.order-flow .progress-nav { display: none; }
+      body.order-flow .app-container { height: 100vh; min-height: unset; padding: 0; }
+      #truv-embed { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+      #truv-embed iframe { flex: 1; border: none; }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    
+
     <div class="spinner-container hidden">
       <div class="spinner-border" role="status">
         <span class="sr-only">Loading...</span>
@@ -354,46 +201,35 @@
       </div>
 
       <div id="employmentVerification" class="screen">
-         <div class="content-wrapper">
-            <svg class="employment-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="32" cy="32" r="32" fill="#E8EDFF"/>
-                <path d="M22 28C22 26.8954 22.8954 26 24 26H40C41.1046 26 42 26.8954 42 28V40C42 41.1046 41.1046 42 40 42H24C22.8954 42 22 41.1046 22 40V28Z" stroke="#4169E1" stroke-width="2"/>
-                <path d="M36 26V22C36 20.8954 35.1046 20 34 20H30C28.8954 20 28 20.8954 28 22V26" stroke="#4169E1" stroke-width="2"/>
-                <path d="M28 34H36" stroke="#4169E1" stroke-width="2" stroke-linecap="round"/>
-                <path d="M28 38H32" stroke="#4169E1" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-    
-            <h1 class="title">Employment Verification</h1>
-            <p class="subtitle">To proceed, we need to verify your employment details through your payroll provider.</p>
-        </div>
-        <div class="button-container">
-            <button class="button-primary" onclick="bridge.open()">Connect Payroll</button>
-        </div>
+        <div id="truv-embed"></div>
       </div>
 
-      <div id="employmentComplete" class="screen screen-center-content">
-          <svg class="checkmark-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="32" fill="#F4F8FF"/>
-            <path d="M20 34L29 43L44 26" stroke="#4169E1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <h1 class="screen-title">Verification Complete</h1>
-          <div class="screen-subtitle">Please review your employment data below.</div>
-          
-          <div class="review-data-container">
-            <div class="review-data-row">Employer Name <span id="employerName" data-field="employerName"></span></div>
-            <div class="review-data-row">Job Title <span id="jobTitle" data-field="jobTitle"></span></div>
-            <div class="review-data-row">Employment Status <span id="employmentStatus" data-field="employmentStatus"></span></div>
-            <div class="review-data-row">Start Date <span id="startDate" data-field="startDate"></span></div>
-            <div class="review-data-row">End Date <span id="endDate" data-field="endDate"></span></div>
+      <div id="employmentComplete" class="screen">
+        <div class="data-section">
+          <h3>Please review your data</h3>
+          <div id="employmentData" class="employment-data">
+            <div class="data-row">
+              <span class="data-label">Employer:</span>
+              <span class="data-value" id="employerName"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Job Title:</span>
+              <span class="data-value" id="jobTitle"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Employment Status:</span>
+              <span class="data-value" id="employmentStatus"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Start Date:</span>
+              <span class="data-value" id="startDate"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">End Date:</span>
+              <span class="data-value" id="endDate"></span>
+            </div>
           </div>
-          
-          <div id="refreshMessage" class="refresh-message hidden">
-             Last updated: <span id="refreshTime"></span>
-          </div>
-
-          <button class="button refresh-button" id="refreshButton" onclick="refresh()">
-             Refresh Data
-          </button>
+        </div>
       </div>
     </div>
 
@@ -401,192 +237,110 @@
       let currentStep = 0;
 
       function showScreen(screenId, navIndex) {
-        // Prevent skipping steps
-        if (navIndex > currentStep) {
-          return;
-        }
-        
-        // Hide all screens
-        document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-        
-        // Show selected screen
+        if (navIndex > currentStep) return;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
-        
-        // Update navigation
         document.querySelector('.nav-item.active').classList.remove('active');
         document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
-
         currentStep = navIndex;
       }
 
       function showEmploymentVerification() {
         currentStep = 1;
         showScreen('employmentVerification', 1);
+        document.body.classList.add('order-flow')
+        if (window.bridge) bridge.open();
       }
 
       function getApiRequests(apiEndpoint) {
-        const headers = {
-          "Content-Type": "application/json;charset=UTF-8",
-        }
+        const headers = { "Content-Type": "application/json;charset=UTF-8" }
 
         const getBridgeToken = async () => {
-          console.log("Requesting a bridge_token from the quickstart back end.")
-          const response = await fetch(apiEndpoint + `getBridgeToken`, {
-            method: "get",
-            headers,
-          }).then((r) => r.json())
+          const response = await fetch(apiEndpoint + `getBridgeToken`, { method: "get", headers }).then(r => r.json())
           console.table(response)
           return response
         }
 
-        const getVerificationInfoByToken = async (public_token) => {
-          console.log("Requesting employment verification data from the quickstart back end with public_token.")
-          const response = await fetch(
-            apiEndpoint + `getVerifications/${public_token}`,
-            {
-              method: "get",
-              headers,
-            }
-          ).then((r) => r.json())
+        const getOrderData = async (orderId) => {
+          const response = await fetch(apiEndpoint + `getOrderData/${orderId}`, { method: "get", headers }).then(r => r.json())
           console.table(response)
-          console.table(response.employments)
-          return response.employments
+          return response
         }
 
-        const createRefreshTask = async () => {
-          console.log("Requesting a data refresh from the quickstart back end.")
-          const response = await fetch(apiEndpoint + `createRefreshTask`, {
-            method: "get",
-            headers,
-          }).then((r) => r.json())
-          console.table(response)
-          console.table(response.employments)
-          return response.employments
-        }
-
-        return {
-          getVerificationInfoByToken,
-          getBridgeToken,
-          createRefreshTask,
-        }
+        return { getBridgeToken, getOrderData }
       }
 
       const apiRequests = getApiRequests("{{ server_url }}")
 
       ;(async function () {
-
-        let successClosing
-
-        // Step 2 - Call your back end to retrieve a bridge token from truv
-        const bridgeToken = await apiRequests.getBridgeToken()
-
-        let orderFlag = false
-        if (bridgeToken.id) orderFlag = true
+        // Step 2 - Call back end to create an order and get bridge token
+        const order = await apiRequests.getBridgeToken()
+        const orderId = order.id
 
         // Step 3 - Initialize the Truv Bridge
         const bridge = TruvBridge.init({
-          bridgeToken: bridgeToken.bridge_token,
-          isOrder: orderFlag,
+          bridgeToken: order.bridge_token,
+          isOrder: true,
+          position: { type: 'inline', container: document.getElementById('truv-embed') },
           onLoad: function () {
-            console.log("onLoad callback called")
-            successClosing = null
+            console.log("[TruvBridge] onLoad")
           },
-          onEvent: async function (eventType, payload) {
-            console.log(`onEvent callback called. Event Type: ${eventType}`)
-            if (payload) console.log("onEvent payload:", payload)
-
-            if (eventType === "SUCCESS") {
-              successClosing = true
-
-              const content = document.querySelector(".spinner-container")
-              content.classList.remove("hidden")
-
-              // Add 2 second delay before making the request
-              await new Promise(resolve => setTimeout(resolve, 2000));
-
-              let verificationInfo
-              try {
-                verificationInfo = await apiRequests.getVerificationInfoByToken(
-                  payload.public_token
-                )
-              } catch (e) {
-                console.error(e)
-                content.classList.add("hidden")
-                return
-              }
-              content.classList.add("hidden")
-
-              if (!verificationInfo?.length) {
-                return
-              }
-
-              renderEmploymentData(verificationInfo)
-            }
+          onEvent: function (eventType, payload, source) {
+            console.log(`[TruvBridge] onEvent: ${eventType}`, { source, payload })
           },
-          onSuccess: async function (public_token, meta) {
-            console.log(
-              `onSuccess callback called. public_token: ${public_token}`
-            )
-            console.log("onSuccess meta: ", meta)
-
-            // Check if public_token is provided, return early if not
-            if (!public_token) {
-              console.log("No public_token received in onSuccess callback");
-              return;
-            }
-            
+          onSuccess: function () {
+            console.log("[TruvBridge] onSuccess")
           },
-          onClose: function () {
-            console.log("onClose callback called.")
+          onClose: async function () {
+            console.log("[TruvBridge] onClose")
+            await fetchAndRenderOrderData()
           },
         })
+
+        async function fetchAndRenderOrderData() {
+          if (window.orderComplete) return
+          window.orderComplete = true
+          document.body.classList.remove('order-flow')
+
+          const content = document.querySelector(".spinner-container")
+          content.classList.remove("hidden")
+
+          let orderData
+          try {
+            orderData = await apiRequests.getOrderData(orderId)
+          } catch (e) {
+            console.error(e)
+            content.classList.add("hidden")
+            showScreen('personalInfo', 0)
+            return
+          }
+          content.classList.add("hidden")
+
+          if (orderData?.employers?.length) {
+            renderOrderData(orderData)
+          } else {
+            showScreen('personalInfo', 0)
+          }
+        }
+
         window.bridge = bridge
       })()
 
-      async function refresh() {
-        const content = document.querySelector(".spinner-container")
+      function renderOrderData(orderData) {
+        const employer = orderData.employers[0]
+        const employment = employer?.employments?.[0] || {}
 
-            content.classList.remove("hidden")
-            let refreshedInfo
-            try {
-              refreshedInfo = await apiRequests.createRefreshTask()
-              document.getElementById("refreshMessage").classList.remove("hidden")
-              document.getElementById("refreshTime").innerHTML = new Date()
-            } catch (e) {
-              console.error(e)
-              content.classList.add("hidden")
-              return
-            }
-            content.classList.add("hidden")
-
-            if (!refreshedInfo.length) {
-              return
-            }
-
-            renderEmploymentData(refreshedInfo)
-      }
-
-      function renderEmploymentData(data) {
-        const employmentData = data[0]; // Get the first employment record
-        
-        // Debug logging
-        console.log('Employment Data:', employmentData);
-        
-        // Create date formatter
         const dateFormatter = new Intl.DateTimeFormat('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+          year: 'numeric', month: 'long', day: 'numeric'
         });
-        
-        // Format the data using getElementById
-        document.getElementById("employerName").textContent = employmentData.company?.name || "N/A";
-        document.getElementById("jobTitle").textContent = employmentData.job_title || "N/A";
-        document.getElementById("employmentStatus").textContent = employmentData.is_active ? "Active" : "Inactive";
-        document.getElementById("startDate").textContent = employmentData.start_date ? 
-            dateFormatter.format(new Date(employmentData.start_date)) : "N/A";
-        document.getElementById("endDate").textContent = employmentData.end_date ? 
-            dateFormatter.format(new Date(employmentData.end_date)) : "N/A";
+
+        document.getElementById("employerName").textContent = employment.company?.name || employer?.company_name || "N/A";
+        document.getElementById("jobTitle").textContent = employment.job_title || "N/A";
+        document.getElementById("employmentStatus").textContent = employment.is_active ? "Active" : "Inactive";
+        document.getElementById("startDate").textContent = employment.start_date
+          ? dateFormatter.format(new Date(employment.start_date)) : "N/A";
+        document.getElementById("endDate").textContent = employment.end_date
+          ? dateFormatter.format(new Date(employment.end_date)) : "N/A";
 
         document.getElementById("employmentVerification").classList.remove('active');
         document.getElementById("employmentComplete").classList.add('active');

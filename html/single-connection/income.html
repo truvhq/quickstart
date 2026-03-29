@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="theme-color" content="#000000" />
+
+    <title>YourBank - Income Verification</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" />
+    <script src="https://cdn.truv.com/bridge.js"></script>
+    <style>
+      :root {
+        --primary-blue: #4169E1;
+        --text-primary: #1A1A1A;
+        --text-secondary: #666666;
+        --background-input: #F8F9FA;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #F5F5F5;
+      }
+
+      .app-container {
+        width: 100%;
+        max-width: 390px;
+        min-height: 844px;
+        background: white;
+        padding: 48px 24px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 32px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 20px;
+        font-weight: 500;
+        color: var(--primary-blue);
+      }
+
+      .logo-circle {
+        width: 24px;
+        height: 24px;
+        background: var(--primary-blue);
+        border-radius: 50%;
+      }
+
+      .menu-icon {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+      }
+
+      .progress-nav {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 40px;
+      }
+
+      .nav-item {
+        font-size: 16px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding-bottom: 8px;
+        border-bottom: 2px solid transparent;
+      }
+
+      .nav-item.active {
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--primary-blue);
+      }
+
+      .title {
+        font-size: 32px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+        color: var(--text-secondary);
+        margin-bottom: 40px;
+      }
+
+      .form-group {
+        margin-bottom: 24px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 16px;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        background: var(--background-input);
+        box-sizing: border-box;
+      }
+
+      .button {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 16px;
+        width: 100%;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: 100px;
+        cursor: pointer;
+        margin-top: auto;
+      }
+
+      .button:hover {
+        opacity: 0.9;
+      }
+
+      .spinner-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      #incomeComplete {
+        margin-top: 0;
+      }
+
+      #incomeComplete.hidden {
+        display: none;
+      }
+
+      #incomeVerification .button {
+        margin-top: auto;
+      }
+
+      .data-section {
+        background: var(--background-input);
+        padding: 24px;
+        border-radius: 8px;
+        margin-top: 24px;
+      }
+
+      .employment-data {
+        margin: 20px 0;
+      }
+
+      .data-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #E0E0E0;
+      }
+
+      .data-row:last-child {
+        border-bottom: none;
+      }
+
+      .data-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .data-value {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      pre {
+        background: white;
+        padding: 16px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+
+      @media (max-width: 390px) {
+        .app-container {
+          min-height: 100vh;
+          padding: 48px 16px;
+        }
+      }
+
+      .screen {
+        display: none;
+      }
+
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+
+      #personalInfo.active {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .income-icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 24px;
+      }
+
+      #incomeVerification {
+        text-align: left;
+        justify-content: center;
+        padding: 40px 0;
+      }
+
+      #incomeVerification .subtitle {
+        margin-bottom: 24px;
+      }
+
+      #incomeVerification .content-wrapper {
+        margin-bottom: 32px;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    
+    <div class="spinner-container hidden">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+
+    <div class="app-container">
+      <header class="header">
+        <div class="logo">
+          <div class="logo-circle"></div>
+          YourBank
+        </div>
+      </header>
+
+      <nav class="progress-nav">
+        <a href="#" class="nav-item active" onclick="showScreen('personalInfo', 0); return false;">My info</a>
+        <a href="#" class="nav-item" onclick="showScreen('incomeVerification', 1); return false;">Income</a>
+        <a href="#" class="nav-item" onclick="showScreen('incomeComplete', 2); return false;">Submit</a>
+      </nav>
+
+      <div id="personalInfo" class="screen active">
+        <h1 class="title">Your information</h1>
+        <p class="subtitle">Fill in your details to apply for a mortgage loan.</p>
+
+        <div class="form-group">
+          <label class="form-label">First name</label>
+          <input type="text" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Last name</label>
+          <input type="text" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date of birth</label>
+          <input type="date" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Social security number</label>
+          <input type="text" class="form-input" pattern="[0-9]*" />
+        </div>
+
+        <button class="button" onclick="showIncomeVerification()">
+          Continue
+        </button>
+      </div>
+
+      <div id="incomeVerification" class="screen">
+        <div class="content-wrapper">
+          <svg class="income-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="32" fill="#E8EDFF"/>
+            <path d="M20 24C20 22.8954 20.8954 22 22 22H42C43.1046 22 44 22.8954 44 24V32C44 39.732 37.732 46 30 46H22C20.8954 46 20 45.1046 20 44V24Z" stroke="#4169E1" stroke-width="2"/>
+            <path d="M26 22V18C26 16.8954 26.8954 16 28 16H36C37.1046 16 38 16.8954 38 18V22" stroke="#4169E1" stroke-width="2"/>
+            <circle cx="32" cy="34" r="6" stroke="#4169E1" stroke-width="2"/>
+            <path d="M29 34L31 36L35 32" stroke="#4169E1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+
+          <h1 class="title">Income verification</h1>
+          <p class="subtitle">To proceed with your application, we need to verify your income and employment information</p>
+        </div>
+
+        <button class="button" onclick="bridge.open()">
+          Continue
+        </button>
+      </div>
+
+      <div id="incomeComplete" class="screen">
+        <div class="data-section">
+          <h3>Please review your data</h3>
+          <div id="employmentData" class="employment-data">
+            <div class="data-row">
+              <span class="data-label">Employer:</span>
+              <span class="data-value" id="employerName"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Job Title:</span>
+              <span class="data-value" id="jobTitle"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Employment Status:</span>
+              <span class="data-value" id="employmentStatus"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Income:</span>
+              <span class="data-value" id="incomeAmount"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Last Statement Date:</span>
+              <span class="data-value" id="lastPayDate"></span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Gross Pay:</span>
+              <span class="data-value" id="grossPay"></span>
+            </div>
+          </div>
+          <div id="refreshMessage" class="hidden">
+            Last updated: <span id="refreshTime"></span>
+          </div>
+          <button class="button" id="refreshButton" onclick="refresh()">
+            Refresh Data
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentStep = 0;
+
+      function showScreen(screenId, navIndex) {
+        // Prevent skipping steps
+        if (navIndex > currentStep) {
+          return;
+        }
+        
+        // Hide all screens
+        document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+        
+        // Show selected screen
+        document.getElementById(screenId).classList.add('active');
+        
+        // Update navigation
+        document.querySelector('.nav-item.active').classList.remove('active');
+        document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+
+        currentStep = navIndex;
+      }
+
+      function showIncomeVerification() {
+        currentStep = 1;
+        showScreen('incomeVerification', 1);
+      }
+
+      function getApiRequests(apiEndpoint) {
+        const headers = {
+          "Content-Type": "application/json;charset=UTF-8",
+        }
+
+        const getBridgeToken = async () => {
+          console.log("Requesting a bridge_token from the quickstart back end.")
+          const response = await fetch(apiEndpoint + `getBridgeToken`, {
+            method: "get",
+            headers,
+          }).then((r) => r.json())
+          console.table(response)
+          return response
+        }
+
+        /**
+         * @return {Promise<IncomeItem[]>}
+         */
+        const getVerificationInfoByToken = async (public_token) => {
+          console.log("Requesting income verification data from the quickstart back end with public_token.")
+          const response = await fetch(
+            apiEndpoint + `getVerifications/${public_token}`,
+            {
+              method: "get",
+              headers,
+            }
+          ).then((r) => r.json())
+          console.table(response)
+          console.table(response.employments)
+          return response.employments
+        }
+
+        const createRefreshTask = async () => {
+          console.log("Requesting a data refresh from the quickstart back end.")
+          const response = await fetch(apiEndpoint + `createRefreshTask`, {
+            method: "get",
+            headers,
+          }).then((r) => r.json())
+          console.table(response)
+          console.table(response.employments)
+          return response.employments
+        }
+
+        return {
+          getVerificationInfoByToken,
+          getBridgeToken,
+          createRefreshTask,
+        }
+      }
+
+      const apiRequests = getApiRequests("{{ server_url }}")
+
+      ;(async function () {
+
+        let successClosing
+
+        // Step 2 - Call your back end to retrieve a bridge token from truv
+        const bridgeToken = await apiRequests.getBridgeToken()
+
+        let orderFlag = false
+        // Order API returns ID while BridgeToken does not
+        if (bridgeToken.id) orderFlag = true
+
+        // Step 3 - Initialize the Truv Bridge
+        const bridge = TruvBridge.init({
+          bridgeToken: bridgeToken.bridge_token,
+          isOrder: orderFlag,
+          onLoad: function () {
+            console.log("onLoad callback called")
+            successClosing = null
+          },
+          onEvent: async function (eventType, payload) {
+            console.log(`onEvent callback called. Event Type: ${eventType}`)
+            if (payload) console.log("onEvent payload:", payload)
+
+            if (eventType === "SUCCESS") {
+              successClosing = true
+
+              const content = document.querySelector(".spinner-container")
+              content.classList.remove("hidden")
+
+              // Add 2 second delay before making the request
+              await new Promise(resolve => setTimeout(resolve, 2000));
+
+              let verificationInfo
+              try {
+                verificationInfo = await apiRequests.getVerificationInfoByToken(
+                  payload.public_token
+                )
+              } catch (e) {
+                console.error(e)
+                content.classList.add("hidden")
+                return
+              }
+              content.classList.add("hidden")
+
+              if (!verificationInfo?.length) {
+                return
+              }
+
+              renderPayrollData(verificationInfo)
+            }
+          },
+          onSuccess: async function (public_token, meta) {
+            console.log(
+              `onSuccess callback called. public_token: ${public_token}`
+            )
+            console.log("onSuccess meta: ", meta)
+
+            // Check if public_token is provided, return early if not
+            if (!public_token) {
+              console.log("No public_token received in onSuccess callback");
+              return;
+            }
+            
+          },
+          onClose: function () {
+            console.log("onClose callback called.")
+          },
+        })
+        window.bridge = bridge
+      })()
+
+      async function refresh() {
+        const content = document.querySelector(".spinner-container")
+
+            content.classList.remove("hidden")
+            let refreshedInfo
+            try {
+              refreshedInfo = await apiRequests.createRefreshTask()
+              document.getElementById("refreshMessage").classList.remove("hidden")
+              document.getElementById("refreshTime").innerHTML = new Date()
+            } catch (e) {
+              console.error(e)
+              content.classList.add("hidden")
+              return
+            }
+            content.classList.add("hidden")
+
+            if (!refreshedInfo.length) {
+              return
+            }
+
+            renderPayrollData(refreshedInfo)
+      }
+
+      function formatIncomeUnit(unit) {
+        const unitMap = {
+          'YEARLY': 'Annually',
+          'MONTHLY': 'Monthly',
+          'BI_WEEKLY': 'Bi-weekly',
+          'WEEKLY': 'Weekly',
+          'DAILY': 'Daily',
+          'HOURLY': 'Hourly'
+        };
+        return unitMap[unit] || unit;
+      }
+
+      /**
+       *
+       * @param {IncomeItem[]} incomes
+       */
+      function renderPayrollData(data) {
+        const employmentData = data[0]; // Get the first employment record
+        
+        // Debug logging
+        console.log('Employment Data:', employmentData);
+        console.log('Statements:', employmentData.statements);
+        
+        // Create currency formatter
+        const currencyFormatter = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+
+        // Create date formatter
+        const dateFormatter = new Intl.DateTimeFormat('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        // Format the data
+        document.getElementById("employerName").textContent = employmentData.company?.name || "N/A";
+        document.getElementById("jobTitle").textContent = employmentData.job_title || "N/A";
+        document.getElementById("employmentStatus").textContent = employmentData.is_active ? "Active" : "Inactive";
+        document.getElementById("incomeAmount").textContent = `${currencyFormatter.format(employmentData.income)} ${formatIncomeUnit(employmentData.income_unit)}`;
+        
+        // Format pay date and gross pay from statements
+        const statement = employmentData.statements?.[0];
+        console.log('First Statement:', statement);
+        
+        // Check if statement exists and has the expected properties
+        if (statement) {
+            console.log('Pay Date:', statement.pay_date);
+            console.log('Gross Pay:', statement.gross_pay);
+            
+            document.getElementById("lastPayDate").textContent = statement.pay_date ? 
+                dateFormatter.format(new Date(statement.pay_date)) : "N/A";
+            document.getElementById("grossPay").textContent = statement.gross_pay ? 
+                currencyFormatter.format(statement.gross_pay) : "N/A";
+        } else {
+            document.getElementById("lastPayDate").textContent = "N/A";
+            document.getElementById("grossPay").textContent = "N/A";
+        }
+
+        document.getElementById("incomeVerification").classList.remove('active');
+        document.getElementById("incomeComplete").classList.add('active');
+        currentStep = 2;
+        document.querySelector('.nav-item.active').classList.remove('active');
+        document.querySelectorAll('.nav-item')[2].classList.add('active');
+      }
+    </script>
+  </body>
+</html>

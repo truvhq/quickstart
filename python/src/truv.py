@@ -133,6 +133,13 @@ class TruvClient:
         
         return self.post("orders/", json=payload)
 
+    def get_order(self, order_id: str) -> dict:
+        logging.info(
+            "TRUV: Requesting order from https://prod.truv.com/v1/orders/{order_id}"
+        )
+        logging.info("TRUV: Order ID - %s", order_id)
+        return self.get(f"orders/{order_id}")
+
     def get_access_token(self, public_token: str) -> dict:
         logging.info(
             "TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens"

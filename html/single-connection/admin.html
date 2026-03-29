@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="theme-color" content="#000000" />
+
+    <title>Admin payroll data portal</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <!-- Step 1 - add the bridge library to your app with a script tag -->
+    <script src="https://cdn.truv.com/bridge.js"></script>
+    <style>
+      header {
+        position: fixed;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        background: white;
+        padding: 1rem;
+      }
+
+      header img {
+        height: 3rem;
+      }
+      body {
+        padding: 40px;
+        margin: 0;
+        margin-top: 4rem;
+        background: #f1f4f9;
+      }
+      button {
+        border: 0;
+        background: #15aa63;
+        border-radius: 6px;
+        color: #ffffff;
+        cursor: pointer;
+        font-family: Open Sans;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 32px;
+        padding: 12px 60px;
+        outline: 0;
+        transition: all 0.15s ease-out;
+        display: block;
+      }
+
+      button:hover {
+        background: #179463;
+      }
+
+      .spinnerContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .row {
+        justify-content: space-between;
+      }
+
+      .titleContainer {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 2rem;
+      }
+
+      .titleContainer .img {
+        border-radius: 50%;
+        background: #365bf0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        color: white;
+        margin-right: 1rem;
+      }
+
+      .titleContainer svg {
+        width: 50%;
+        height: 50%;
+      }
+
+      form {
+        background: white;
+        padding: 2rem 5rem;
+      }
+
+      .formSection {
+        margin-bottom: 2rem;
+      }
+
+      #homeAdrressInput {
+        margin-bottom: 1rem;
+      }
+
+      .historyText {
+        display: block;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        margin-bottom: 1rem;
+      }
+
+      .container {
+        padding-bottom: 30px;
+        border-bottom: 1px solid #e2e2e2;
+        margin-bottom: 30px;
+      }
+      .container:last-child {
+        padding-bottom: 0px;
+        border-bottom: 0px solid #e2e2e2;
+        margin-bottom: 0px;
+      }
+
+      .codeContainer {
+        border-width: 0 1px 1px;
+        border-color: #dee2e6;
+        border-style: solid;
+        padding: 15px;
+      }
+
+      #refreshMessage {
+        margin-bottom: 20px;
+      }
+
+      #refreshTime {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <script>
+      function getApiRequests(apiEndpoint) {
+        const headers = {
+          "Content-Type": "application/json;charset=UTF-8",
+        }
+
+        const getBridgeToken = async () => {
+          console.log("Requesting a bridge_token from the quickstart back end.")
+          const response = await fetch(apiEndpoint + `getBridgeToken`, {
+            method: "get",
+            headers,
+          }).then((r) => r.json())
+          console.table(response)
+          return response
+        }
+
+        const getAdminInfoByToken = async (public_token) => {
+          console.log("Requesting payroll admin data from the quickstart back end with public_token.")
+          const response = await fetch(
+            apiEndpoint + `getAdminData/${public_token}`,
+            {
+              method: "get",
+              headers,
+            }
+          ).then((r) => r.json())
+          console.table(response)
+          console.log("response.directory.directory")
+          console.table(response.directory.directory)
+          console.log("response.payroll.payroll_report")
+          console.table(response.payroll.payroll_report)
+          return response
+        }
+
+        const createRefreshTask = async () => {
+          console.log("Requesting a data refresh from the quickstart back end.")
+          const response = await fetch(apiEndpoint + `createRefreshTask`, {
+            method: "get",
+            headers,
+          }).then((r) => r.json())
+          console.table(response)
+          console.log("response.directory.directory")
+          console.table(response.directory.directory)
+          console.log("response.payroll.payroll_report")
+          console.table(response.payroll.payroll_report)
+          return response
+        }
+
+        return {
+          getAdminInfoByToken,
+          getBridgeToken,
+          createRefreshTask
+        }
+      }
+
+      const apiRequests = getApiRequests("{{ server_url }}")
+
+      ;(async function () {
+
+        let successClosing
+
+        // Step 2 - Call your back end to retrieve a bridge token from truv
+        const bridgeToken = await apiRequests.getBridgeToken()
+
+        // Step 3 - Initialize the Truv Bridge
+        const bridge = TruvBridge.init({
+          bridgeToken: bridgeToken.bridge_token,
+          onLoad: function () {
+            console.log("onLoad callback called")
+            successClosing = null
+          },
+          onEvent: function (eventType, payload) {
+            console.log(`onEvent callback called. Event Type: ${eventType}`)
+            if (payload) console.log("onEvent payload:", payload)
+          },
+          onSuccess: async function (public_token, meta) {
+            console.log(
+              `onSuccess callback called. public_token: ${public_token}`
+            )
+            console.log("onSuccess meta: ", meta)
+
+            successClosing = true
+
+            const content = document.querySelector(".spinnerContainer")
+
+            content.classList.remove("hidden")
+            let adminInfo
+            try {
+              adminInfo = await apiRequests.getAdminInfoByToken(public_token)
+            } catch (e) {
+              console.error(e)
+              content.classList.add("hidden")
+              return
+            }
+            content.classList.add("hidden")
+
+            renderPayrollData(adminInfo)
+            changeTab("directory")
+          },
+          onClose: function () {
+            console.log("onClose callback called.")
+          },
+        })
+        window.bridge = bridge
+      })()
+
+      async function refresh() {
+        const content = document.querySelector(".spinnerContainer")
+
+        content.classList.remove("hidden")
+        let refreshedInfo
+        try {
+          refreshedInfo = await apiRequests.createRefreshTask()
+          document.getElementById("refreshMessage").classList.remove("hidden")
+          document.getElementById("refreshTime").innerHTML = new Date()
+        } catch (e) {
+          console.error(e)
+          content.classList.add("hidden")
+          return
+        }
+        content.classList.add("hidden")
+
+        renderPayrollData(refreshedInfo)
+      }
+
+      function renderPayrollData(data) {
+        const directoryContainer = document.querySelector("#historyDirectory")
+        directoryContainer.innerHTML = JSON.stringify(data.directory, null, 2)
+        const reportContainer = document.querySelector("#historyReport")
+        reportContainer.innerHTML = JSON.stringify(data.payroll, null, 2)
+        document.getElementById("connectButton").hidden = true
+        document.getElementById("adminComplete").classList.remove("hidden")
+      }
+
+      function changeTab(active) {
+        switch(active) {
+          case "directory":
+            document.getElementById("reportContainer").classList.add("hidden")
+            document.getElementById("reportTab").classList.remove("active")
+            document.getElementById("directoryContainer").classList.remove("hidden")
+            document.getElementById("directoryTab").classList.add("active")
+            break;
+          default:
+            document.getElementById("directoryContainer").classList.add("hidden")
+            document.getElementById("directoryTab").classList.remove("active")
+            document.getElementById("reportContainer").classList.remove("hidden")
+            document.getElementById("reportTab").classList.add("active")
+        }
+      }
+    </script>
+
+    <div class="spinnerContainer hidden">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+
+    <div id="content" class="container">
+      <div class="titleContainer">
+        <div>
+          <h2>Request payroll admin data</h2>
+          <span>
+            Truv enables companies to share their payroll data including a directory of employees and payroll history.
+            Payroll admin can help companies to better run FP&A analyses, calculate taxes or onboard employees via a directory.
+            Click "Connect" below to start the payroll admin process. <strong>Monitor console logs to learn what's happening behind the scenes</strong>.
+          </span>
+        </div>
+      </div>
+      <form>
+        <div class="formSection historyContainer">
+          <!-- Step 4 - Create a button or action that calls bridge.open() to open the Truv Bridge -->
+          <button type="button" id="connectButton" onclick="bridge.open()">
+            Connect
+          </button>
+          <div id="adminComplete" class="hidden">
+            <p>The admin process is now complete. Here's what happened. <a href="#dataView">What data was returned?</a></p>
+
+            <h3>Initializing the Truv Bridge</h3>
+            <ol>
+              <li>The quickstart front end requested a <code>bridge_token</code> from the quickstart back end.</li>
+              <li>
+                The quickstart back end requested a <code>bridge_token</code> from Truv, providing <code>admin</code> as the value for <code>product_type</code>.
+              </li>
+              <li>Truv provided the quickstart backend with a <code>bridge_token</code>, which the quickstart back end returned to the quickstart front end.</li>
+              <li>The quickstart front end initialized the Truv Bridge with the provided <code>bridge_token</code></li>
+            </ol>
+            <h3>Connecting the administrator to their payroll administration account</h3>
+            <ol>
+              <li>The administrator logged into their payroll administration account through the Truv Bridge.</li>
+              <li>The Truv Bridge provided a <code>public_token</code> to the quickstart front end, who passed that <code>public_token</code> to the quickstart back end.</li>
+              <li>The quickstart back end exchanged that <code>public_token</code> with Truv for an <code>access_token</code> and stored that <code>access_token</code> for later use.</li>
+            </ol>
+            <h3>Accessing admin data from Truv</h3>
+            <ol>
+              <li>The quickstart back end uses the stored <code>access_token</code> to request employee directory data and a payroll report from Truv.</li>
+              <li>Truv provides that admin information to the quickstart back end who sends it to the quickstart front end.</li>
+            </ol>
+            <div id="dataView">
+              <h3>What data was returned?</h3>
+              <ul class="nav nav-tabs">
+                <li class="nav-item" onclick="changeTab('directory')">
+                  <span id="directoryTab" class="nav-link active">Employee Directory</span>
+                </li>
+                <li class="nav-item">
+                  <span id="reportTab" class="nav-link" onclick="changeTab('report')">Payroll Report</span>
+                </li>
+              </ul>
+              <div class="codeContainer">
+                <div id="directoryContainer">
+                  <pre><code id="historyDirectory"></code></pre>
+                </div>
+                <div id="reportContainer">
+                  <pre><code id="historyReport"></code></pre>
+                </div>
+              </div>
+              <p>Did you know that you can use the same <code>access_token</code> from this payroll provider connection to refresh the user's data at a later point in time? Click the button below and follow along
+                in the console logs to see what happens.</p>
+              <div id="refreshMessage" class="hidden">The above data was last refreshed <span id="refreshTime"></span></div>
+              <button type="button" id="refreshButton" onclick="refresh()">
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
