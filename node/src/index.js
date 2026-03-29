@@ -53,7 +53,8 @@ app.get('/getBridgeToken', async (req, res) => {
   // retrieve bridge token
   try {
     const isOrder = IS_ORDER === undefined || IS_ORDER.trim() === '' || IS_ORDER.trim().toLowerCase() === 'true';
-    if (isOrder) {
+    const orderProducts = ['income', 'employment'];
+    if (isOrder && orderProducts.includes(API_PRODUCT_TYPE)) {
       const order = await createOrder();
       res.json(order);
     } else {

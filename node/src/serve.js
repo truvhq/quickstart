@@ -12,7 +12,9 @@ if (validProductTypes.indexOf(API_PRODUCT_TYPE) < 0) {
   process.exit(-1);
 }
 
-const prefix = isOrder ? '' : 'single-connection/';
+const orderProducts = ['income', 'employment'];
+const useOrder = isOrder && orderProducts.includes(API_PRODUCT_TYPE);
+const prefix = useOrder ? '' : 'single-connection/';
 const html = readFileSync(`../html/${prefix}${API_PRODUCT_TYPE}.html`)
   .toString()
   .replace('{{ product_type }}', API_PRODUCT_TYPE);

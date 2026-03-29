@@ -19,7 +19,10 @@ namespace c_sharp.Controllers
         {
             var productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
             var isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
-            var prefix = string.IsNullOrWhiteSpace(isOrder) || isOrder.Trim().Equals("true", StringComparison.OrdinalIgnoreCase) ? "" : "single-connection/";
+            var orderProducts = new[] { "income", "employment" };
+            var isOrderFlag = string.IsNullOrWhiteSpace(isOrder) || isOrder.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
+            var useOrder = isOrderFlag && orderProducts.Contains(productType);
+            var prefix = useOrder ? "" : "single-connection/";
             var fileContent = System.IO.File.ReadAllText($"../html/{prefix}{productType}.html");
             fileContent = fileContent.Replace("{{ server_url }}", $"http://{Request.Host.Value}/");
             return base.Content(fileContent, "text/html");

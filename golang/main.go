@@ -29,8 +29,10 @@ var accessToken *AccessTokenResponse
 func homePage(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	isOrder := strings.TrimSpace(os.Getenv("IS_ORDER"))
+	orderProducts := productType == "income" || productType == "employment"
+	useOrder := (isOrder == "" || strings.ToLower(isOrder) == "true") && orderProducts
 	prefix := ""
-	if !(isOrder == "" || strings.ToLower(isOrder) == "true") {
+	if !useOrder {
 		prefix = "single-connection/"
 	}
 	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s%s.html", prefix, productType))
@@ -47,8 +49,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 // bridgeToken accepts requests for a bridge token and sends the response
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
 	isOrder := strings.TrimSpace(os.Getenv("IS_ORDER"))
+	productType := os.Getenv("API_PRODUCT_TYPE")
+	orderProducts := productType == "income" || productType == "employment"
 
-	if isOrder == "" || strings.ToLower(isOrder) == "true" {
+	if (isOrder == "" || strings.ToLower(isOrder) == "true") && orderProducts {
 		orderData, err := createOrder()
 		if err != nil {
 			log.Println("Error creating order", err)

@@ -69,16 +69,19 @@ def index():
     """
     Render bridge.js
     """
-    prefix = "" if is_order else "single-connection/"
+    # Orders are only supported for income and employment
+    order_products = ["income", "employment"]
+    use_order = is_order and product_type in order_products
+    prefix = "" if use_order else "single-connection/"
 
     if product_type == "income":
         return render_template(f"{prefix}income.html")
 
     elif product_type == "deposit_switch":
-        return render_template(f"{prefix}deposit_switch.html")
+        return render_template("single-connection/deposit_switch.html")
 
     elif product_type == "pll":
-        return render_template(f"{prefix}pll.html")
+        return render_template("single-connection/pll.html")
 
     else:
         return render_template(f"{prefix}employment.html")
@@ -89,9 +92,10 @@ def create_bridge_token():
     """
     API endpoint to request a bridge token
     """
-    if is_order:
+    order_products = ["income", "employment"]
+    if is_order and product_type in order_products:
         return api_client.create_order()
-    
+
     user = api_client.create_user()
     return api_client.create_user_bridge_token(user_id=user["id"])
 
