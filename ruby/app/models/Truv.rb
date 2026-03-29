@@ -70,6 +70,12 @@ class Truv
     return sendRequest("orders/", body, "POST")
   end
 
+  def self.getOrder(order_id)
+    puts "TRUV: Requesting order from https://prod.truv.com/v1/orders/#{order_id}"
+    puts "TRUV: Order ID - #{order_id}"
+    return sendRequest("orders/#{order_id}", nil, "GET")
+  end
+
   def self.getAccessToken(public_token)
     body = { "public_token" => public_token }.to_json
     Truv.link_token = sendRequest('link-access-tokens/', body, "POST")

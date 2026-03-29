@@ -125,6 +125,18 @@ const getLinkReport = async (link_id, product_type) => {
 }
 
 /**
+ * Get an order by ID
+ * https://docs.truv.com/reference/orders_get
+ * @param {String} orderId
+ * @returns The response from Truv
+ */
+const getOrder = async (orderId) => {
+  console.log('TRUV: Requesting order from https://prod.truv.com/v1/orders/{orderId}');
+  console.log(`TRUV: Order ID - ${orderId}`);
+  return await sendRequest(`orders/${orderId}`, { method: 'GET' });
+};
+
+/**
  * Create an order
  * https://docs.truv.com/reference/orders_create
  * @returns The response from Truv
@@ -194,4 +206,5 @@ export {
   createUserBridgeToken,
   getLinkReport,
   createOrder,
+  getOrder,
 };

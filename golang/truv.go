@@ -221,6 +221,29 @@ func createOrder() (string, error) {
 	return string(data), nil
 }
 
+// getOrder retrieves order data from the Truv API
+// with the given order ID
+func getOrder(orderID string) (string, error) {
+	log.Printf("TRUV: Requesting order from https://prod.truv.com/v1/orders/%s", orderID)
+	log.Printf("TRUV: Order ID - %s\n", orderID)
+	request, err := getRequest(fmt.Sprintf("orders/%s", orderID), "GET", nil)
+	if err != nil {
+		return "", err
+	}
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close()
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
 // getAccessToken requests an access token from the Truv API
 // with the given public token
 func getAccessToken(public_token string) (*AccessTokenResponse, error) {

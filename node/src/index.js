@@ -13,6 +13,7 @@ import {
   createUserBridgeToken,
   getLinkReport,
   createOrder,
+  getOrder,
 } from './truv.js';
 
 const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE, IS_ORDER } = process.env;
@@ -62,6 +63,18 @@ app.get('/getBridgeToken', async (req, res) => {
     }
   } catch (e) {
     console.error('error with getBridgeToken');
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.get('/getOrderData/:orderId', async (req, res) => {
+  // retrieve order data by order ID
+  try {
+    const orderData = await getOrder(req.params.orderId);
+    res.json(orderData);
+  } catch (e) {
+    console.error('error with getOrderData');
     console.error(e);
     res.status(500).json({ success: false });
   }

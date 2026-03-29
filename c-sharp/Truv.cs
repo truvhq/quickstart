@@ -128,6 +128,13 @@ namespace c_sharp
             return await SendRequest(HttpMethod.Post, "orders/", body);
         }
 
+        public async Task<string> GetOrder(string orderId)
+        {
+            Console.WriteLine("TRUV: Requesting order from https://prod.truv.com/v1/orders/{0}", orderId);
+            Console.WriteLine("TRUV: Order ID - {0}", orderId);
+            return await SendRequest(HttpMethod.Get, $"orders/{orderId}");
+        }
+
         public async Task<string> GetAccessToken(string publicToken)
         {
             Console.WriteLine("TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens");

@@ -212,6 +212,19 @@ func find(slice []string, val string) (int, bool) {
 	return -1, false
 }
 
+// getOrderData retrieves order data by order ID
+func getOrderData(w http.ResponseWriter, r *http.Request) {
+	splitPath := strings.Split(r.URL.Path, "/")
+	orderID := splitPath[2]
+	orderData, err := getOrder(orderID)
+	if err != nil {
+		log.Println("Error getting order data", err)
+		fmt.Fprintf(w, `{ "success": false }`)
+		return
+	}
+	fmt.Fprintf(w, orderData)
+}
+
 // getPaycheckLinkedLoanData retrieves pll data
 func getPaycheckLinkedLoanData(w http.ResponseWriter, r *http.Request) {
 	var err error
@@ -312,6 +325,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 func handleRequests() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/getBridgeToken", bridgeToken)
+	http.HandleFunc("/getOrderData/", getOrderData)
 	http.HandleFunc("/getVerifications/", verifications)
 	http.HandleFunc("/getPaycheckLinkedLoanData/", getPaycheckLinkedLoanData)
 	http.HandleFunc("/getDepositSwitchData/", getDepositSwitchData)
