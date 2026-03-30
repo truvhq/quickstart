@@ -29,7 +29,7 @@ Once you have your API keys, it's time to run the Truv Ruby on Rails Quickstart 
     IS_ORDER=<true or false - optional, defaults to true>
     ```
 
-    **Note:** The default flow uses the Orders API, which is best suited for use cases where multiple connections are required from the user. Set `IS_ORDER=false` for a single connection flow, which fits best consumer lending, deposit switching, and financial account aggregation use cases.
+    **Note:** The default flow uses the [Orders API](https://docs.truv.com/docs/embedded-orders) for `income` and `employment` products, designed for home lending and social services use cases where multiple employer connections are expected. Set `IS_ORDER=false` for a single connection flow. The `deposit_switch` and `pll` products always use the single connection flow.
 
 5. `make ruby_local`
 
