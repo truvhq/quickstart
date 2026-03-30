@@ -115,7 +115,10 @@ def generate_webhook_sign(payload: str, key: str) -> str:
 @app.route("/webhook", methods=["POST"])
 def webhook():
     """
-    API Endpoint to generate new webhook signature
+    API Endpoint to receive webhook events from Truv.
+    In production, listen for "order-status-updated" with status "completed"
+    to know when order data is ready to pull via GET /orders/{order_id}.
+    This quickstart only logs events for demonstration purposes.
     """
     signature = generate_webhook_sign(request.data.decode("UTF-8"), secret)
     logging.info("TRUV: Webhook received")
