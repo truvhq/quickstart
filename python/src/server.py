@@ -47,7 +47,6 @@ token = None
 
 
 def get_token() -> Optional[dict]:
-    global token
     return token
 
 

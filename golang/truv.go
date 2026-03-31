@@ -58,11 +58,11 @@ type UserResponse struct {
 
 // OrderRequest defines the body of the request when creating an order
 type OrderRequest struct {
-	OrderNumber string      `json:"order_number"`
-	FirstName   string      `json:"first_name"`
-	LastName    string      `json:"last_name"`
-	Products    []string    `json:"products"`
-	Employers   []Employer  `json:"employers,omitempty"`
+	OrderNumber string     `json:"order_number"`
+	FirstName   string     `json:"first_name"`
+	LastName    string     `json:"last_name"`
+	Products    []string   `json:"products"`
+	Employers   []Employer `json:"employers,omitempty"`
 }
 
 // Employer defines the employer structure for orders
@@ -166,12 +166,11 @@ func createOrder() (string, error) {
 	log.Println("TRUV: Requesting an order from https://prod.truv.com/v1/orders/")
 	productType := os.Getenv("API_PRODUCT_TYPE")
 	uniqueNumber := time.Now().UnixNano() / (1 << 22)
-	
+
 	orderRequest := OrderRequest{
 		OrderNumber: fmt.Sprintf("qs-%d", uniqueNumber),
 		FirstName:   "John",
 		LastName:    "Johnson",
-		Email:       "j.johnson@example.com",
 		Products:    []string{productType},
 	}
 
@@ -180,7 +179,7 @@ func createOrder() (string, error) {
 		employer := Employer{
 			CompanyName: "Home Depot",
 		}
-		
+
 		// Add account information for deposit_switch and pll
 		if productType == "deposit_switch" || productType == "pll" {
 			account := AccountRequest{
@@ -189,15 +188,15 @@ func createOrder() (string, error) {
 				RoutingNumber: "12345678",
 				BankName:      "Truv Bank",
 			}
-			
+
 			if productType == "pll" {
 				account.DepositType = "amount"
 				account.DepositValue = "100"
 			}
-			
+
 			employer.Account = &account
 		}
-		
+
 		orderRequest.Employers = []Employer{employer}
 	}
 
@@ -206,7 +205,6 @@ func createOrder() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
@@ -329,7 +327,7 @@ func createRefreshTask(access_token string) (string, error) {
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
 		return "", fmt.Errorf("server returned non-success status code: %d, body: %s", res.StatusCode, string(data))
 	}
-	
+
 	return string(data), nil
 }
 
@@ -354,4 +352,3 @@ func getRefreshTask(taskId string) (string, error) {
 	}
 	return string(data), nil
 }
-

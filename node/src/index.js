@@ -93,9 +93,9 @@ app.get('/getVerifications/:token', async (req, res) => {
     res.json(verifications);
   } catch (e) {
     console.error('error with getVerifications:', e.message);
-    res.status(e.message.includes('access token') ? 400 : 500).json({ 
-      success: false, 
-      error: e.message 
+    res.status(e.message.includes('access token') ? 400 : 500).json({
+      success: false,
+      error: e.message,
     });
   }
 });
@@ -191,12 +191,12 @@ function sleep(ms) {
 }
 
 // Global error handler middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   console.error('Global error handler:', err.message);
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
     success: false,
-    error: err.message || 'Internal server error'
+    error: err.message || 'Internal server error',
   });
 });
 

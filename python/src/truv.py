@@ -95,25 +95,19 @@ class TruvClient:
                     }
                 )
         return self.post(f"users/{user_id}/tokens/", json=payload)
-    
+
     def create_order(self) -> dict:
-        logging.info(
-            "TRUV: Requesting order from https://prod.truv.com/v1/orders/"
-        )
+        logging.info("TRUV: Requesting order from https://prod.truv.com/v1/orders/")
 
         payload = {
             "order_number": f"qs-{uuid4().hex}",
             "first_name": fake.first_name(),
             "last_name": fake.last_name(),
-            "products": [self.product_type]
+            "products": [self.product_type],
         }
 
         if self.product_type in ["deposit_switch", "pll", "employment"]:
-            payload["employers"] = [
-                {
-                    "company_name": "Home Depot"
-                }
-            ]
+            payload["employers"] = [{"company_name": "Home Depot"}]
 
         if self.product_type in ["deposit_switch", "pll"]:
             payload["employers"][0]["account"] = {
@@ -130,7 +124,7 @@ class TruvClient:
                         "deposit_value": "100",
                     }
                 )
-        
+
         return self.post("orders/", json=payload)
 
     def get_order(self, order_id: str) -> dict:
@@ -181,4 +175,3 @@ class TruvClient:
         logging.info("TRUV: Task ID - %s", task_id)
 
         return self.get(f"refresh/tasks/{task_id}/")
-

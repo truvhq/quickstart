@@ -117,12 +117,12 @@ const getRefreshTask = async (task_id) => {
  */
 const getLinkReport = async (link_id, product_type) => {
   console.log(
-    `TRUV: Requesting ${product_type} report data from https://prod.truv.com/v1/links/${link_id}/${product_type}/report`
+    `TRUV: Requesting ${product_type} report data from https://prod.truv.com/v1/links/${link_id}/${product_type}/report`,
   );
   console.log(`TRUV: Link ID - ${link_id}`);
 
-  return await sendRequest(`links/${link_id}/${product_type}/report`, { method: "GET" });
-}
+  return await sendRequest(`links/${link_id}/${product_type}/report`, { method: 'GET' });
+};
 
 /**
  * Get an order by ID
@@ -147,14 +147,14 @@ const createOrder = async () => {
     order_number: `qs-${uuidv4()}`,
     first_name: 'John',
     last_name: 'Johnson',
-    products: [API_PRODUCT_TYPE]
+    products: [API_PRODUCT_TYPE],
   };
 
   if (['deposit_switch', 'pll', 'employment'].includes(API_PRODUCT_TYPE)) {
     bodyObj.employers = [
       {
-        company_name: 'Home Depot'
-      }
+        company_name: 'Home Depot',
+      },
     ];
   }
 
@@ -167,10 +167,10 @@ const createOrder = async () => {
     };
 
     if (API_PRODUCT_TYPE === 'pll') {
-      bodyObj.employers[0].account = { 
-        ...bodyObj.employers[0].account, 
-        deposit_type: 'amount', 
-        deposit_value: '100' 
+      bodyObj.employers[0].account = {
+        ...bodyObj.employers[0].account,
+        deposit_type: 'amount',
+        deposit_value: '100',
       };
     }
   }

@@ -10,7 +10,6 @@ namespace c_sharp
         private readonly string clientId = Environment.GetEnvironmentVariable("API_CLIENT_ID");
         private readonly string clientSecret = Environment.GetEnvironmentVariable("API_SECRET");
         private readonly string productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
-        private readonly string isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
 
         private readonly HttpClient client;
 

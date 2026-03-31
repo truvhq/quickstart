@@ -38,10 +38,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s%s.html", prefix, productType))
 	check(err)
 	html := string(dat)
-	
+
 	// Use a fixed server URL since we're running in Docker
 	html = strings.ReplaceAll(html, "{{ server_url }}", r.URL.Host)
-	
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Write([]byte(html))
 }
@@ -191,7 +191,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		if found {
 			isFinished = true
 		} else {
-			log.Printf("TRUV: Task %s is not finished (status: %s). Waiting 2 seconds, then checking again.", 
+			log.Printf("TRUV: Task %s is not finished (status: %s). Waiting 2 seconds, then checking again.",
 				taskResponse.TaskId, refreshStatusResponse.Status)
 			time.Sleep(2 * time.Second)
 		}
@@ -321,7 +321,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	log.Printf("TRUV: Signature match: %t\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
 	log.Printf("TRUV: Event type:      %s\n", parsedJson.EventType)
 	if parsedJson.Status == "" {
-		log.Println("TRUV: No status, skipping\n")
+		log.Printf("TRUV: No status, skipping\n\n")
 		fmt.Fprintf(w, "")
 		return
 	}
