@@ -13,8 +13,11 @@ namespace c_sharp.Controllers
         public async Task<string> Get()
         {
             var isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
+            var productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
+            var orderProducts = new[] { "income", "employment" };
+            var isOrderFlag = string.IsNullOrWhiteSpace(isOrder) || isOrder.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
 
-            if (string.IsNullOrWhiteSpace(isOrder) || isOrder.Trim().Equals("true", StringComparison.OrdinalIgnoreCase))
+            if (isOrderFlag && orderProducts.Contains(productType))
             {
                 return await _truv.CreateOrder();
             }

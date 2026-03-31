@@ -18,12 +18,6 @@ class Refresh
 
     if Refresh.product_type == "employment" or Refresh.product_type == "income"
       return Truv.getLinkReport(nil, Refresh.product_type)
-    elsif Refresh.product_type == "admin"
-      directory = Truv.getEmployeeDirectoryByToken(nil)
-      # A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-      report_id = Truv.requestPayrollReport(nil, '2020-01-01', '2020-02-01')['payroll_report_id']
-      payroll = Truv.getPayrollById(report_id)
-      return { "directory" => directory, "payroll" => payroll } 
     end
   end
 end

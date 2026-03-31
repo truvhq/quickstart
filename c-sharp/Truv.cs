@@ -10,7 +10,6 @@ namespace c_sharp
         private readonly string clientId = Environment.GetEnvironmentVariable("API_CLIENT_ID");
         private readonly string clientSecret = Environment.GetEnvironmentVariable("API_SECRET");
         private readonly string productType = Environment.GetEnvironmentVariable("API_PRODUCT_TYPE");
-        private readonly string isOrder = Environment.GetEnvironmentVariable("IS_ORDER");
 
         private readonly HttpClient client;
 
@@ -128,6 +127,13 @@ namespace c_sharp
             return await SendRequest(HttpMethod.Post, "orders/", body);
         }
 
+        public async Task<string> GetOrder(string orderId)
+        {
+            Console.WriteLine("TRUV: Requesting order from https://prod.truv.com/v1/orders/{0}", orderId);
+            Console.WriteLine("TRUV: Order ID - {0}", orderId);
+            return await SendRequest(HttpMethod.Get, $"orders/{orderId}");
+        }
+
         public async Task<string> GetAccessToken(string publicToken)
         {
             Console.WriteLine("TRUV: Exchanging a public_token for an access_token from https://prod.truv.com/v1/link-access-tokens");
@@ -181,33 +187,6 @@ namespace c_sharp
             return await SendRequest(HttpMethod.Get, $"refresh/tasks/{taskId}/");
         }
 
-        public async Task<string> GetEmployeeDirectoryByToken(string accessToken)
-        {
-            accessToken ??= Truv.accessToken;
-            Console.WriteLine("TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/link/reports/admin/");
-            Console.WriteLine("TRUV: Access Token - {0}", accessToken);
-            var body = new AccessTokenRequest { AccessToken = accessToken };
-            return await SendRequest(HttpMethod.Post, "link/reports/admin/", body);
-        }
-
-        public async Task<string> RequestPayrollReport(string accessToken, string startDate, string endDate)
-        {
-            accessToken ??= Truv.accessToken;
-            Console.WriteLine("TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls");
-            Console.WriteLine("TRUV: Access Token - {0}", accessToken);
-            var body = new PayrollReportRequest { AccessToken = accessToken, StartDate = startDate, EndDate = endDate };
-            var response = await SendRequest(HttpMethod.Post, "administrators/payrolls/", body);
-
-            PayrollReportResponse payrollReportResponse = JsonSerializer.Deserialize<PayrollReportResponse>(response);
-            return payrollReportResponse.PayrollReportId;
-        }
-
-        public async Task<string> GetPayrollById(string reportId)
-        {
-            Console.WriteLine("TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}");
-            Console.WriteLine("TRUV: Report ID - {0}", reportId);
-            return await SendRequest(HttpMethod.Get, $"administrators/payrolls/{reportId}/");
-        }
     }
 
 
@@ -230,24 +209,6 @@ namespace c_sharp
     {
         [JsonPropertyName("public_token")]
         public string PublicToken { get; set; }
-    }
-
-    public class PayrollReportRequest
-    {
-        [JsonPropertyName("access_token")]
-        public string AccessToken { get; set; }
-
-        [JsonPropertyName("start_date")]
-        public string StartDate { get; set; }
-
-        [JsonPropertyName("end_date")]
-        public string EndDate { get; set; }
-    }
-
-    public class PayrollReportResponse
-    {
-        [JsonPropertyName("payroll_report_id")]
-        public string PayrollReportId { get; set; }
     }
 
     public class UserRequest

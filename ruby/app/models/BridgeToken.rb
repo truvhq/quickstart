@@ -1,6 +1,8 @@
 class BridgeToken
   def self.get
-    if Truv.is_order
+    product_type = ENV['API_PRODUCT_TYPE']
+    order_products = ['income', 'employment']
+    if Truv.is_order && order_products.include?(product_type)
       return Truv.createOrder()
     else
       user_id = Truv.createUser()

@@ -7,15 +7,13 @@ import crypto from 'crypto';
 
 import {
   getAccessToken,
-  getEmployeeDirectoryByToken,
-  getPayrollById,
-  requestPayrollReport,
   createRefreshTask,
   getRefreshTask,
   createUser,
   createUserBridgeToken,
   getLinkReport,
   createOrder,
+  getOrder,
 } from './truv.js';
 
 const { API_CLIENT_ID, API_SECRET, API_PRODUCT_TYPE, IS_ORDER } = process.env;
@@ -55,7 +53,8 @@ app.get('/getBridgeToken', async (req, res) => {
   // retrieve bridge token
   try {
     const isOrder = IS_ORDER === undefined || IS_ORDER.trim() === '' || IS_ORDER.trim().toLowerCase() === 'true';
-    if (isOrder) {
+    const orderProducts = ['income', 'employment'];
+    if (isOrder && orderProducts.includes(API_PRODUCT_TYPE)) {
       const order = await createOrder();
       res.json(order);
     } else {
@@ -65,6 +64,18 @@ app.get('/getBridgeToken', async (req, res) => {
     }
   } catch (e) {
     console.error('error with getBridgeToken');
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.get('/getOrderData/:orderId', async (req, res) => {
+  // retrieve order data by order ID
+  try {
+    const orderData = await getOrder(req.params.orderId);
+    res.json(orderData);
+  } catch (e) {
+    console.error('error with getOrderData');
     console.error(e);
     res.status(500).json({ success: false });
   }
@@ -82,9 +93,9 @@ app.get('/getVerifications/:token', async (req, res) => {
     res.json(verifications);
   } catch (e) {
     console.error('error with getVerifications:', e.message);
-    res.status(e.message.includes('access token') ? 400 : 500).json({ 
-      success: false, 
-      error: e.message 
+    res.status(e.message.includes('access token') ? 400 : 500).json({
+      success: false,
+      error: e.message,
     });
   }
 });
@@ -120,39 +131,9 @@ app.get('/createRefreshTask', async (req, res) => {
       case 'income':
         res.json(await getLinkReport(accessTokenResponse.link_id, API_PRODUCT_TYPE));
         break;
-      case 'admin':
-        const accessToken = accessTokenResponse.access_token;
-        const directory = await getEmployeeDirectoryByToken(accessToken);
-        // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-        const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id;
-        const payroll = await getPayrollById(reportId);
-        const data = { directory, payroll };
-        res.json(data);
-        break;
     }
   } catch (e) {
     console.error('error with createRefreshTask');
-    console.error(e);
-    res.status(500).json({ success: false });
-  }
-});
-
-app.get('/getAdminData/:token', async (req, res) => {
-  // retrieve income verification information
-  try {
-    const accessTokenResponse = await getAccessToken(req.params.token);
-    accessToken = accessTokenResponse.access_token;
-
-    const directory = await getEmployeeDirectoryByToken(accessToken);
-
-    // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-    const reportId = (await requestPayrollReport(accessToken, '2020-01-01', '2020-02-01')).payroll_report_id;
-    const payroll = await getPayrollById(reportId);
-
-    const data = { directory, payroll };
-    res.json(data);
-  } catch (e) {
-    console.error('error with getAdminData');
     console.error(e);
     res.status(500).json({ success: false });
   }
@@ -210,12 +191,12 @@ function sleep(ms) {
 }
 
 // Global error handler middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   console.error('Global error handler:', err.message);
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
     success: false,
-    error: err.message || 'Internal server error'
+    error: err.message || 'Internal server error',
   });
 });
 

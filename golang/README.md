@@ -25,11 +25,11 @@ Once you have your API keys, it's time to run the Truv Go Quickstart app locally
     ```bash
     API_CLIENT_ID=<YOUR CLIENT_ID HERE>
     API_SECRET=<YOUR SECRET KEY MUST BE HERE>
-    API_PRODUCT_TYPE=<employment, income, admin, deposit_switch or fas>
+    API_PRODUCT_TYPE=<employment, income, deposit_switch or pll>
     IS_ORDER=<true or false - optional, defaults to true>
     ```
 
-    **Note:** The default flow uses the Orders API, which is best suited for use cases where multiple connections are required from the user. Set `IS_ORDER=false` for a single connection flow, which fits best consumer lending, deposit switching, and financial account aggregation use cases.
+    **Note:** The default flow uses the [Orders API](https://docs.truv.com/docs/embedded-orders) for `income` and `employment` products, designed for home lending and social services use cases where multiple employer connections are expected. Set `IS_ORDER=false` for a single connection flow. The `deposit_switch` and `pll` products always use the single connection flow.
 
 5. `make golang_local`
 

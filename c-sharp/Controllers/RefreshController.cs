@@ -42,13 +42,6 @@ namespace c_sharp.Controllers
                 case "income":
                     return await _truv.GetLinkReport(null, _productType);
 
-                case "admin":
-                    var directory = await _truv.GetEmployeeDirectoryByToken(null);
-                    // A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-                    var reportId = await _truv.RequestPayrollReport(null, "2020-01-01", "2020-02-01");
-                    var payroll = await _truv.GetPayrollById(reportId);
-                    return "{ \"directory\": " + directory + ", \"payroll\": " + payroll + "}";
-
                 default:
                     return "{ \"success\": false }";
             }

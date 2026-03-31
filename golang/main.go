@@ -28,13 +28,20 @@ var accessToken *AccessTokenResponse
 // given in the API_PRODUCT_TYPE environment variable
 func homePage(w http.ResponseWriter, r *http.Request) {
 	productType := os.Getenv("API_PRODUCT_TYPE")
-	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s.html", productType))
+	isOrder := strings.TrimSpace(os.Getenv("IS_ORDER"))
+	orderProducts := productType == "income" || productType == "employment"
+	useOrder := (isOrder == "" || strings.ToLower(isOrder) == "true") && orderProducts
+	prefix := ""
+	if !useOrder {
+		prefix = "single-connection/"
+	}
+	dat, err := ioutil.ReadFile(fmt.Sprintf("../html/%s%s.html", prefix, productType))
 	check(err)
 	html := string(dat)
-	
+
 	// Use a fixed server URL since we're running in Docker
 	html = strings.ReplaceAll(html, "{{ server_url }}", r.URL.Host)
-	
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Write([]byte(html))
 }
@@ -42,8 +49,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 // bridgeToken accepts requests for a bridge token and sends the response
 func bridgeToken(w http.ResponseWriter, r *http.Request) {
 	isOrder := strings.TrimSpace(os.Getenv("IS_ORDER"))
+	productType := os.Getenv("API_PRODUCT_TYPE")
+	orderProducts := productType == "income" || productType == "employment"
 
-	if isOrder == "" || strings.ToLower(isOrder) == "true" {
+	if (isOrder == "" || strings.ToLower(isOrder) == "true") && orderProducts {
 		orderData, err := createOrder()
 		if err != nil {
 			log.Println("Error creating order", err)
@@ -182,7 +191,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		if found {
 			isFinished = true
 		} else {
-			log.Printf("TRUV: Task %s is not finished (status: %s). Waiting 2 seconds, then checking again.", 
+			log.Printf("TRUV: Task %s is not finished (status: %s). Waiting 2 seconds, then checking again.",
 				taskResponse.TaskId, refreshStatusResponse.Status)
 			time.Sleep(2 * time.Second)
 		}
@@ -194,31 +203,6 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 
 	if productType == "employment" || productType == "income" {
 		refreshResponse, err = getLinkReport(accessToken.LinkId, productType)
-	} else if productType == "admin" {
-		directory, err := getEmployeeDirectoryByToken(accessToken.AccessToken)
-		if err != nil {
-			log.Println("Error getting Employee Directory", err)
-			fmt.Fprintf(w, `{ "success": false, "error": "Failed to get employee directory" }`)
-			return
-		}
-		
-		// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-		report, err := requestPayrollReport(accessToken.AccessToken, "2020-01-01", "2020-02-01")
-		if err != nil {
-			log.Println("Error requesting payroll report", err)
-			fmt.Fprintf(w, `{ "success": false, "error": "Failed to request payroll report" }`)
-			return
-		}
-
-		reportId := report.PayrollReportId
-		payroll, err := getPayrollById(reportId)
-		if err != nil {
-			log.Println("Error getting payroll by id", err)
-			fmt.Fprintf(w, `{ "success": false, "error": "Failed to get payroll by ID" }`)
-			return
-		}
-
-		refreshResponse = fmt.Sprintf(`{ "directory": %s, "payroll": %s }`, directory, payroll)
 	}
 	if err != nil {
 		log.Println("Error getting refresh data", err)
@@ -237,41 +221,17 @@ func find(slice []string, val string) (int, bool) {
 	return -1, false
 }
 
-// adminData accepts requests for admin data and sends the response
-func adminData(w http.ResponseWriter, r *http.Request) {
-	var err error
+// getOrderData retrieves order data by order ID
+func getOrderData(w http.ResponseWriter, r *http.Request) {
 	splitPath := strings.Split(r.URL.Path, "/")
-	token := splitPath[2]
-	accessToken, err := getAccessToken(token)
+	orderID := splitPath[2]
+	orderData, err := getOrder(orderID)
 	if err != nil {
-		log.Println("Error getting access token", err)
+		log.Println("Error getting order data", err)
 		fmt.Fprintf(w, `{ "success": false }`)
 		return
 	}
-	directory, err := getEmployeeDirectoryByToken(accessToken.AccessToken)
-	if err != nil {
-		log.Println("Error getting Employee Directory", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-		return
-	}
-	// A start and end date are needed for a payroll report. The dates hard coded below will return a proper report from the sandbox environment
-	report, err := requestPayrollReport(accessToken.AccessToken, "2020-01-01", "2020-02-01")
-	if err != nil {
-		log.Println("Error requesting payroll report", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-		return
-	}
-	reportId := report.PayrollReportId
-	payroll, err := getPayrollById(reportId)
-	if err != nil {
-		log.Println("Error getting payroll by id", err)
-		fmt.Fprintf(w, `{ "success": false }`)
-		return
-	}
-
-	data := fmt.Sprintf(`{ "directory": %s, "payroll": %s }`, directory, payroll)
-
-	fmt.Fprintf(w, data)
+	fmt.Fprintf(w, orderData)
 }
 
 // getPaycheckLinkedLoanData retrieves pll data
@@ -330,8 +290,8 @@ func checkEnv() {
 		log.Println("No API_PRODUCT_TYPE provided")
 		os.Exit(1)
 	}
-	if productType != "employment" && productType != "income" && productType != "admin" && productType != "pll" && productType != "deposit_switch" {
-		log.Println("API_PRODUCT_TYPE must be one of employment, income, admin, deposit_switch or pll")
+	if productType != "employment" && productType != "income" && productType != "pll" && productType != "deposit_switch" {
+		log.Println("API_PRODUCT_TYPE must be one of employment, income, deposit_switch or pll")
 		os.Exit(1)
 	}
 }
@@ -361,7 +321,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	log.Printf("TRUV: Signature match: %t\n", r.Header.Get("X-WEBHOOK-SIGN") == signature)
 	log.Printf("TRUV: Event type:      %s\n", parsedJson.EventType)
 	if parsedJson.Status == "" {
-		log.Println("TRUV: No status, skipping\n")
+		log.Printf("TRUV: No status, skipping\n\n")
 		fmt.Fprintf(w, "")
 		return
 	}
@@ -374,8 +334,8 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 func handleRequests() {
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/getBridgeToken", bridgeToken)
+	http.HandleFunc("/getOrderData/", getOrderData)
 	http.HandleFunc("/getVerifications/", verifications)
-	http.HandleFunc("/getAdminData/", adminData)
 	http.HandleFunc("/getPaycheckLinkedLoanData/", getPaycheckLinkedLoanData)
 	http.HandleFunc("/getDepositSwitchData/", getDepositSwitchData)
 	http.HandleFunc("/createRefreshTask/", refresh)

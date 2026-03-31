@@ -117,62 +117,23 @@ const getRefreshTask = async (task_id) => {
  */
 const getLinkReport = async (link_id, product_type) => {
   console.log(
-    `TRUV: Requesting ${product_type} report data from https://prod.truv.com/v1/links/${link_id}/${product_type}/report`
+    `TRUV: Requesting ${product_type} report data from https://prod.truv.com/v1/links/${link_id}/${product_type}/report`,
   );
   console.log(`TRUV: Link ID - ${link_id}`);
 
-  return await sendRequest(`links/${link_id}/${product_type}/report`, { method: "GET" });
-}
-
-/**
- * Retrieves employee directories from Truv
- * @param {String} access_token
- * @return The response from Truv
- */
-const getEmployeeDirectoryByToken = async (access_token) => {
-  console.log(
-    'TRUV: Requesting employee directory data using an access_token from https://prod.truv.com/v1/links/reports/admin/',
-  );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-  });
-  return await sendRequest('links/reports/admin/', { body });
+  return await sendRequest(`links/${link_id}/${product_type}/report`, { method: 'GET' });
 };
 
 /**
- * Creates a payroll report in Truv
- * @param {String} access_token
- * @param {String} start_date
- * @param {String} end_date
- * @return The payroll report ID from Truv
+ * Get an order by ID
+ * https://docs.truv.com/reference/orders_get
+ * @param {String} orderId
+ * @returns The response from Truv
  */
-const requestPayrollReport = async (access_token, start_date, end_date) => {
-  console.log(
-    'TRUV: Requesting a payroll report be created using an access_token from https://prod.truv.com/v1/administrators/payrolls',
-  );
-  console.log(`TRUV: Access Token - ${access_token}`);
-  const body = JSON.stringify({
-    access_token,
-    start_date,
-    end_date,
-  });
-  return await sendRequest('administrators/payrolls/', { body });
-};
-
-/**
- * Retrieves a payroll report from Truv
- * @param {String} report_id
- * @return The payroll report ID from Truv
- */
-const getPayrollById = async (report_id) => {
-  console.log(
-    'TRUV: Requesting a payroll report using a report_id from https://prod.truv.com/v1/administrators/payrolls/{report_id}',
-  );
-  console.log(`TRUV: Report ID - ${report_id}`);
-  return await sendRequest(`administrators/payrolls/${report_id}`, {
-    method: 'GET',
-  });
+const getOrder = async (orderId) => {
+  console.log('TRUV: Requesting order from https://prod.truv.com/v1/orders/{orderId}');
+  console.log(`TRUV: Order ID - ${orderId}`);
+  return await sendRequest(`orders/${orderId}`, { method: 'GET' });
 };
 
 /**
@@ -186,14 +147,14 @@ const createOrder = async () => {
     order_number: `qs-${uuidv4()}`,
     first_name: 'John',
     last_name: 'Johnson',
-    products: [API_PRODUCT_TYPE]
+    products: [API_PRODUCT_TYPE],
   };
 
   if (['deposit_switch', 'pll', 'employment'].includes(API_PRODUCT_TYPE)) {
     bodyObj.employers = [
       {
-        company_name: 'Home Depot'
-      }
+        company_name: 'Home Depot',
+      },
     ];
   }
 
@@ -206,10 +167,10 @@ const createOrder = async () => {
     };
 
     if (API_PRODUCT_TYPE === 'pll') {
-      bodyObj.employers[0].account = { 
-        ...bodyObj.employers[0].account, 
-        deposit_type: 'amount', 
-        deposit_value: '100' 
+      bodyObj.employers[0].account = {
+        ...bodyObj.employers[0].account,
+        deposit_type: 'amount',
+        deposit_value: '100',
       };
     }
   }
@@ -239,13 +200,11 @@ const sendRequest = async (endpoint, { body = undefined, method = 'POST' }) => {
 
 export {
   getAccessToken,
-  getEmployeeDirectoryByToken,
-  requestPayrollReport,
-  getPayrollById,
   createRefreshTask,
   getRefreshTask,
   createUser,
   createUserBridgeToken,
   getLinkReport,
   createOrder,
+  getOrder,
 };

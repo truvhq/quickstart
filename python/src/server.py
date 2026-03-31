@@ -47,7 +47,6 @@ token = None
 
 
 def get_token() -> Optional[dict]:
-    global token
     return token
 
 
@@ -69,20 +68,22 @@ def index():
     """
     Render bridge.js
     """
-    if product_type == "income":
-        return render_template("income.html")
+    # Orders are only supported for income and employment
+    order_products = ["income", "employment"]
+    use_order = is_order and product_type in order_products
+    prefix = "" if use_order else "single-connection/"
 
-    elif product_type == "admin":
-        return render_template("admin.html")
+    if product_type == "income":
+        return render_template(f"{prefix}income.html")
 
     elif product_type == "deposit_switch":
-        return render_template("deposit_switch.html")
+        return render_template("single-connection/deposit_switch.html")
 
     elif product_type == "pll":
-        return render_template("pll.html")
+        return render_template("single-connection/pll.html")
 
     else:
-        return render_template("employment.html")
+        return render_template(f"{prefix}employment.html")
 
 
 @app.route("/getBridgeToken", methods=["GET"])
@@ -90,9 +91,10 @@ def create_bridge_token():
     """
     API endpoint to request a bridge token
     """
-    if is_order:
+    order_products = ["income", "employment"]
+    if is_order and product_type in order_products:
         return api_client.create_order()
-    
+
     user = api_client.create_user()
     return api_client.create_user_bridge_token(user_id=user["id"])
 
@@ -112,7 +114,10 @@ def generate_webhook_sign(payload: str, key: str) -> str:
 @app.route("/webhook", methods=["POST"])
 def webhook():
     """
-    API Endpoint to generate new webhook signature
+    API Endpoint to receive webhook events from Truv.
+    In production, listen for "order-status-updated" with status "completed"
+    to know when order data is ready to pull via GET /orders/{order_id}.
+    This quickstart only logs events for demonstration purposes.
     """
     signature = generate_webhook_sign(request.data.decode("UTF-8"), secret)
     logging.info("TRUV: Webhook received")
@@ -126,6 +131,14 @@ def webhook():
         return ""
     logging.info("TRUV: Status:          %s\n", data.get("status"))
     return ""
+
+
+@app.route("/getOrderData/<order_id>", methods=["GET"])
+def get_order_data(order_id: str):
+    """
+    API endpoint to retrieve order data by order ID
+    """
+    return api_client.get_order(order_id)
 
 
 @app.route("/getVerifications/<public_token>", methods=["GET"])
@@ -182,9 +195,6 @@ def create_refresh_task_by_token():
     if product_type in ["employment", "income"]:
         return api_client.get_link_report(link_token["link_id"], product_type)
 
-    if product_type == "admin":
-        return get_admin_data(link_token["access_token"])
-
     raise ValueError("Unsupported product type!")
 
 
@@ -204,40 +214,6 @@ def get_pll_data_by_token(public_token: str):
     """
     tokenResult = api_client.get_access_token(public_token)
     return api_client.get_link_report(tokenResult["link_id"], "pll")
-
-
-@app.route("/getAdminData/<public_token>", methods=["GET"])
-def get_admin_data_by_token(public_token: str):
-    """
-    API endpoint to retrieve payroll admin data
-    """
-    # First, exchange public_token to access_token
-    tokenResult = api_client.get_access_token(public_token)
-    access_token = tokenResult["access_token"]
-
-    # Second, request admin data
-    return get_admin_data(access_token)
-
-
-def get_admin_data(access_token: str) -> dict:
-    # request employee directory
-    directory = api_client.get_employee_directory_by_token(access_token)
-
-    # create request for payroll report
-    # A start and end date are needed for a payroll report.
-    # The dates hard coded below will return a proper report from the sandbox environment
-    report_id = api_client.request_payroll_report(
-        access_token, "2020-01-01", "2020-02-01"
-    )["payroll_report_id"]
-
-    # collect prepared payroll report
-    payroll = api_client.get_payroll_report_by_id(report_id)
-    if payroll["status"] != "done":
-        logging.info("TRUV: Report not complete. Waiting and trying again")
-        time.sleep(2)
-        payroll = api_client.get_payroll_report_by_id(report_id)
-
-    return {"directory": directory, "payroll": payroll}
 
 
 if __name__ == "__main__":

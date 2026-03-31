@@ -66,12 +66,6 @@
         border-radius: 50%;
       }
 
-      .menu-icon {
-        width: 24px;
-        height: 24px;
-        cursor: pointer;
-      }
-
       .progress-nav {
         display: flex;
         gap: 16px;
@@ -104,26 +98,9 @@
         margin-bottom: 40px;
       }
 
-      .form-group {
-        margin-bottom: 24px;
-      }
-
-      .form-label {
-        display: block;
-        font-size: 16px;
-        color: var(--text-primary);
-        margin-bottom: 8px;
-      }
-
-      .form-input {
-        width: 100%;
-        padding: 16px;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
-        background: var(--background-input);
-        box-sizing: border-box;
-      }
+      .form-group { margin-bottom: 24px; }
+      .form-label { display: block; font-size: 16px; color: var(--text-primary); margin-bottom: 8px; }
+      .form-input { width: 100%; padding: 16px; font-size: 16px; border: none; border-radius: 8px; background: var(--background-input); box-sizing: border-box; }
 
       .button {
         background: var(--primary-blue);
@@ -138,124 +115,42 @@
         margin-top: auto;
       }
 
-      .button:hover {
-        opacity: 0.9;
-      }
+      .button:hover { opacity: 0.9; }
 
       .spinner-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
         background: rgba(255, 255, 255, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         z-index: 1000;
       }
 
-      .hidden {
-        display: none;
-      }
+      .hidden { display: none; }
+      .screen { display: none; }
+      .screen.active { display: flex; flex-direction: column; flex: 1; }
+      #personalInfo.active { display: flex; flex-direction: column; }
 
-      #incomeComplete {
-        margin-top: 0;
-      }
-
-      #incomeComplete.hidden {
-        display: none;
-      }
-
-      #incomeVerification .button {
-        margin-top: auto;
-      }
-
-      .data-section {
-        background: var(--background-input);
-        padding: 24px;
-        border-radius: 8px;
-        margin-top: 24px;
-      }
-
-      .employment-data {
-        margin: 20px 0;
-      }
-
-      .data-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #E0E0E0;
-      }
-
-      .data-row:last-child {
-        border-bottom: none;
-      }
-
-      .data-label {
-        color: var(--text-secondary);
-        font-weight: 500;
-      }
-
-      .data-value {
-        color: var(--text-primary);
-        font-weight: 600;
-      }
-
-      pre {
-        background: white;
-        padding: 16px;
-        border-radius: 4px;
-        overflow-x: auto;
-      }
+      .data-section { background: var(--background-input); padding: 24px; border-radius: 8px; margin-top: 24px; }
+      .employment-data { margin: 20px 0; }
+      .data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #E0E0E0; }
+      .data-row:last-child { border-bottom: none; }
+      .data-label { color: var(--text-secondary); font-weight: 500; }
+      .data-value { color: var(--text-primary); font-weight: 600; }
 
       @media (max-width: 390px) {
-        .app-container {
-          min-height: 100vh;
-          padding: 48px 16px;
-        }
+        .app-container { min-height: 100vh; padding: 48px 16px; }
       }
 
-      .screen {
-        display: none;
-      }
-
-      .screen.active {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-      }
-
-      #personalInfo.active {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .income-icon {
-        width: 64px;
-        height: 64px;
-        margin-bottom: 24px;
-      }
-
-      #incomeVerification {
-        text-align: left;
-        justify-content: center;
-        padding: 40px 0;
-      }
-
-      #incomeVerification .subtitle {
-        margin-bottom: 24px;
-      }
-
-      #incomeVerification .content-wrapper {
-        margin-bottom: 32px;
-      }
+      /* Order inline embed styles */
+      body.order-flow { margin: 0; height: 100vh; overflow: hidden; }
+      body.order-flow .header, body.order-flow .progress-nav { display: none; }
+      body.order-flow .app-container { height: 100vh; min-height: unset; padding: 0; }
+      #truv-embed { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+      #truv-embed iframe { flex: 1; border: none; }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    
+
     <div class="spinner-container hidden">
       <div class="spinner-border" role="status">
         <span class="sr-only">Loading...</span>
@@ -306,22 +201,7 @@
       </div>
 
       <div id="incomeVerification" class="screen">
-        <div class="content-wrapper">
-          <svg class="income-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="32" fill="#E8EDFF"/>
-            <path d="M20 24C20 22.8954 20.8954 22 22 22H42C43.1046 22 44 22.8954 44 24V32C44 39.732 37.732 46 30 46H22C20.8954 46 20 45.1046 20 44V24Z" stroke="#4169E1" stroke-width="2"/>
-            <path d="M26 22V18C26 16.8954 26.8954 16 28 16H36C37.1046 16 38 16.8954 38 18V22" stroke="#4169E1" stroke-width="2"/>
-            <circle cx="32" cy="34" r="6" stroke="#4169E1" stroke-width="2"/>
-            <path d="M29 34L31 36L35 32" stroke="#4169E1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-
-          <h1 class="title">Income verification</h1>
-          <p class="subtitle">To proceed with your application, we need to verify your income and employment information</p>
-        </div>
-
-        <button class="button" onclick="bridge.open()">
-          Continue
-        </button>
+        <div id="truv-embed"></div>
       </div>
 
       <div id="incomeComplete" class="screen">
@@ -353,12 +233,6 @@
               <span class="data-value" id="grossPay"></span>
             </div>
           </div>
-          <div id="refreshMessage" class="hidden">
-            Last updated: <span id="refreshTime"></span>
-          </div>
-          <button class="button" id="refreshButton" onclick="refresh()">
-            Refresh Data
-          </button>
         </div>
       </div>
     </div>
@@ -367,236 +241,126 @@
       let currentStep = 0;
 
       function showScreen(screenId, navIndex) {
-        // Prevent skipping steps
-        if (navIndex > currentStep) {
-          return;
-        }
-        
-        // Hide all screens
-        document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-        
-        // Show selected screen
+        if (navIndex > currentStep) return;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
-        
-        // Update navigation
         document.querySelector('.nav-item.active').classList.remove('active');
         document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
-
         currentStep = navIndex;
       }
 
       function showIncomeVerification() {
         currentStep = 1;
         showScreen('incomeVerification', 1);
+        document.body.classList.add('order-flow')
+        if (window.bridge) bridge.open();
       }
 
       function getApiRequests(apiEndpoint) {
-        const headers = {
-          "Content-Type": "application/json;charset=UTF-8",
-        }
+        const headers = { "Content-Type": "application/json;charset=UTF-8" }
 
         const getBridgeToken = async () => {
-          console.log("Requesting a bridge_token from the quickstart back end.")
-          const response = await fetch(apiEndpoint + `getBridgeToken`, {
-            method: "get",
-            headers,
-          }).then((r) => r.json())
+          const response = await fetch(apiEndpoint + `getBridgeToken`, { method: "get", headers }).then(r => r.json())
           console.table(response)
           return response
         }
 
-        /**
-         * @return {Promise<IncomeItem[]>}
-         */
-        const getVerificationInfoByToken = async (public_token) => {
-          console.log("Requesting income verification data from the quickstart back end with public_token.")
-          const response = await fetch(
-            apiEndpoint + `getVerifications/${public_token}`,
-            {
-              method: "get",
-              headers,
-            }
-          ).then((r) => r.json())
+        const getOrderData = async (orderId) => {
+          const response = await fetch(apiEndpoint + `getOrderData/${orderId}`, { method: "get", headers }).then(r => r.json())
           console.table(response)
-          console.table(response.employments)
-          return response.employments
+          return response
         }
 
-        const createRefreshTask = async () => {
-          console.log("Requesting a data refresh from the quickstart back end.")
-          const response = await fetch(apiEndpoint + `createRefreshTask`, {
-            method: "get",
-            headers,
-          }).then((r) => r.json())
-          console.table(response)
-          console.table(response.employments)
-          return response.employments
-        }
-
-        return {
-          getVerificationInfoByToken,
-          getBridgeToken,
-          createRefreshTask,
-        }
+        return { getBridgeToken, getOrderData }
       }
 
       const apiRequests = getApiRequests("{{ server_url }}")
 
       ;(async function () {
-
-        let successClosing
-
-        // Step 2 - Call your back end to retrieve a bridge token from truv
-        const bridgeToken = await apiRequests.getBridgeToken()
-
-        let orderFlag = false
-        // Order API returns ID while BridgeToken does not
-        if (bridgeToken.id) orderFlag = true
+        // Step 2 - Call back end to create an order and get bridge token
+        const order = await apiRequests.getBridgeToken()
+        const orderId = order.id
 
         // Step 3 - Initialize the Truv Bridge
         const bridge = TruvBridge.init({
-          bridgeToken: bridgeToken.bridge_token,
-          isOrder: orderFlag,
+          bridgeToken: order.bridge_token,
+          isOrder: true,
+          position: { type: 'inline', container: document.getElementById('truv-embed') },
           onLoad: function () {
-            console.log("onLoad callback called")
-            successClosing = null
+            console.log("[TruvBridge] onLoad")
           },
-          onEvent: async function (eventType, payload) {
-            console.log(`onEvent callback called. Event Type: ${eventType}`)
-            if (payload) console.log("onEvent payload:", payload)
-
-            if (eventType === "SUCCESS") {
-              successClosing = true
-
-              const content = document.querySelector(".spinner-container")
-              content.classList.remove("hidden")
-
-              // Add 2 second delay before making the request
-              await new Promise(resolve => setTimeout(resolve, 2000));
-
-              let verificationInfo
-              try {
-                verificationInfo = await apiRequests.getVerificationInfoByToken(
-                  payload.public_token
-                )
-              } catch (e) {
-                console.error(e)
-                content.classList.add("hidden")
-                return
-              }
-              content.classList.add("hidden")
-
-              if (!verificationInfo?.length) {
-                return
-              }
-
-              renderPayrollData(verificationInfo)
-            }
+          onEvent: function (eventType, payload, source) {
+            console.log(`[TruvBridge] onEvent: ${eventType}`, { source, payload })
           },
-          onSuccess: async function (public_token, meta) {
-            console.log(
-              `onSuccess callback called. public_token: ${public_token}`
-            )
-            console.log("onSuccess meta: ", meta)
-
-            // Check if public_token is provided, return early if not
-            if (!public_token) {
-              console.log("No public_token received in onSuccess callback");
-              return;
-            }
-            
+          onSuccess: function () {
+            console.log("[TruvBridge] onSuccess")
           },
-          onClose: function () {
-            console.log("onClose callback called.")
+          onClose: async function () {
+            console.log("[TruvBridge] onClose")
+            await fetchAndRenderOrderData()
           },
         })
+
+        async function fetchAndRenderOrderData() {
+          if (window.orderComplete) return
+          window.orderComplete = true
+          document.body.classList.remove('order-flow')
+
+          const content = document.querySelector(".spinner-container")
+          content.classList.remove("hidden")
+
+          let orderData
+          try {
+            orderData = await apiRequests.getOrderData(orderId)
+          } catch (e) {
+            console.error(e)
+            content.classList.add("hidden")
+            showScreen('personalInfo', 0)
+            return
+          }
+          content.classList.add("hidden")
+
+          if (orderData?.employers?.length) {
+            renderOrderData(orderData)
+          } else {
+            showScreen('personalInfo', 0)
+          }
+        }
+
         window.bridge = bridge
       })()
 
-      async function refresh() {
-        const content = document.querySelector(".spinner-container")
-
-            content.classList.remove("hidden")
-            let refreshedInfo
-            try {
-              refreshedInfo = await apiRequests.createRefreshTask()
-              document.getElementById("refreshMessage").classList.remove("hidden")
-              document.getElementById("refreshTime").innerHTML = new Date()
-            } catch (e) {
-              console.error(e)
-              content.classList.add("hidden")
-              return
-            }
-            content.classList.add("hidden")
-
-            if (!refreshedInfo.length) {
-              return
-            }
-
-            renderPayrollData(refreshedInfo)
-      }
-
       function formatIncomeUnit(unit) {
         const unitMap = {
-          'YEARLY': 'Annually',
-          'MONTHLY': 'Monthly',
-          'BI_WEEKLY': 'Bi-weekly',
-          'WEEKLY': 'Weekly',
-          'DAILY': 'Daily',
-          'HOURLY': 'Hourly'
+          'YEARLY': 'Annually', 'MONTHLY': 'Monthly', 'BI_WEEKLY': 'Bi-weekly',
+          'WEEKLY': 'Weekly', 'DAILY': 'Daily', 'HOURLY': 'Hourly'
         };
         return unitMap[unit] || unit;
       }
 
-      /**
-       *
-       * @param {IncomeItem[]} incomes
-       */
-      function renderPayrollData(data) {
-        const employmentData = data[0]; // Get the first employment record
-        
-        // Debug logging
-        console.log('Employment Data:', employmentData);
-        console.log('Statements:', employmentData.statements);
-        
-        // Create currency formatter
+      function renderOrderData(orderData) {
+        const employer = orderData.employers[0]
+        const employment = employer?.employments?.[0] || {}
+
         const currencyFormatter = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
+          style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2
+        });
+        const dateFormatter = new Intl.DateTimeFormat('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        // Create date formatter
-        const dateFormatter = new Intl.DateTimeFormat('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-        
-        // Format the data
-        document.getElementById("employerName").textContent = employmentData.company?.name || "N/A";
-        document.getElementById("jobTitle").textContent = employmentData.job_title || "N/A";
-        document.getElementById("employmentStatus").textContent = employmentData.is_active ? "Active" : "Inactive";
-        document.getElementById("incomeAmount").textContent = `${currencyFormatter.format(employmentData.income)} ${formatIncomeUnit(employmentData.income_unit)}`;
-        
-        // Format pay date and gross pay from statements
-        const statement = employmentData.statements?.[0];
-        console.log('First Statement:', statement);
-        
-        // Check if statement exists and has the expected properties
-        if (statement) {
-            console.log('Pay Date:', statement.pay_date);
-            console.log('Gross Pay:', statement.gross_pay);
-            
-            document.getElementById("lastPayDate").textContent = statement.pay_date ? 
-                dateFormatter.format(new Date(statement.pay_date)) : "N/A";
-            document.getElementById("grossPay").textContent = statement.gross_pay ? 
-                currencyFormatter.format(statement.gross_pay) : "N/A";
-        } else {
-            document.getElementById("lastPayDate").textContent = "N/A";
-            document.getElementById("grossPay").textContent = "N/A";
-        }
+        document.getElementById("employerName").textContent = employment.company?.name || employer?.company_name || "N/A";
+        document.getElementById("jobTitle").textContent = employment.job_title || "N/A";
+        document.getElementById("employmentStatus").textContent = employment.is_active ? "Active" : "Inactive";
+        document.getElementById("incomeAmount").textContent = employment.income
+          ? `${currencyFormatter.format(employment.income)} ${formatIncomeUnit(employment.income_unit)}`
+          : "N/A";
+
+        const statement = employment.statements?.[0];
+        document.getElementById("lastPayDate").textContent = statement?.pay_date
+          ? dateFormatter.format(new Date(statement.pay_date)) : "N/A";
+        document.getElementById("grossPay").textContent = statement?.gross_pay
+          ? currencyFormatter.format(statement.gross_pay) : "N/A";
 
         document.getElementById("incomeVerification").classList.remove('active');
         document.getElementById("incomeComplete").classList.add('active');
