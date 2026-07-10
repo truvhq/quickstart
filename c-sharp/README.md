@@ -6,7 +6,7 @@ Let's get you started with Truv by walking through this C# Quickstart app. You'l
 
 You'll have two different API keys used by the back end, `Client ID` and `Access key`.
 
-Full documentation is available at [https://docs.truv.com/docs/quickstart-guide](https://docs.truv.com/docs/quickstart-guide)
+Full documentation is available at [https://docs.truv.com/developers/quickstart](https://docs.truv.com/developers/quickstart)
 
 ## Requirements
 
@@ -28,7 +28,7 @@ Once you have your API keys, it's time to run the Truv C# Quickstart app locally
     IS_ORDER=<true or false - optional, defaults to true>
     ```
 
-    **Note:** The default flow uses the [Orders API](https://docs.truv.com/docs/embedded-orders) for `income` and `employment` products, designed for home lending and social services use cases where multiple employer connections are expected. Set `IS_ORDER=false` for a single connection flow. The `deposit_switch` and `pll` products always use the single connection flow.
+    **Note:** The default flow uses the [Orders API](https://docs.truv.com/developers/integration/embedded-orders/overview) for `income` and `employment` products, designed for home lending and social services use cases where multiple employer connections are expected. Set `IS_ORDER=false` for a single connection flow. The `deposit_switch` and `pll` products always use the single connection flow.
 
 5. `make csharp_local`
 
