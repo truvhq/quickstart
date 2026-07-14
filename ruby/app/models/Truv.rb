@@ -92,7 +92,7 @@ class Truv
   end
 
   def self.createRefreshTask(product_type)
-    # https://docs.truv.com/?ruby#data-refresh
+    # https://docs.truv.com/api-reference/refresh/refresh_task_create
     access_token = Truv.link_token["access_token"]
     puts "TRUV: Requesting a data refresh using an access_token from https://prod.truv.com/v1/refresh/tasks/"
     puts "TRUV: Access Token - #{access_token}"
@@ -101,7 +101,7 @@ class Truv
   end
 
   def self.getRefreshTask(task_id)
-    # https://docs.truv.com/?ruby#data-refresh
+    # https://docs.truv.com/api-reference/refresh/refresh_task
     puts "TRUV: Requesting a refresh task using a task_id from https://prod.truv.com/v1/refresh/tasks/{task_id}/"
     puts "TRUV: Task ID - #{task_id}"
     sendRequest("refresh/tasks/#{task_id}/", nil, "GET")

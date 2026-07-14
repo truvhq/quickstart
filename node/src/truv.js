@@ -23,7 +23,7 @@ const getHeaders = () => {
 
 /**
  * Create a user
- * https://docs.truv.com/reference/users_create
+ * https://docs.truv.com/api-reference/users/users_create
  * @returns The response from Truv
  */
 const createUser = async () => {
@@ -41,7 +41,7 @@ const createUser = async () => {
 
 /**
  * Create a bridge token for a user
- * https://docs.truv.com/reference/users_tokens
+ * https://docs.truv.com/api-reference/bridge-token/users_tokens
  * @param {String} user_id
  * @returns The response from Truv
  */
@@ -76,7 +76,7 @@ const createUserBridgeToken = async (user_id) => {
 /**
  * Calls out to Truv exchanging the public token given by the API request
  * for an access token to make subsequent requests
- * https://docs.truv.com/reference/link_exchange_token_flow
+ * https://docs.truv.com/api-reference/links/link_exchange_token_flow
  * @param {String} public_token The token provided by the API request to exchange
  * @return The access token provided by truv
  **/
@@ -106,10 +106,10 @@ const getRefreshTask = async (task_id) => {
 
 /**
  * Retrieves a report by link_id from Truv
- * https://docs.truv.com/reference/employment_verification
- * https://docs.truv.com/reference/income_verification
- * https://docs.truv.com/reference/dds_report
- * https://docs.truv.com/reference/pll_report
+ * https://docs.truv.com/api-reference/account-link-income-and-employment-reports/link_detail_reports_employment
+ * https://docs.truv.com/api-reference/account-link-income-and-employment-reports/link_detail_reports_income
+ * https://docs.truv.com/api-reference/deposit-switch/link_detail_reports_dds
+ * https://docs.truv.com/api-reference/deposit-switch/link_detail_reports_pll
  *
  * @param {String} link_id
  * @param {String} product_type
@@ -126,7 +126,7 @@ const getLinkReport = async (link_id, product_type) => {
 
 /**
  * Get an order by ID
- * https://docs.truv.com/reference/orders_get
+ * https://docs.truv.com/api-reference/orders/orders_read
  * @param {String} orderId
  * @returns The response from Truv
  */
@@ -138,7 +138,7 @@ const getOrder = async (orderId) => {
 
 /**
  * Create an order
- * https://docs.truv.com/reference/orders_create
+ * https://docs.truv.com/api-reference/orders/orders_create
  * @returns The response from Truv
  */
 const createOrder = async () => {

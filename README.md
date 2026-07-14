@@ -1,5 +1,5 @@
 # Get started with Quickstart for web
-To get started with Truv, we recommend following a step-by-step walkthrough in our docs https://docs.truv.com/docs/quickstart-guide
+To get started with Truv, we recommend following a step-by-step walkthrough in our docs https://docs.truv.com/developers/quickstart
 
 1. Clone the repository
 ```shell
@@ -24,7 +24,7 @@ API_SECRET=
 IS_ORDER=true
 ```
 
-**Note about Orders API:** The default flow uses the [Orders API](https://docs.truv.com/docs/embedded-orders) for `income` and `employment` products, designed for home lending and social services use cases where multiple employer connections are expected. Set `IS_ORDER=false` for a single connection flow. The `deposit_switch` and `pll` products always use the single connection flow.
+**Note about Orders API:** The default flow uses the [Orders API](https://docs.truv.com/developers/integration/embedded-orders/overview) for `income` and `employment` products, designed for home lending and social services use cases where multiple employer connections are expected. Set `IS_ORDER=false` for a single connection flow. The `deposit_switch` and `pll` products always use the single connection flow.
 
 4. Run all-in-one docker-compose
 ```shell
